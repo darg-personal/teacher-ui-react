@@ -1,6 +1,7 @@
 .App {
   margin: 0px;
   padding: 0px;
+  margin-top: 0.5vh;
 }
 .row {
   margin: 0px;
@@ -21,4 +22,94 @@
 
 td {
   word-wrap: break-word;
+}
+
+.import-button {
+  margin-left: 0.5vh;
+  margin-right: 0.5vh;
+  margin-bottom: 0.5vh;
+  padding-left: 4vh;
+  padding-right: 4vh;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  background-color: transparent;
+  border: 0.7px solid black;
+  border-radius: 0.7vh;
+  font-weight: bold;
+}
+
+.modal {
+  padding-top: 0.5vh;
+  padding-bottom: 0.5vh;
+  /* overflow: auto; */
+}
+
+.modal-header {
+  height: 8vh;
+  margin-left: 1vh;
+  margin-right: 1vh;
+}
+.cross {
+  margin-left: 1vh;
+  margin-right: 1vh;
+  margin-top: -0.5vh;
+  font-size: 4vh;
+
+  cursor: pointer;
+}
+.modal-title {
+  font-size: 2.5vh;
+  font-weight: bold;
+  margin-left: 1vh;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+}
+
+hr {
+  border: 0;
+  clear: both;
+  display: block;
+  width: 80%;
+  background-color: #ffff00;
+  height: 1px;
+}
+
+.form-group {
+  margin-left: 1vh;
+  margin-right: 1vh;
+  margin-bottom: 2vh;
+  margin-top: 1vh;
+  display: inline;
+}
+.form-label {
+  font-size: 1.9vh;
+  display: block;
+  margin-left: 1vh;
+  margin-right: 1vh;
+}
+.form-input {
+  font-size: 1.5vh;
+  font-weight: bold;
+  margin-left: 1vh;
+  margin-right: 1vh;
+  width: 90%;
+  height: 5vh;
+  border: 1px solid black;
+  border-radius: 0.5vh;
+  background-color: #f9f9f9;
+  text-indent: 1vh;
+}
+
+.submit-button {
+  margin-left: 1vh;
+  margin-right: 5vh;
+  margin-bottom: 1vh;
+  padding-left: 4vh;
+  padding-right: 4vh;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  background-color: #00aebb;
+  border-radius: 0.7vh;
+  font-weight: bold;
+  color: #f0fafa;
 }
