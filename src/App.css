@@ -41,7 +41,10 @@ td {
 .modal {
   padding-top: 0.5vh;
   padding-bottom: 0.5vh;
-  /* overflow: auto; */
+}
+
+.my-modal {
+  min-width: 40vw !important;
 }
 
 .modal-header {
@@ -79,7 +82,7 @@ hr {
   margin-right: 1vh;
   margin-bottom: 2vh;
   margin-top: 1vh;
-  display: inline;
+  /* display: inline; */
 }
 .form-label {
   font-size: 1.9vh;

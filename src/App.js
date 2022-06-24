@@ -4,6 +4,9 @@ import axios from "axios";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { ThreeDots } from "react-loader-spinner";
+
 function App() {
   const [token, setToken] = useState(null);
   const [data, setData] = useState([]);
@@ -26,6 +29,11 @@ function App() {
             headers: { Authorization: `${user_token}` },
           }
         );
+
+        const rex = await axios("http://localhost:8040/voip/api_voip/active", {
+          headers: { Authorization: `${user_token}` },
+        });
+        console.log(rex.data);
         var replace = NaN;
         var re = new RegExp(replace, "g");
         const parsedData = JSON.parse(
@@ -58,6 +66,7 @@ function App() {
         setLoading(false);
       } catch (err) {
         console.log(err);
+        toast.error(err.message);
       }
     };
     fetchLeads();
@@ -67,75 +76,92 @@ function App() {
   }
   return (
     <Container className="App" fluid>
-      <Modal
-        dialogClassName="my-modal"
-        className="modal"
-        show={show}
-        onHide={handleClose}
-      >
-        <Row className="modal-header align-items-center">
-          <Col className="d-flex justify-content-between">
-            <span className="modal-title">Add New Lead</span>
-            <span className="cross" onClick={handleClose}>
-              &times;
-            </span>
-          </Col>
-        </Row>
-        <Row></Row>
-        <Row>
-          <Col>
-            <form>
-              {headers.map((element) => {
-                if (["id", "logo"].includes(element)) return;
-                return (
-                  <div className="form-group">
-                    <label className="form-label">
-                      {capitalizeFirstLetter(element)}
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      id={element}
-                      placeholder={capitalizeFirstLetter(element)}
-                    />
-                  </div>
-                );
-              })}
-              <div className="form-label d-flex justify-content-end">
-                <button className="submit-button">Submit</button>
-              </div>
-            </form>
-          </Col>
-        </Row>
-      </Modal>
-      <Row>
-        <Col>
-          <header className="d-flex justify-content-end">
-            <button className="import-button" onClick={handleShow}>
-              Import
-            </button>
-            <button className="import-button" onClick={handleShow}>
-              Add
-            </button>
-          </header>
-        </Col>
-      </Row>
-      <Row className="lg-12">
-        <Col className="lg-12">
-          {!loading ? (
-            <BootstrapTable
-              keyField="dataField"
-              data={data[0]}
-              columns={columns}
-              striped
-              classes="table-responsive"
-              pagination={paginationFactory()}
-            />
-          ) : (
-            <h1>loading...</h1>
-          )}
-        </Col>
-      </Row>
+      <ToastContainer />
+      {!loading ? (
+        <>
+          <Modal
+            dialogClassName="my-modal"
+            className="modal"
+            show={show}
+            onHide={handleClose}
+          >
+            <Row className="modal-header align-items-center">
+              <Col className="d-flex justify-content-between">
+                <span className="modal-title">Add New Lead</span>
+                <span className="cross" onClick={handleClose}>
+                  &times;
+                </span>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <form>
+                  <Row>
+                    {headers.map((element) => {
+                      if (["id", "logo"].includes(element)) return;
+                      return (
+                        <Col lg="6" md="12" sm="12">
+                          <div className="form-group">
+                            <label className="form-label">
+                              {capitalizeFirstLetter(element)}
+                            </label>
+                            <input
+                              type="text"
+                              className="form-input"
+                              id={element}
+                              placeholder={capitalizeFirstLetter(element)}
+                            />
+                          </div>
+                        </Col>
+                      );
+                    })}
+                    <div className="form-label d-flex justify-content-end">
+                      <button className="submit-button">Submit</button>
+                    </div>
+                  </Row>
+                </form>
+              </Col>
+            </Row>
+          </Modal>
+          <Row>
+            <Col>
+              <header className="d-flex justify-content-end">
+                <button className="import-button" onClick={handleShow}>
+                  Import
+                </button>
+                <button className="import-button" onClick={handleShow}>
+                  Add
+                </button>
+              </header>
+            </Col>
+          </Row>
+          <Row className="lg-12">
+            <Col className="lg-12">
+              <BootstrapTable
+                keyField="dataField"
+                data={data[0]}
+                columns={columns}
+                striped
+                classes="table-responsive"
+                pagination={paginationFactory()}
+              />
+            </Col>
+          </Row>
+        </>
+      ) : (
+        <div
+          style={{
+            position: "fixed",
+            left: "50%",
+            top: "50%",
+            width: "100%",
+            height: "100%",
+            "z-index": "9999",
+          }}
+        >
+          <ThreeDots />
+        </div>
+      )}
     </Container>
   );
 }
