@@ -116,3 +116,29 @@ hr {
   font-weight: bold;
   color: #f0fafa;
 }
+
+.fa-phone {
+  color: #00aebb;
+  font-size: 2.8vh !important;
+  border: 1px solid #00aebb;
+  padding-left: 1vh;
+  padding-right: 1vh;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  border-radius: 0.5vh;
+}
+
+.fa-message {
+  color: #00aebb;
+  font-size: 2.8vh !important;
+  border: 1px solid #00aebb;
+  padding-left: 1vh;
+  padding-right: 1vh;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  border-radius: 0.5vh;
+}
+
+.actionIcons {
+  margin: 0.5vh;
+}

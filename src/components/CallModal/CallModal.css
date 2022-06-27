@@ -1,0 +1,38 @@
+.details {
+  margin: 1vh;
+  background-color: #edf6f8;
+  border-radius: 0.5vw;
+  padding: 1vh;
+  /* height: 10vh; */
+}
+.detail {
+  margin: 0.1vh;
+  /* height: 10vh; */
+}
+
+.select {
+  width: 100%;
+  height: 6vh;
+  margin-top: 1vh;
+  border-radius: 0.5vh;
+  background-color: #f9f9f9;
+}
+
+.input {
+  width: 100%;
+  height: 6vh;
+  margin-top: 1vh;
+  border-radius: 0.5vh;
+  border: 0.001vh solid black;
+  background-color: #f9f9f9;
+}
+
+.call-button {
+  width: 100%;
+  height: 6vh;
+  margin-top: 2vh;
+  border-radius: 0.5vh;
+  background-color: #00aebb;
+  color: #f0fafa;
+  font-weight: bold;
+}

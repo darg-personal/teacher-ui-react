@@ -6,7 +6,8 @@ import paginationFactory from "react-bootstrap-table2-paginator";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { ThreeDots } from "react-loader-spinner";
-
+import BasicModal from "./components/BasicModal/BasicModal";
+import CallModal from "./components/CallModal/CallModal";
 function App() {
   const [token, setToken] = useState(null);
   const [data, setData] = useState([]);
@@ -14,6 +15,10 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [show, setShow] = useState(false);
   const [headers, setHeaders] = useState([]);
+  const [basicModal, setBasicModal] = useState(false);
+  const [number, setNumber] = useState(null);
+  const [name, setName] = useState(null);
+  const [activeNumbers, setActiveNumbers] = useState([]);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -23,31 +28,40 @@ function App() {
       const user_token = window.location.search.substring(1).split("=")[1];
       setToken(window.location.search.substring(1).split("=")[1]);
       try {
-        const { data } = await axios(
-          "http://localhost:8040/voip/api_voip/getlead",
-          {
-            headers: { Authorization: `${user_token}` },
-          }
-        );
+        let parsedData = JSON.parse(localStorage.getItem("data"));
+        if (!parsedData) {
+          const { data } = await axios(
+            "http://localhost:8040/voip/api_voip/getlead",
+            {
+              headers: { Authorization: `${user_token}` },
+            }
+          );
 
-        const rex = await axios("http://localhost:8040/voip/api_voip/active", {
+          var replace = NaN;
+          var re = new RegExp(replace, "g");
+          parsedData = JSON.parse(
+            JSON.stringify(JSON.parse(data.replace(re, '""')))
+          );
+          setData(parsedData);
+          localStorage.setItem("data", JSON.stringify(parsedData));
+        }
+
+        const res = await axios("http://localhost:8040/voip/api_voip/active", {
           headers: { Authorization: `${user_token}` },
         });
-        console.log(rex.data);
-        var replace = NaN;
-        var re = new RegExp(replace, "g");
-        const parsedData = JSON.parse(
-          JSON.stringify(JSON.parse(data.replace(re, '""')))
-        );
+
+        setActiveNumbers(res.data.active);
+
         setData(parsedData);
         console.log(parsedData);
+        // console.log(parsedData);
         const headers = Object.keys(parsedData[0][0]);
         setHeaders(headers);
         const column = [];
 
         // Make table resizable
         headers.forEach((element) => {
-          if (["id", "logo"].includes(element)) return;
+          if (["id", "logo", "website"].includes(element)) return;
           column.push({
             dataField: element,
             text: element.toLocaleUpperCase(),
@@ -58,9 +72,42 @@ function App() {
               fontWeight: "bold",
             },
             style: {
-              with: "25vh",
+              with: "auto",
             },
           });
+        });
+        const actionFormatter = (_, row) => {
+          return (
+            <>
+              <div className="">
+                <i
+                  className="fa-solid fa-phone actionIcons"
+                  onClick={() => {
+                    setBasicModal(true);
+                    setNumber(row.phone);
+                    setName(row.name);
+                  }}
+                ></i>
+                <i className="fa-solid fa-message actionIcons"></i>
+              </div>
+            </>
+          );
+        };
+        column.push({
+          dataField: "Actions",
+          text: "Actions".toLocaleUpperCase(),
+          formatter: actionFormatter,
+          sort: true,
+          headerStyle: {
+            backgroundColor: "#3c3c3c",
+            color: "white",
+            fontWeight: "bold",
+          },
+          style: {
+            with: "25vh",
+            verticalAlign: "middle",
+            textAlign: "center",
+          },
         });
         setColumns(column);
         setLoading(false);
@@ -79,6 +126,18 @@ function App() {
       <ToastContainer />
       {!loading ? (
         <>
+          <BasicModal
+            isModalOpen={basicModal}
+            handleModal={() => setBasicModal(false)}
+            body={
+              <CallModal
+                title="Call Member"
+                number={number}
+                name={name}
+                activeNumbers={activeNumbers}
+              />
+            }
+          />
           <Modal
             dialogClassName="my-modal"
             className="modal"
