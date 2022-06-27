@@ -15,7 +15,7 @@ function CallModal({ title, number, name, activeNumbers }) {
       your_number: code + your_number,
     };
     await axios.post(
-      "http://localhost:8040/voip/api_voip/join_conference",
+      "http://api.dreampotential.org/voip/api_voip/join_conference",
       formData
     );
   };
