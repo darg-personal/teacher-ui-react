@@ -30,7 +30,7 @@ function Call() {
         let parsedData = JSON.parse(localStorage.getItem("data"));
         if (!parsedData) {
           const { data } = await axios(
-            "http://localhost:8040/voip/api_voip/getlead",
+            "https://api.dreampotential.org/voip/api_voip/getlead",
             {
               headers: { Authorization: `${user_token}` },
             }
@@ -45,9 +45,12 @@ function Call() {
           localStorage.setItem("data", JSON.stringify(parsedData));
         }
 
-        const res = await axios("http://localhost:8040/voip/api_voip/active", {
-          headers: { Authorization: `${user_token}` },
-        });
+        const res = await axios(
+          "https://api.dreampotential.org/voip/api_voip/active",
+          {
+            headers: { Authorization: `${user_token}` },
+          }
+        );
 
         setActiveNumbers(res.data.active);
 
