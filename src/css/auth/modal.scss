@@ -1,0 +1,85 @@
+@import "colors";
+
+.auth-modal{
+  position: fixed;
+  width: 100%;
+  min-height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(3, 56, 81, .16);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .modal-data{
+    @media screen and (min-width: 600px) {
+      width: 575px;
+    }
+
+    @media screen and (max-width: 599px) {
+      width: calc(90% - 1.5rem);
+    }
+
+    background: $white;
+    padding: 1rem;
+    border-radius: 16px;
+    min-height: 180px;
+    animation: scaleUp .3s;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h3{
+      font-size: 1.5rem;
+    }
+
+    .feedback-text{
+      font-size: .85rem;
+      line-height: 1.5rem;
+    }
+
+    h3, .feedback-text{
+      margin-bottom: 1.2rem;
+    }
+
+    .feedback-button{
+      padding: 13px 20px;
+      background: $blueMain;
+      color: $white;
+      font-size: .9rem;
+      border: 1px solid $blueMain;
+      min-width: 100px;
+      border-radius: 4px;
+      font-weight: 700;
+      transition: ease-in-out .3s;
+
+
+      &:hover{
+        background: transparent;
+        color: $blueMain;
+      }
+    }
+
+
+    @keyframes scaleUp {
+      from{ transform: scale(0.5); opacity: 0 }
+      to{ transform: scale(1); opacity: 1 }
+    }
+
+    @-webkit-keyframes scaleUp {
+      from{ transform: scale(0.5); opacity: 0 }
+      to{ transform: scale(1); opacity: 1 }
+    }
+    @-moz-keyframes scaleUp {
+      from{ transform: scale(0.5); opacity: 0 }
+      to{ transform: scale(1); opacity: 1 }
+    }
+
+    @-o-keyframes scaleUp {
+      from{ transform: scale(0.5); opacity: 0 }
+      to{ transform: scale(1); opacity: 1 }
+    }
+  }
+}

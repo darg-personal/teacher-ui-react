@@ -121,7 +121,7 @@ function Call() {
         toast.error(err.message);
       }
     };
-    fetchLeads();
+   // fetchLeads();
   }, []);
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -223,7 +223,7 @@ function Call() {
             top: "50%",
             width: "100%",
             height: "100%",
-            "z-index": "9999",
+            zIndex: "9999",
           }}
         >
           <ThreeDots />
