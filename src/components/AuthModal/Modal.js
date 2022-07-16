@@ -8,7 +8,7 @@ const Modal = ({ text, feedbackText, onClose, closable }) => {
 
             { feedbackText ? <p className={'feedback-text'}>{ feedbackText }</p> : null }
 
-            { closable ? <button className={'feedback-button'}>Ok</button> : null}
+            { closable ? <button className={'feedback-button'} onClick={() => onClose()}>Ok</button> : null}
         </div>
     </div>
 }
