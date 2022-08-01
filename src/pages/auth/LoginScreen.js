@@ -1,160 +1,193 @@
-import React, {useRef, useState} from "react";
+import React, { useRef, useState } from "react";
 import "../../css/auth/auth.scss";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import Modal from "../../components/AuthModal/Modal";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import swal from "sweetalert";
+
 const LoginScreen = () => {
-    let loginFields = [
-        {
-            placeholder: "Email address or username",
-            value: "",
-            name: "username",
-            type: "email",
-            hasError: false
-        },
+  let navigate = useNavigate();
+  let loginFields = [
+    {
+      placeholder: "Email address or username",
+      value: "",
+      name: "username",
+      type: "email",
+      hasError: false,
+    },
 
-        {
-            placeholder: "Password",
-            value: "",
-            name: "password",
-            type: "password",
-            hasError: false
+    {
+      placeholder: "Password",
+      value: "",
+      name: "password",
+      type: "password",
+      hasError: false,
+    },
+  ];
+
+  let feedbackObject = {
+    process: "",
+    feedback: "",
+    closable: false,
+  };
+
+  const [fields, updateFields] = useState(loginFields);
+  const [sendingRequest, updateSendingRequest] = useState(false);
+  const [feedbackData, updateFeedbackData] = useState(feedbackObject);
+
+  let resetTimeout = useRef(null);
+
+  const setFieldValue = (value, index) => {
+    let fieldData = [...fields];
+    fieldData[index].value = value;
+    fieldData[index].hasError = value === "";
+    updateFields(fieldData);
+  };
+
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+
+    console.log("Form submitted");
+
+    let requestObject = {};
+
+    fields.forEach((field) => {
+      requestObject[field.name] = field.value;
+    });
+
+    let feedbackTemplate = {
+      process: "Signing in!",
+      feedback: "",
+      closable: false,
+    };
+
+    updateFeedbackData({ ...feedbackTemplate });
+    updateSendingRequest(true);
+
+    axios
+      .post(
+        "https://api.dreampotential.org/s3_uploader/user/login",
+        requestObject
+      )
+      .then((response) => {
+        console.log({ response });
+        console.log("_______________", response.data.user);
+        const token = response.data.token;
+        console.log("________token_______", response.data);
+        if (response.status === 200) {
+          console.log("======if=======", token);
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          window.location.href = "/dashboard";
+        } else {
+          swal("Failed", response, "error");
         }
-    ]
-
-    let feedbackObject = {
-        process: '',
-        feedback: '',
-        closable: false
-    }
-
-    const [fields, updateFields] = useState(loginFields);
-    const [sendingRequest, updateSendingRequest] = useState(false);
-    const [feedbackData, updateFeedbackData] = useState(feedbackObject);
-
-    let resetTimeout = useRef(null)
-
-
-    const setFieldValue = (value, index) => {
-        let fieldData = [...fields];
-        fieldData[index].value = value;
-        fieldData[index].hasError = value === ''
-        updateFields(fieldData)
-    }
-
-    const handleFormSubmit = (event) => {
-        event.preventDefault();
-
-        console.log('Form submitted')
-
-        let requestObject = {};
-
-        fields.forEach(field => {
-            requestObject[field.name] = field.value
-        })
-
-        let feedbackTemplate = {
-            process: 'Signing in!',
-            feedback: '',
-            closable: false
+      })
+      .catch((error) => {
+        let errorFeedback = {
+          process: "Error",
+          feedback: "",
+          closable: true,
         };
 
-        updateFeedbackData({...feedbackTemplate})
-        updateSendingRequest(true)
+        if (error.response) {
+          errorFeedback.feedback = error.response.message;
+          if (error.response.data) {
+            if (error.response.data["non_field_errors"]) {
+              errorFeedback.feedback = error.response.data["non_field_errors"];
+            }
+          } else {
+            errorFeedback.feedback = "An unexpected error occurred";
+          }
+        } else {
+          errorFeedback.feedback = "An unexpected error occurred";
+        }
 
-        axios.post('https://api.dreampotential.org/s3_uploader/user/login', requestObject)
-            .then(response => {
-                console.log({ response })
-            }).catch(error => {
-                let errorFeedback = {
-                    process: 'Error',
-                    feedback: '',
-                    closable: true
-                };
+        updateFeedbackData({ ...errorFeedback });
 
-                if (error.response) {
-                    errorFeedback.feedback = error.response.message;
-                    if (error.response.data) {
-                        if (error.response.data['non_field_errors']) {
-                            errorFeedback.feedback = error.response.data['non_field_errors']
-                        }
-                    } else {
-                        errorFeedback.feedback = 'An unexpected error occurred';
-                    }
-                } else {
-                    errorFeedback.feedback = 'An unexpected error occurred'
-                }
+        resetTimeout.current = setTimeout(() => {
+          updateSendingRequest(false);
+        }, 5000);
+        console.log({ error });
+      });
+  };
 
-                updateFeedbackData({...errorFeedback})
+  return (
+    <div className={"login-section page-container"}>
+      <div className={"auth-container"}>
+        <div className={"auth-logo"}>
+          <img
+            src={require("../../assets/teacherlogo.png")}
+            alt={"Teacher logo"}
+          />
+        </div>
 
-              resetTimeout.current = setTimeout(() => {
-                    updateSendingRequest(false)
-                }, 5000)
-                console.log({ error })
-        })
-    }
+        <div className={"auth-content"}>
+          <div className={"auth-header"}>
+            <h4>Login</h4>
+            <div className={"header-text"}>
+              Don't have an account yet? <Link to={"/register"}>Sign Up</Link>
+            </div>
+          </div>
 
-    return <div className={'login-section page-container'}>
-            <div className={'auth-container'}>
-                <div className={'auth-logo'}>
-                    <img src={require('../../assets/teacherlogo.png')} alt={'Teacher logo'}/>
-                </div>
-
-                <div className={'auth-content'}>
-                    <div className={'auth-header'}>
-                        <h4>Login</h4>
-                        <div className={'header-text'}>
-                            Don't have an account yet? <Link to={'/register'}>Sign Up</Link>
-                        </div>
-                    </div>
-
-               <form method={'post'} action={''} onSubmit={event => handleFormSubmit(event)}>
-                   <div className={'input-list centered-data'}>
-                       {
-                           fields.map((field, index) => {
-                               return <div className={`input-control`} key={index}>
-                                   <input
-                                       type={field.type}
-                                       value={field.value}
-                                       name={field.name}
-                                       onChange={event => setFieldValue(event.target.value, index)}
-                                       placeholder={field.placeholder}
-                                       className={`${field.hasError ? 'input-error': ''}`}
-                                   />
-                               </div>
-                           })
-                       }
-                   </div>
-
-                   <div className={'centered-data'}>
-
-                       <div className={'forgot-password-section'}>
-                           <Link to={'/'}>Forgot password?</Link>
-                       </div>
-
-                       <div className={'button-container'}>
-                           <button type={'submit'} disabled={fields.filter(field => field.value === '').length > 0}>Log in</button>
-                       </div>
-                   </div>
-               </form>
-
-
-                </div>
+          <form
+            method={"post"}
+            action={""}
+            onSubmit={(event) => handleFormSubmit(event)}
+          >
+            <div className={"input-list centered-data"}>
+              {fields.map((field, index) => {
+                return (
+                  <div className={`input-control`} key={index}>
+                    <input
+                      type={field.type}
+                      value={field.value}
+                      name={field.name}
+                      onChange={(event) =>
+                        setFieldValue(event.target.value, index)
+                      }
+                      placeholder={field.placeholder}
+                      className={`${field.hasError ? "input-error" : ""}`}
+                    />
+                  </div>
+                );
+              })}
             </div>
 
-        {
-            sendingRequest ? <Modal
-                                text={feedbackData.process}
-                                feedbackText={feedbackData.feedback}
-                                closable={feedbackData.closable}
-                                onClose={() => {
-                                    clearTimeout(resetTimeout.current)
-                                    updateSendingRequest(false)
-                                }
-                                }
-                                /> : null
-        }
-    </div>
-}
+            <div className={"centered-data"}>
+              <div className={"forgot-password-section"}>
+                <Link to={"/"}>Forgot password?</Link>
+              </div>
 
-export default LoginScreen
+              <div className={"button-container"}>
+                <button
+                  type={"submit"}
+                  disabled={
+                    fields.filter((field) => field.value === "").length > 0
+                  }
+                >
+                  Log in
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {sendingRequest ? (
+        <Modal
+          text={feedbackData.process}
+          feedbackText={feedbackData.feedback}
+          closable={feedbackData.closable}
+          onClose={() => {
+            clearTimeout(resetTimeout.current);
+            updateSendingRequest(false);
+          }}
+        />
+      ) : null}
+    </div>
+  );
+};
+
+export default LoginScreen;

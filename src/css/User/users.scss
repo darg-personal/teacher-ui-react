@@ -1,0 +1,13 @@
+.users{
+    padding: 16px 0;
+   .userdata{
+    .table{
+            th{
+                font-weight: 500;
+                @media(max-width:575px){
+                    font-size: 15px;
+                }
+            }
+        }
+   }
+}

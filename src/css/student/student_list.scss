@@ -1,0 +1,36 @@
+.add_student{
+    padding: 50px 80px 0 80px;
+    @media(max-width:767px){
+        padding: 30px 20px 0 20px;
+    }
+    .student{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        h1{
+            font-size: 22px;
+            font-weight: 600;
+        }
+        button{
+            background: #64B3E6;
+            border-color: #64B3E6;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            &:focus{
+                box-shadow: none;
+            }
+            svg{
+                margin-right: 4px;
+                font-size: 14px;
+            }
+        }
+    }
+    .stu_table{
+        th{
+            padding: 10px;
+        }
+    }
+}

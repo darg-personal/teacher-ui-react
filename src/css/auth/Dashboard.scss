@@ -1,0 +1,95 @@
+.dashboard-wrapper{
+    display: flex;
+    align-items: flex-start;
+    // header scss start
+    .header-main{
+        width: calc(100% - 230px);
+        .container{
+            @media (min-width:1200px) {
+                max-width: 1400px !important;
+            }
+            @media (min-width:992px) {
+                max-width: 960px;
+            }
+        }
+        .action-wrap{
+            background-color: #343a40;
+            padding: 10px;
+            .dropdown{
+                button{
+                    background: transparent;
+                    border: 0;
+                    display: flex;
+                    align-items: center;
+                    color: #ffffff80;
+                    margin-left: auto;
+                    &:focus{
+                        box-shadow: none;
+                    }
+                    svg{
+                        margin-right: 4px;
+                    }
+                }
+                .dropdown-menu {
+                    transform: translate(0px, 40px) !important;
+                    .dropdown-divider{
+                        width: 100%;
+                    }
+                }
+            }
+        }
+        .student-wrap{
+            margin: 6px 0;
+            padding: 0 30px;
+            h1{
+                font-size: 22px;
+                color: #000;
+                padding: 20px 0;
+                margin-bottom: 0;
+            }
+            p{
+                padding: 0 15px;
+                border-bottom: 1px solid #0000001a;
+                padding-bottom: 16px;
+            }
+            .pagination{
+                padding-top: 15px;
+            }
+        }
+    }
+    // sidebar scss start
+    .sidebar-wrap{
+        width: 230px;
+        background-color: #132644;
+        .sidebar-data{
+            .teach-wrap{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 4px 20px;
+                &:hover{
+                    background-color: #1d2124;
+                }
+                svg{
+                    fill: #fff;
+                }
+            }
+            .student-wrap{
+                display: flex;
+                align-items: center;
+                padding: 12px 20px;
+                &:hover{
+                    background-color: #1d2124;
+                }
+                svg{
+                    fill: #fff;
+                    margin-right: 16px;
+                    // font-size: 20px;
+                }
+                p{
+                    color: #fff;
+                }
+            }
+        }
+    }
+}

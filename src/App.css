@@ -142,3 +142,51 @@ hr {
 .actionIcons {
   margin: 0.5vh;
 }
+.stu_modal .modal-content{
+  border-radius: 0;
+}
+.stu_modal .modal-dialog{
+  top: 60px;
+}
+.stu_modal .modal-body{
+  padding: 10px;
+}
+.stu_modal h5{
+  margin-bottom: 0;
+  font-weight: 400;
+}
+.stu_modal .modal-header{
+  padding: 30px 16px;
+  margin: 0;
+}
+.stu_modal .form label{
+    font-size: 16px;
+    margin: 0;
+    margin-bottom: 10px;
+}
+.stu_modal .form input{
+  border-radius: 0
+}
+.stu_modal .form input:focus{
+  box-shadow: none;
+}
+.stu_modal .submit{
+  display: flex;
+  justify-content: end;
+}
+.stu_modal .submit button{
+  background: #64B3E6;
+  border:0;
+  border-radius: 0;
+}
+.stu_modal .submit button:hover{
+  background-color: #64B3E6;
+}
+.stu_modal button:focus{
+  box-shadow: none;
+}
+.stu_modal .submit button:focus{
+  background-color: #64B3E6;
+  box-shadow: none;
+  outline:0;
+}
