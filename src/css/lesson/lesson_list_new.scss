@@ -1,0 +1,181 @@
+.new_lesson{
+    h1{
+        font-size:22px;
+        font-weight:600;
+        margin: 0;
+        padding: 20px 0;  
+    }
+    .lesson_modal{
+        button{
+            background: none;
+            border:none;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            color: #007bff;
+            padding: 0;
+            &:hover{
+                color: #0056b3;
+                text-decoration: underline;
+                svg{
+                    background: #0056b3;
+                }
+            }
+            &:focus{
+                box-shadow: none;
+            }
+            svg{
+                margin-right: 4px;
+                font-size: 14px;
+                background-color: #007bff;
+                color: #fff;
+                border-radius: 100%;
+                padding: 2px;
+                margin-right: 8px;
+            }
+        }
+        hr{
+            width: 100%;
+            border-top: 1px solid #00000061;
+            background: none;
+        }
+    }
+    .lesson_list{
+        .lesson_box{
+            border: 1px solid #132644;
+            border-radius: 5px;
+            padding: 10px 15px;
+            background: #d3d3d340;
+            margin-bottom: 10px;
+            &:hover{
+                background: #132644;
+                color: white;
+                .mark_asread{
+                    color: #fff;
+                }
+            }
+            h1{
+                padding: 0;
+                font-size: 20px;
+            }
+            .mark_asread{
+                display: flex;
+                align-items: center;
+                color: #908b8b;
+                padding-top: 100px;
+                p{
+                    margin: 0;
+                }
+                svg{
+                    margin-right: 10px;
+                }
+            }
+            hr{
+                width: 100%;
+                margin: 12px 0;
+            }
+            .icons{
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                button{
+                    background: none;
+                    border: 0;
+                    color: #007bff;
+                    padding: 0;
+                    margin: 0 7px;
+                    &:focus{
+                        box-shadow: none;
+                    }
+                    &:last-child{
+                        svg{
+                            font-size: 20px;
+                        }
+                    }
+                    &:first-child{
+                        svg{
+                            font-size: 20px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .pages{
+        margin-top: 18px;
+        .pagination{
+            margin-top: 0;
+            margin-bottom: 0;
+            box-shadow: none;
+            @media(max-width:575px){
+                justify-content:center;
+            }
+            .active{
+                .page-link{
+                    color: #fff;
+                }
+            }
+            .page-link{
+                    padding: 8px 12px;
+                    min-width: auto;
+                    color: #007bff;
+            }
+        }
+        .prevoius{
+            color: #6c757d;
+        }
+        button{
+            cursor: pointer;
+            background: none;
+            border: 1px solid #dee2e6;
+            border-radius:0;
+            padding: 8px 12px;
+            &:focus{
+                box-shadow: none;
+            }
+        }
+        .next{
+            color: #007bff;
+        }
+    }
+}
+.modal{
+    label{
+        font-size: 18px;
+    }
+    button{
+        &:focus{
+            box-shadow: none;
+        }
+    }
+    input{
+        border-radius: 0;
+        &:focus{
+            box-shadow: none;
+        }
+    }
+    .submit{
+        display: flex;
+        justify-content: flex-end;
+        button{
+            background-color: #88c3e6;
+            border: 0;
+            border-radius: 0;
+            &:focus{
+                box-shadow: none;
+            }
+        }
+    }
+    h5{
+        margin-bottom: 0;
+    }
+    .modal-content{
+        width: 100% !important;
+        border-radius: 0 !important;
+    }
+    .modal-header{
+        height: 7vh;
+        margin: 0;
+    }
+}

@@ -1,0 +1,94 @@
+.user_leads{
+    padding: 100px 0;
+    .userlead{
+        margin-bottom: 30px;
+        .adddocument{
+            display: flex;
+            justify-content: flex-end;
+            button{
+                margin: 0 28px;
+                background-color: #17a2b8;
+                border: 0;
+                border-radius: 0;
+                &:focus{
+                    box-shadow: none;
+                }
+                &:last-child{
+                    margin-right: 0;
+                    background-color: #dc3545;
+                }
+            }
+        }
+    }
+    .user_data_table{
+        .searchdata{
+            display: flex;
+            padding-left: 70px;
+            input{
+                border-radius: 0;
+                &:focus{
+                    box-shadow: none;
+                }
+            }
+        }
+        .userleads_datatable{
+            max-width: 1244px;
+            margin: auto;
+            table{
+                th{
+                    padding: 16px 8px;
+                }
+                tr{
+                    text-align: center;
+                }
+                td{
+                    text-align: center;
+                    font-size: 16px;
+                }
+                thead{
+                    background-color: #bbb;
+                }
+            }
+        }
+    }
+}
+.modal{
+    h5{
+        font-weight: 500;
+    }
+    .modal-content{
+        border-radius: 5px !important;
+    }
+    .csvformat{
+        display: flex;
+        justify-content: flex-end;
+        button{
+            color: #007bff;
+            background: none;
+            text-decoration: underline;
+            border: 0;
+            text-align: right;
+        }
+    }
+    hr{
+        width: 100%;
+    }
+    .upload{
+        display: flex;
+        justify-content: flex-end;
+        padding-bottom: 50px;
+        button{
+            background-color: #88c3e6;
+            border: 0;
+            border-radius: 0;
+        }
+    }
+    .choosefile{
+        input{
+            border: 1px solid #ced4da;
+            width: 100%;
+            padding: 6px 12px;
+            margin-top: 10px;
+        }
+    }
+}
