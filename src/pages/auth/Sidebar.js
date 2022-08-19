@@ -44,6 +44,8 @@ const SideData = [
   { icon: <FaUserAlt />, path:"#", student: "User Profile" },
   { icon: <BsFillCreditCardFill />, path:"#", student: "Braintree" },
   { icon: <BsTelephoneFill />, path:"#", student: "RingLess Voice-Mail" },
+  { icon: <TiMessages />, path:"/chatroom", student: "Chat Room" },
+
 ];
 
 const Sidebar = ({handleClickHere})=> {

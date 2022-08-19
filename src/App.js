@@ -22,6 +22,7 @@ import Lesson_list_new from "./components/Lesson/Lesson_list_new";
 import Users from "./components/User/Users";
 import Leads from "./components/User/Leads";
 import Sms from "./pages/Sms";
+import ChatRoom from "./components/ChatRoom/ChatRoom";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 
@@ -48,7 +49,7 @@ function App() {
             <Route path={"lesson_list_new"} element={<Lesson_list_new />} />
             <Route path={"users"} element={<Users />} />
             <Route path={"leads"} element={<Leads />} />
-
+            <Route path={"chatroom"} element={<ChatRoom />} />
             <Route path={"sms"} element={<Sms />} />
           </Route>
         </Routes>
