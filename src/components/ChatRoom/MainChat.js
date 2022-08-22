@@ -1,25 +1,36 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import "./mainChat.css";
-import ChatMessage from "./ChatMessage";
+import Avatar from "../../assets/Images/avatar.svg";
 
 function MainChat() {
   const inputRef = useRef(null);
-  const [prints, setPrints] = useState([]);
-  const [msg, setMsg] = useState("");
+  const [messages, setMessages] = useState([]);
+
+  // 👇️ With PM / AM
+  let today = new Date();
+  // const timeWithPmAm = today.toLocaleTimeString("en-US", {
+  //   hour: "2-digit",
+  //   minute: "2-digit",
+  // });
 
   function handleClick() {
-    setMsg(inputRef.current.value);
-    ws.send(JSON.stringify({
-      "meta_attributes":"react",
-      "media_link":"http://www.doogle.com/",
-       "message_text":"hi team all good11111"
-  }))
+    ws.send(
+      JSON.stringify({
+        meta_attributes: "react",
+        media_link: "http://www.doogle.com/",
+        message_text: inputRef.current.value,
+        user: "user1",
+      })
+    );
+    // const input1 = document.getElementById('inp').value
+    // document.getElementById('inp').value = ''
   }
 
   var ws = new WebSocket(
-    "ws://localhost:8001/msg/channel/?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYwOTE2NDg5LCJpYXQiOjE2NjA4MzAwODksImp0aSI6ImE5OTQ5ODZhZDE4MjQxMzc5MDU5NmY0MDdiMjFjNDcyIiwidXNlcl9pZCI6MX0.cqflQryF1ro-CqOvErcvqD-HmxdtpEFwzzGlgIF4NVI&roomname=class8"
+    "ws://192.168.1.37:8000/msg/channel/?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYxMjYyMDQ1LCJpYXQiOjE2NjExNzU2NDUsImp0aSI6IjdmMzc5YzBmMzUwOTQwMDU4ZjQ2NTk3YzQyNTU1MDhlIiwidXNlcl9pZCI6MX0.bB1gHwTMFGYNPLabp38HUmRm2KBUiF5Sh60whIHWJfU&roomname=class8"
   );
 
   useEffect(() => {
@@ -31,89 +42,88 @@ function MainChat() {
   useEffect(() => {
     ws.onmessage = (evt) => {
       // listen to data sent from the websocket server
-      const message = JSON.parse(evt.data);
+      const message = JSON.parse(JSON.stringify(evt.data));
+      console.log(message);
       // setState({dataFromServer: message})
-      setPrints(message);
+      const receivedObj = JSON.parse(message);
+      // console.log(receivedObj);
+      const msgObj = {
+        sender: receivedObj?.name || "NA",
+        message: receivedObj?.message_text || "NA",
+        time: receivedObj?.created_at || "NA",
+      };
+
+      console.log(msgObj.time);
+      const date = new Date(msgObj.time);
+      const timeWithPmAm = date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      console.log(timeWithPmAm);
+
+      const prevMsgs = [...messages];
+      prevMsgs.push(msgObj);
+      setMessages([...prevMsgs]);
+      console.log({ messages, prevMsgs, receivedObj });
     };
-  }, []);
-
-
+  }, [messages]);
 
   return (
     <>
+
       {/* Page content */}
       <div className="content">
+      <div className="position-relative close-btn">
+        <Link to="/dashboard">
+          {" "}
+          <button
+            type="button"
+            className="btn btn-secondary position-absolute top-0 end-0"
+          >Back to Home</button>
+        </Link>
+      </div>  
+        {messages.map((e, i) => {
+          return e.sender == "admin01" ? (
+            <div key={i} className="container darker" id="right">
+              <img src={Avatar} alt="Avatar" className="right" />
+              <span className="name right">Me</span>
+              <p>{`${e.message}`}</p>
 
+              <span className="time-right">02:33</span>
+            </div>
+          ) : (
+            <div key={i} className="container" id="left">
+              <img
+                src="https://www.w3schools.com/w3images/avatar2.png"
+                alt="Avatar"
+                className="right"
+              />
+              <span className="name right">{e.sender}</span>
+              <p>{`${e.message}`}</p>
 
-        <ChatMessage msg={prints} />
+              <span className="time-left">02:33</span>
+            </div>
+          );
+        })}
 
-        {msg == "" ? null : (
-          <div className="container darker">
-            <img
-              src="https://www.w3schools.com/w3images/avatar2.png"
-              alt="Avatar"
-              className="right"
-            />
-            <span className="name right">Me</span>
-            <p>{msg}</p>
-
-            <span className="time-left">11:01</span>
-          </div>
-        )}
-
-
-        <div className="sticky">
-        <input
-          ref={inputRef}
-          className="text-box"
-          id="inp"
-          type="text"
-          placeholder="Enter Text Here..."
-        />
-        <button onClick={handleClick}>send</button>
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={25}
-          height={25}
-          fill="currentColor"
-          className="bi bi-mic-fill"
-          viewBox="0 0 16 16"
+        <div
+          className="box"
+          // style={{
+          //   position: "absolute",
+          //   bottom: 0,
+          //   width: "calc(100% - 330px)",
+          // }}
         >
-          <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z" />
-          <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z" />
-        </svg>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={25}
-          height={25}
-          fill="currentColor"
-          className="bi bi-heart"
-          viewBox="0 0 16 16"
-        >
-          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
-        </svg>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={25}
-          height={25}
-          fill="currentColor"
-          className="bi bi-image"
-          viewBox="0 0 16 16"
-        >
-          <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-          <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z" />
-        </svg>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={25}
-          height={25}
-          fill="currentColor"
-          className="bi bi-folder2"
-          viewBox="0 0 16 16"
-        >
-          <path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5v-9zM2.5 3a.5.5 0 0 0-.5.5V6h12v-.5a.5.5 0 0 0-.5-.5H9c-.964 0-1.71-.629-2.174-1.154C6.374 3.334 5.82 3 5.264 3H2.5zM14 7H2v5.5a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5V7z" />
-        </svg>
+          <input
+            ref={inputRef}
+            className="input_text"
+            id="inp"
+            type="text"
+            placeholder="Enter Text Here..."
+          />
+          <button onClick={handleClick} className="btn btn-outline-success">
+            send
+          </button>
         </div>
       </div>
     </>
