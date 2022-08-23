@@ -23,6 +23,7 @@ import Users from "./components/User/Users";
 import Leads from "./components/User/Leads";
 import Sms from "./pages/Sms";
 import ChatRoom from "./components/ChatRoom/ChatRoom";
+import MainChat from "./components/ChatRoom/MainChat";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 
@@ -49,7 +50,9 @@ function App() {
             <Route path={"lesson_list_new"} element={<Lesson_list_new />} />
             <Route path={"users"} element={<Users />} />
             <Route path={"leads"} element={<Leads />} />
-            <Route path={"chatroom"} element={<ChatRoom />} />
+            <Route path={"chatroom"} element={<ChatRoom />}>
+              <Route path={"class9"} element={<MainChat />} />
+            </Route>
             <Route path={"sms"} element={<Sms />} />
           </Route>
         </Routes>

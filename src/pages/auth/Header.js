@@ -14,23 +14,43 @@ const Header = () => {
   };
   return (
     // <div className="header-main">
-      <div className="action-wrap">
-        <Dropdown>
-          <Dropdown.Toggle variant="success" id="dropdown-basic">
-            <FaUserCircle />
-          </Dropdown.Toggle>
+    <div className="action-wrap">
+      <Dropdown>
+        <Dropdown.Toggle variant="success" id="dropdown-basic">
+          <FaUserCircle />
+        </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            <Dropdown.Item href="#/action-1">Settings</Dropdown.Item>
-            <Dropdown.Item href="#/action-2">Activity Log</Dropdown.Item>
-            <Dropdown.Item href="#/action-3">Messages</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item eventKey="4" onClickCapture={logout}>
-              Logout
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
+        <Dropdown.Menu>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-toggle="modal"
+            data-target=".bd-example-modal-sm"
+          >
+            Small modal
+          </button>
+
+          <div
+            class="modal fade bd-example-modal-sm"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="mySmallModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-sm">
+              <div class="modal-content">...</div>
+            </div>
+          </div>
+          <Dropdown.Item href="#/action-1">Settings</Dropdown.Item>
+          <Dropdown.Item href="#/action-2">Activity Log</Dropdown.Item>
+          <Dropdown.Item href="#/action-3">Messages</Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item eventKey="4" onClickCapture={logout}>
+            Logout
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
+    </div>
     //   {/* <Dashboard /> */}
     // // </div>
   );
