@@ -5,7 +5,6 @@ import { Link, Outlet } from "react-router-dom";
 import "./mainChat.css";
 import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
-import { jssPreset } from "@material-ui/core";
 
 function MainChat() {
   const inputRef = useRef(null);
