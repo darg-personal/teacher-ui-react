@@ -50,9 +50,8 @@ function App() {
             <Route path={"lesson_list_new"} element={<Lesson_list_new />} />
             <Route path={"users"} element={<Users />} />
             <Route path={"leads"} element={<Leads />} />
-            <Route path={"chatroom"} element={<ChatRoom />}>
+            <Route path={"chatroom/:chatroom"} element={<ChatRoom />}/>
               <Route path={"class9"} element={<MainChat />} />
-            </Route>
             <Route path={"sms"} element={<Sms />} />
           </Route>
         </Routes>

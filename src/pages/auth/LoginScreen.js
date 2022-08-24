@@ -67,7 +67,7 @@ const LoginScreen = () => {
 
     axios
       .post(
-        "https://api.dreampotential.org/s3_uploader/user/login",
+        "http://192.168.1.37:8000/s3_uploader/user/login",
         requestObject
       )
       .then((response) => {

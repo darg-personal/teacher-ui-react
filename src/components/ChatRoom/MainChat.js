@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useParams} from "react-router-dom";
 import "./mainChat.css";
 import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
 
+
 function MainChat() {
+  let token = localStorage.getItem("token");
   const inputRef = useRef(null);
   const [messages, setMessages] = useState([]);
-  // 👇️ With PM / AM
-  // let today = new Date();
-  // const timeWithPmAm = today.toLocaleTimeString("en-US", {
-  //   hour: "2-digit",
-  //   minute: "2-digit",
-  // });
+  const [time, setTime] = useState('');
+  let { chatroom } = useParams();
+  console.log({ chatroom });
 
   function handleClick() {
     ws.send(
@@ -25,32 +24,50 @@ function MainChat() {
         user: "user1",
       })
     );
-    // const input1 = document.getElementById('inp').value
-    // document.getElementById('inp').value = ''
   }
 
   var ws = new WebSocket(
-    "ws://192.168.1.37:8000/msg/channel/?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYxMzE2MjQ2LCJpYXQiOjE2NjEyMjk4NDYsImp0aSI6ImMwZWExNzg1ZDI3ZTRiMzA4Y2EzMzMzNzA5ZTBmNmQyIiwidXNlcl9pZCI6MX0.WCerytXPcQya4_S8b3F4-ksAXVN8mOtzuKz-ga2mj7Y&roomname=class8"
+    `ws://localhost:8001/msg/channel/?token=${token}&roomname=${chatroom}`
   );
+
 
   useEffect(() => {
     ws.onopen = function open() {
       console.log("web socket connection created!!");
       axios.get(`http://192.168.1.37:8000/chat/get/nummsg/user/?p=1&records=10`)
       .then(res => {
-        const datas = JSON.stringify(res.data);
-        const data = JSON.parse(datas);
-        console.log(data);
-        const dataObj = {
-            resultData: data?.results || "NA",
-        }
-        console.log(dataObj.resultData);
 
-        // setMessages(dataObj.resultData)
+        const datas = JSON.stringify(res.data);
+          const message = JSON.parse(datas);
+
+          console.log("4444", message.results);
+
+          const prevMsgs = [...messages];
+
+          for (let i = 0; i < message.results.length; i++) {
+            const receivedObj = message.results[i]
+            const msgObj = {
+              sender: receivedObj?.name || "NA",
+              message: receivedObj?.message_text || "NA",
+              time: receivedObj?.created_at || "NA",
+            };
+            prevMsgs.push(msgObj);
+            console.log("=======5===", receivedObj);
+            const date = new Date(msgObj.time);
+            const time = date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          console.log(time);
+          setTime(time);
+          }
+          setMessages([...prevMsgs]);
+          
+         
       })
     };
 
-  }, []);
+  }, [chatroom]);
 
 
 
@@ -70,13 +87,13 @@ function MainChat() {
       prevMsgs.push(msgObj);
       setMessages([...prevMsgs]);
 
-      console.log(msgObj.time);
-      const date = new Date(msgObj.time);
-      const time = date.toLocaleTimeString("en-US", {
+        const date = new Date(msgObj.time);
+        const time = date.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
       });
       console.log(time);
+      setTime(time);
 
     };
   }, [messages]);
@@ -102,7 +119,7 @@ function MainChat() {
               <span className="name right">Me</span>
               <p>{`${e.message}`}</p>
 
-              <span className="time-right">{}</span>
+              <span className="time-right">{time}</span>
             </div>
           ) : (
             <div key={i} className="container" id="left">
@@ -113,7 +130,7 @@ function MainChat() {
               />
               <span className="name right">{e.sender}</span>
               <p>{`${e.message}`}</p>
-              <span className="time-left">{}</span>
+              <span className="time-left">{time}</span>
             </div>
           );
         })}

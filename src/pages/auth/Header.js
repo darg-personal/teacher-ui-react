@@ -41,7 +41,13 @@ const Header = () => {
               <div class="modal-content">...</div>
             </div>
           </div>
-          <Dropdown.Item href="#/action-1">Settings</Dropdown.Item>
+          <Dropdown.Item
+            href="#action-1"
+            data-toggle="modal"
+            data-target="#myModal"
+          >
+            Settings
+          </Dropdown.Item>
           <Dropdown.Item href="#/action-2">Activity Log</Dropdown.Item>
           <Dropdown.Item href="#/action-3">Messages</Dropdown.Item>
           <Dropdown.Divider />

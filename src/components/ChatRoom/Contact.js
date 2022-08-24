@@ -5,7 +5,7 @@ function Contact() {
   return (
     <>
 <div className="sidebar">
-  <Link className="active" to="class8">
+  <Link className="active" to="/chatroom/class8">
     <img
       src="https://www.w3schools.com/howto/img_avatar.png"
       alt="Avatar"
@@ -13,7 +13,7 @@ function Contact() {
     />
     class8
   </Link>
-  <Link to="class9">
+  <Link to="/chatroom/class9">
     <img
       src="https://www.w3schools.com/howto/img_avatar2.png"
       alt="Avatar"
