@@ -5,6 +5,7 @@ import Modal from "../../components/AuthModal/Modal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import swal from "sweetalert";
+import utils from "./utils";
 
 const LoginScreen = () => {
   let navigate = useNavigate();
@@ -65,9 +66,9 @@ const LoginScreen = () => {
     updateFeedbackData({ ...feedbackTemplate });
     updateSendingRequest(true);
 
-    axios
-      .post(
-        "http://192.168.1.37:8000/s3_uploader/user/login",
+    axios.post(
+        // "http://192.168.1.37:8000/s3_uploader/user/login",
+        `${utils.getHost()}/s3_uploader/user/login`,
         requestObject
       )
       .then((response) => {

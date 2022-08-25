@@ -5,8 +5,11 @@ import MainChat from './MainChat'
 function ChatRoom() {
   return (
     <>
-<Contact/>
-<MainChat />
+    <div className="chatroom">
+    <Contact/>
+    <MainChat />
+    </div>
+
     </>
   )
 }

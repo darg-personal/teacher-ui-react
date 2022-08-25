@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { ThreeDots } from "react-loader-spinner";
 import BasicModal from "../components/BasicModal/BasicModal";
 import CallModal from "../components/CallModal/CallModal";
+import utils from "./auth/utils";
 function Call() {
   const [token, setToken] = useState(null);
   const [data, setData] = useState([]);
@@ -31,7 +32,8 @@ function Call() {
         let parsedData = JSON.parse(localStorage.getItem("data"));
         if (!parsedData) {
           const { data } = await axios(
-            "http://localhost:8040/voip/api_voip/getlead",
+            // "http://localhost:8040/voip/api_voip/getlead",
+            `${utils.getHost()}/voip/api_voip/getlead`,
             {
               headers: { Authorization: `${user_token}` },
             }
@@ -46,7 +48,7 @@ function Call() {
           localStorage.setItem("data", JSON.stringify(parsedData));
         }
 
-        const res = await axios("http://localhost:8040/voip/api_voip/active", {
+        const res = await axios(`${utils.getHost()}/voip/api_voip/active`, {
           headers: { Authorization: `${user_token}` },
         });
 

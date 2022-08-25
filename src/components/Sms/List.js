@@ -6,11 +6,13 @@ import filterFactory, { textFilter } from "react-bootstrap-table2-filter";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import BootstrapTable from "react-bootstrap-table-next";
 import "./Chat.css";
+import utils from "../../pages/auth/utils";
 import "./List.css";
 import MicRecorder from "mic-recorder-to-mp3";
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 function List() {
+  let Token = localStorage.getItem("token");
   const [recording, setRecording] = useState({
     isRecording: false,
     blobURL: "",
@@ -22,11 +24,13 @@ function List() {
     async function fetchData() {
       // const user_token = window.location.search.substring(1).split("=")[1];
       const { data } = await axios(
-        "https://api.dreampotential.org/admin_backend/api_admin/get_members",
+        // "https://api.dreampotential.org/admin_backend/api_admin/get_members",
+        `${utils.getServer()}/admin_backend/api_admin/get_members`,
         {
           headers: {
             Authorization:
-              "Token 8dee6465d2fa76540dacdc18a787e3e06b99c1ce73a7e6a2c127a7c88d4f2797",
+              // "Token 8dee6465d2fa76540dacdc18a787e3e06b99c1ce73a7e6a2c127a7c88d4f2797",
+              `Bearer ${Token}`,
           },
         }
       );
@@ -50,12 +54,14 @@ function List() {
     var bodyFormData = new FormData();
     bodyFormData.set("to_number", id);
     const { data } = await axios.post(
-      "https://api.dreampotential.org/voip/api_voip/list_sms",
+      // "https://api.dreampotential.org/voip/api_voip/list_sms",
+      `${utils.getServer()}/voip/api_voip/list_sms`,
       bodyFormData,
       {
         headers: {
           Authorization:
-            "Token 8dee6465d2fa76540dacdc18a787e3e06b99c1ce73a7e6a2c127a7c88d4f2797",
+            // "Token 8dee6465d2fa76540dacdc18a787e3e06b99c1ce73a7e6a2c127a7c88d4f2797",
+            `Bearer ${Token}`,
         },
         contentType: "multipart/form-data",
       }
