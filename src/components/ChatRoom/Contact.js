@@ -4,17 +4,24 @@ import './contact.css';
 import axios from 'axios';
 import { useEffect } from 'react';
 import utils from '../../pages/auth/utils';
+let Token = localStorage.getItem("token");
 function Contact() {
 const [group, setGroup] = useState([]);
 useEffect(()=>{
 
   // axios.get('http://192.168.1.37:9000/s3_uploader/listgroup/')
-  axios.get(`${utils.getHost()}/s3_uploader/listgroup/`)
-
+  axios.get(`${utils.getHost()}/s3_uploader/listgroup/`
+  , {
+    headers: {
+      Authorization:
+        `Bearer ${Token}`,
+    }
+  })
   .then(response => {
       console.log("===----------====",response.data[0].Channel.name)
       const groups = response.data;
       // console.log(typeof groups);
+      
       const prevGroup = [];
 
       for(let i=0; i < groups.length; i++){

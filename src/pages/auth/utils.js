@@ -3,7 +3,7 @@ function getHost() {
     var HOST = '';  
     if (window.location.origin.includes("localhost")) { 
         HOST = 'http://localhost:8000';
-        // console.log(HOST);
+        console.log(HOST);
     }
     else {
       HOST = 'https://api.dreampotential.org'; 

@@ -9,8 +9,9 @@ import { ThreeDots } from "react-loader-spinner";
 import BasicModal from "../components/BasicModal/BasicModal";
 import CallModal from "../components/CallModal/CallModal";
 import utils from "./auth/utils";
+let Token = localStorage.getItem("token");
 function Call() {
-  const [token, setToken] = useState(null);
+  // const [token, setToken] = useState(null);
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,8 +26,9 @@ function Call() {
 
   useEffect(() => {
     const fetchLeads = async () => {
-      const user_token = window.location.search.substring(1).split("=")[1];
-      setToken(window.location.search.substring(1).split("=")[1]);
+      // const user_token = window.location.search.substring(1).split("=")[1];
+      
+      // setToken(window.location.search.substring(1).split("=")[1]);
       try {
         let parsedData = JSON.parse(localStorage.getItem("data"));
         if (!parsedData) {
@@ -34,7 +36,9 @@ function Call() {
             // "https://api.dreampotential.org/voip/api_voip/getlead",
             `${utils.getServer()}/voip/api_voip/getlead`,
             {
-              headers: { Authorization: `${user_token}` },
+              // headers: { Authorization: `${user_token}`
+              headers: {Authorization:  `${Token}`
+            },
             }
           );
 
@@ -52,7 +56,8 @@ function Call() {
           `${utils.getServer()}/voip/api_voip/active`,
 
           {
-            headers: { Authorization: `${user_token}` },
+            // headers: { Authorization: `${user_token}` },
+            headers: {Authorization: `${Token}`}
           }
         );
 

@@ -3,6 +3,7 @@ import "./CallModal.css";
 import { useState } from "react";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
+let Token = localStorage.getItem("token");
 
 function CallModal({ title, number, name, activeNumbers }) {
   const [source_number, setSourceNumber] = useState(null);
@@ -18,7 +19,11 @@ function CallModal({ title, number, name, activeNumbers }) {
     await axios.post(
       // "http://localhost:8040/voip/api_voip/join_conference/",
       `${utils.getHost()}/api_voip/join_conference/`,
-      formData
+      formData,
+      {
+        // headers: { Authorization: `${user_token}` },
+        headers: { Authorization: ` Bearer ${Token}`},
+      }
     );
   };
   return (

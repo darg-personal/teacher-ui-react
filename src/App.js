@@ -26,10 +26,9 @@ import ChatRoom from "./components/ChatRoom/ChatRoom";
 import MainChat from "./components/ChatRoom/MainChat";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
-
 function App() {
-  let isToken = localStorage.getItem("token");
-  console.log("🚀 ~ file: App.js ~ line 14 ~ App ~ isToken", isToken);
+  let Token = localStorage.getItem("token");
+  console.log("🚀 ~ file: App.js ~ line 14 ~ App ~ isToken   ", Token);
   return (
     <>
       <Router>
