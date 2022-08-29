@@ -1,12 +1,25 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 import "../../css/auth/Dashboard.scss";
 import Dashboard from "./Dashboard";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Header = () => {
   let navigate = useNavigate();
+  let Token = localStorage.getItem("token");
+
+  let api = "http://127.0.0.1:8000/s3_uploader/user/profile_update/";
+  const [profileSrc, updateprofileSrc] = useState(null);
+
+  axios
+    .get(api, { headers: { Authorization: `Bearer ${Token}` } })
+    .then((data) => {
+      const value = data.data;
+      updateprofileSrc(value?.image);
+    })
+    .catch((error) => console.log(error));
 
   const logout = () => {
     localStorage.clear();
@@ -17,37 +30,20 @@ const Header = () => {
     <div className="action-wrap">
       <Dropdown>
         <Dropdown.Toggle variant="success" id="dropdown-basic">
-          <FaUserCircle />
+          {profileSrc ? (
+            <img
+              src={profileSrc}
+              height={24}
+              width={24}
+              style={{ borderRadius: 12, marginRight: 5 }}
+            />
+          ) : (
+            <FaUserCircle />
+          )}
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-toggle="modal"
-            data-target=".bd-example-modal-sm"
-          >
-            Small modal
-          </button>
-
-          <div
-            class="modal fade bd-example-modal-sm"
-            tabindex="-1"
-            role="dialog"
-            aria-labelledby="mySmallModalLabel"
-            aria-hidden="true"
-          >
-            <div class="modal-dialog modal-sm">
-              <div class="modal-content">...</div>
-            </div>
-          </div>
-          <Dropdown.Item
-            href="#action-1"
-            data-toggle="modal"
-            data-target="#myModal"
-          >
-            Settings
-          </Dropdown.Item>
+          <Dropdown.Item href="#/action-1">Settings</Dropdown.Item>
           <Dropdown.Item href="#/action-2">Activity Log</Dropdown.Item>
           <Dropdown.Item href="#/action-3">Messages</Dropdown.Item>
           <Dropdown.Divider />

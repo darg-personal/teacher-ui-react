@@ -72,8 +72,8 @@ float: right;
   padding: 1px 16px;
   height: 85%;
   width: 75%;
-  overflow: auto;
-
+  overflow-y: auto;
+  overflow-wrap: break-word;
 }
 
 
