@@ -45,7 +45,7 @@ const LoginScreen = () => {
     fieldData[index].hasError = value === "";
     updateFields(fieldData);
   };
-
+  
   const handleFormSubmit = (event) => {
     event.preventDefault();
 

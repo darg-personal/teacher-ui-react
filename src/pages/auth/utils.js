@@ -29,6 +29,7 @@ function getHost() {
     var WEBSOCKET_HOST = '';
     if (window.location.origin.includes("localhost")) {
         WEBSOCKET_HOST = 'ws://localhost:8000';
+
       }
       else{
         WEBSOCKET_HOST = 'ws://18.117.227.68:8041';
