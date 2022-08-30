@@ -1,116 +1,94 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Modal from "../../components/AuthModal/Modal";
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const RegisterScreen = () => {
-  let registrationFields = [
-    {
-      placeholder: "Name",
-      value: "",
-      name: "name",
-      type: "text",
-      hasError: false,
-    },
+    const navigate = useNavigate();
+    let registrationFields = [
+        {
+            placeholder: "Name",
+            value: "",
+            name: "name",
+            type: "text",
+            hasError: false
+        },
+        {
+            placeholder: "Email",
+            value: "",
+            name: "email",
+            type: "email",
+            hasError: false
+        },
+        {
+            placeholder: "Password",
+            value: "",
+            name: "password",
+            type: "password",
+            hasError: false
+        }
+    ]
 
-    {
-      placeholder: "Email",
-      value: "",
-      name: "email",
-      type: "email",
-      hasError: false,
-    },
+    const [fields, updateFields] = useState(registrationFields);    
+    async function SignUp() {
+        let items = [...fields]
+        let valu = { "name": items[0].value, "email": items[1].value, 'password': items[2].value }
+        await axios.post("http://localhost:8000/s3_uploader/user/register/", valu).then(resp => {
+            navigate("/");
+        }).catch(resp => {
+            alert("try to sign up with another Email or username")
+        })
+    }
 
-    {
-      placeholder: "Password",
-      value: "",
-      name: "password",
-      type: "password",
-      hasError: false,
-    },
-  ];
 
-  const [fields, updateFields] = useState(registrationFields);
+    const updateFieldValue = (value, index) => {
+        // setUser({...user,[e.target.name]:e.target.value});
+        let fieldItems = [...fields];
+        fieldItems[index].value = value;
+        fieldItems[index].hasError = value === ''
+        updateFields(fieldItems)
+        console.log("input value", fieldItems)
+    }
 
-  const updateFieldValue = (value, index) => {
-    let fieldItems = [...fields];
-    fieldItems[index].value = value;
-    fieldItems[index].hasError = value === "";
-    updateFields(fieldItems);
-  };
+    console.log(fields, "===============");
+    return <div className={'login-section page-container'}>
+        <div className={'auth-container'}>
+            <div className={'auth-logo'}>
+                <img src={require('../../assets/teacherlogo.png')} alt={'Teacher logo'} />
+            </div>
+            <div className={'auth-content'}>
+                <div className={'auth-header'}>
+                    <h4>Sign Up</h4>
+                </div>
+                <div className={'input-list centered-data'}>
+                    {
+                        fields.map((field, index) => {
+                            return <div className={`input-control`} key={index}>
+                                <input
+                                    type={field.type}
+                                    value={field.value}
+                                    name={field.name}
+                                    onChange={event => updateFieldValue(event.target.value, index)}
+                                    placeholder={field.placeholder}
+                                    className={`${field.hasError ? 'input-error' : ''}`}
+                                />
+                            </div>
+                        })
+                    }
+                </div>
+                <div className={'centered-data'}>
 
-  let url = "http://localhost:8000/s3_uploader/user/register/";
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    console.log("Form submitted");
-
-    axios.post(url)
-    .then((response)=>{
-        console.log(response);
-    })
-  };
-
-  return (
-    <div className={"login-section page-container"}>
-      <div className={"auth-container"}>
-        <div className={"auth-logo"}>
-          <img
-            src={require("../../assets/teacherlogo.png")}
-            alt={"Teacher logo"}
-          />
+                    <div className={'signin-section'}>
+                        Have an account? <Link to={'/login'}>Log in</Link>
+                    </div>
+                    <div className={'button-container'}>
+                        <button type={'submit'} onClick={SignUp} disabled={fields.filter(field => field.value === '').length > 0}>Sign Up</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div className={"auth-content"}>
-          <div className={"auth-header"}>
-            <h4>Sign Up</h4>
-          </div>
-          <form
-            method={"post"}
-            action={""}
-            onSubmit={(event) => {
-              handleFormSubmit(event);
-            }}
-          >
-            <div className={"input-list centered-data"}>
-              {fields.map((field, index) => {
-                return (
-                  <div className={`input-control`} key={index}>
-                    <input
-                      type={field.type}
-                      value={field.value}
-                      name={field.name}
-                      onChange={(event) =>
-                        updateFieldValue(event.target.value, index)
-                      }
-                      placeholder={field.placeholder}
-                      className={`${field.hasError ? "input-error" : ""}`}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className={"centered-data"}>
-              <div className={"signin-section"}>
-                Have an account? <Link to={"/login"}>Log in</Link>
-              </div>
-
-              <div className={"button-container"}>
-                <button
-                  type={"submit"}
-                  disabled={
-                    fields.filter((field) => field.value === "").length > 0
-                  }
-                >
-                  Sign Up
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
-  );
-};
+}
 
-export default RegisterScreen;
+export default RegisterScreen
