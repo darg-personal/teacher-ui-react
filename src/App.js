@@ -23,6 +23,7 @@ import Users from "./components/User/Users";
 import Leads from "./components/User/Leads";
 import Sms from "./pages/Sms";
 import ChatRoom from "./components/ChatRoom/ChatRoom";
+import UserFetchApp from "./components/ChatRoom/UserFetchApp";
 import MainChat from "./components/ChatRoom/MainChat";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
@@ -50,6 +51,7 @@ function App() {
             <Route path={"users"} element={<Users />} />
             <Route path={"leads"} element={<Leads />} />
             <Route path={"chatroom"} element={<ChatRoom />}/>
+            <Route path={"usefetch"} element={<UserFetchApp />}/>
             <Route path={"sms"} element={<Sms />} />
           </Route>
         </Routes>
