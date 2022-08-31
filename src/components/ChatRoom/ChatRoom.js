@@ -10,7 +10,7 @@ function ChatRoom() {
   const [type, setType] = useState();
 
   const pull_data = (data) => {
-    console.log(data);
+    console.log(data,"99877654456700000000");
     setChatRoom(data.name);
     setChatRoomId(data.id);
     setType(data.type);

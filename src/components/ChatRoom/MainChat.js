@@ -30,6 +30,22 @@ function MainChat(props) {
     }
   }, []);
 
+ const [page, setPage] = useState(1)
+  const onScroll = () => {
+    if (scrollBottom.current) {
+      const { scrollTop  } = scrollBottom.current;
+      if (scrollTop == 0) {
+        console.log("Reached to top");
+        setPage(page + 1)
+        fetchData();
+        console.log("Reached to top Again");
+      }
+    }
+  };
+
+
+
+
   function handleClick(event) {
     event.preventDefault();
     ws.send(
@@ -44,48 +60,53 @@ function MainChat(props) {
     document.getElementById("inp").value = "";
   }
 
+  function fetchData(){
+    axios
+    .get(
+      `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=${page}`,
+      {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+        },
+      }
+    )
+    .then((res) => {
+      // console.log(res);
+      const datas = JSON.stringify(res.data);
+      const message = JSON.parse(datas);
+      // console.log("4444", message.results);
+      const prevMsgs = [];
+
+      for (let i = message.results.length - 1; i >= 0; i--) {
+        const receivedObj = message.results[i];
+        // console.log('------------------------',receivedObj);
+        const massageTime = receivedObj?.created_at || "NA";
+
+        const date = new Date(massageTime);
+        const time = date.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        const msgObj = {
+          // userId: receivedObj?.user.id || "NA",
+          sender: receivedObj?.user.username || "NA",
+          message: receivedObj?.message_text || "NA",
+          time: time || "NA",
+          images: receivedObj?.user_profile.image || null,
+        };
+
+        prevMsgs.push(msgObj);
+      }
+      setMessages([...prevMsgs,...messages]);
+      console.log(messages,'222222222222222222222222222');
+    });
+  }
+
   useEffect(() => {
     ws.onopen = function open() {
       console.log("web socket connection created!!");
-      axios
-        .get(
-          `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10`,
-          {
-            headers: {
-              Authorization: `Bearer ${Token}`,
-            },
-          }
-        )
-        .then((res) => {
-          // console.log(res);
-          const datas = JSON.stringify(res.data);
-          const message = JSON.parse(datas);
-          // console.log("4444", message.results);
-          const prevMsgs = [];
-
-          for (let i = message.results.length - 1; i >= 0; i--) {
-            const receivedObj = message.results[i];
-            // console.log('------------------------',receivedObj);
-            const massageTime = receivedObj?.created_at || "NA";
-
-            const date = new Date(massageTime);
-            const time = date.toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-
-            const msgObj = {
-              // userId: receivedObj?.user.id || "NA",
-              sender: receivedObj?.user.username || "NA",
-              message: receivedObj?.message_text || "NA",
-              time: time || "NA",
-              images: receivedObj?.user_profile.image || null,
-            };
-
-            prevMsgs.push(msgObj);
-          }
-          setMessages([...prevMsgs]);
-        });
+      fetchData();
     };
   }, [chatroom]);
 
@@ -94,7 +115,7 @@ function MainChat(props) {
       // listen to data sent from the websocket server
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
-      console.log(receivedObj,'[[[[[[[[');
+      console.log(receivedObj, "[[[[[[[[");
       const massageTime = receivedObj?.created_at || "NA";
       const date = new Date(massageTime);
       const time = date.toLocaleTimeString("en-US", {
@@ -106,9 +127,9 @@ function MainChat(props) {
         sender: receivedObj?.user.username || "NA",
         message: receivedObj?.message_text || "NA",
         time: time || "NA",
-        images: receivedObj?.user_profile.image|| Avatar,
+        images: receivedObj?.user_profile.image || Avatar,
       };
-      console.log('----',msgObj);
+      console.log("----", msgObj);
       const prevMsgs = [...messages];
       prevMsgs.push(msgObj);
       setMessages([...prevMsgs]);
@@ -130,33 +151,34 @@ function MainChat(props) {
           </button>
         </Link>
       </div>
-      <div className="content" id="scroll" ref={scrollBottom}>
-        {messages.map((e, i) => {
-          return e.sender === logged_user.username ? (
-            <div key={i} className="container darker" id="right">
-              {e.images ? (
-                <img src={e.images} alt="Avatar" className="right" />
-              ) : (
-                <img src={Avatar} alt="Avatar" className="right" />
-              )}
-              <span className="name right">Me</span>
-              <p>{`${e.message}`}</p>
+      <div className="content" id="scroll" ref={scrollBottom} onScroll={onScroll}>
 
-              <span className="time-right">{e.time}</span>
-            </div>
-          ) : (
-            <div key={i} className="container" id="left">
-              {e.images ? (
-                <img src={e.images} alt="Avatar" className="right" />
-              ) : (
-                <img src={Avatar} alt="Avatar" className="right" />
-              )}
-              <span className="name right">{e.sender}</span>
-              <p>{`${e.message}`}</p>
-              <span className="time-left">{e.time}</span>
-            </div>
-          );
-        })}
+          {messages.map((e, i) => {
+            return e.sender === logged_user.username ? (
+              <div key={i} className="container darker" id="right">
+                {e.images ? (
+                  <img src={e.images} alt="Avatar" className="right" />
+                ) : (
+                  <img src={Avatar} alt="Avatar" className="right" />
+                )}
+                <span className="name right">Me</span>
+                <p>{`${e.message}`}</p>
+
+                <span className="time-right">{e.time}</span>
+              </div>
+            ) : (
+              <div key={i} className="container" id="left">
+                {e.images ? (
+                  <img src={e.images} alt="Avatar" className="right" />
+                ) : (
+                  <img src={Avatar} alt="Avatar" className="right" />
+                )}
+                <span className="name right">{e.sender}</span>
+                <p>{`${e.message}`}</p>
+                <span className="time-left">{e.time}</span>
+              </div>
+            );
+          })}
 
         <Outlet />
       </div>
