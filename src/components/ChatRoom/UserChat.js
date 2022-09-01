@@ -7,18 +7,20 @@ import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 
-// console.log(Token,"***************************************");
-function MainChat(props) {
+function UserChat(props) {
   let Token = localStorage.getItem("token");
   let logged_user = JSON.parse(localStorage.getItem("user"));
-
   const inputRef = useRef(null);
   const scrollBottom = useRef(null);
   const [messages, setMessages] = useState([]);
-  const chatroom = props.chatRoom;
-  const chatroomId = props.chatRoomId;
+  const userName = props.userName;
+  const receiverId = props.userId;
+  const userType = props.type;
+
+
+
   var ws = new WebSocket(
-    `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${chatroom}`
+    `${utils.getWebsocketHost()}/msg/user/?token=${Token}&receiver_id=${receiverId}`
   );
 
   useEffect(() => {
@@ -37,19 +39,27 @@ function MainChat(props) {
         meta_attributes: "react",
         media_link: "http://www.doogle.com/",
         message_text: inputRef.current.value,
-        user: "user1",
+
       })
-    );
-    // const input1 = document.getElementById('inp').value
+    )
+      let date = new Date();
+      let timeNow = date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    let a = { sender: logged_user.username, message: inputRef.current.value, time: timeNow, images: 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png' }
+    const prevMsgs = [...messages];
+    prevMsgs.push(a);
+    setMessages([...prevMsgs]);
     document.getElementById("inp").value = "";
   }
 
   useEffect(() => {
     ws.onopen = function open() {
-      console.log("web socket connection created!!");
+      console.log("web socket connection created for User!!");
       axios
         .get(
-          `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10`,
+          `${utils.getHost()}/chat/get/user/paginated_messages/?user=${receiverId}&records=10`,
           {
             headers: {
               Authorization: `Bearer ${Token}`,
@@ -57,17 +67,13 @@ function MainChat(props) {
           }
         )
         .then((res) => {
-          // console.log(res);
           const datas = JSON.stringify(res.data);
           const message = JSON.parse(datas);
-          // console.log("4444", message.results);
           const prevMsgs = [];
 
           for (let i = message.results.length - 1; i >= 0; i--) {
             const receivedObj = message.results[i];
-            // console.log('------------------------',receivedObj);
             const massageTime = receivedObj?.created_at || "NA";
-
             const date = new Date(massageTime);
             const time = date.toLocaleTimeString("en-US", {
               hour: "2-digit",
@@ -75,11 +81,10 @@ function MainChat(props) {
             });
 
             const msgObj = {
-              // userId: receivedObj?.user.id || "NA",
-              sender: receivedObj?.user.username || "NA",
+              sender: receivedObj?.from_user.username || "NA",
               message: receivedObj?.message_text || "NA",
               time: time || "NA",
-              images: receivedObj?.user_profile.image || null,
+              images: receivedObj?.user_profile?.image || null,
             };
 
             prevMsgs.push(msgObj);
@@ -87,14 +92,13 @@ function MainChat(props) {
           setMessages([...prevMsgs]);
         });
     };
-  }, [chatroom]);
+  }, [userName]);
 
   useEffect(() => {
     ws.onmessage = (evt) => {
       // listen to data sent from the websocket server
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
-      console.log(receivedObj,'[[[[[[[[');
       const massageTime = receivedObj?.created_at || "NA";
       const date = new Date(massageTime);
       const time = date.toLocaleTimeString("en-US", {
@@ -103,17 +107,15 @@ function MainChat(props) {
       });
 
       const msgObj = {
-        sender: receivedObj?.user.username || "NA",
+        sender: receivedObj?.from_user.username || "NA",
         message: receivedObj?.message_text || "NA",
         time: time || "NA",
         images: receivedObj?.user_profile.image|| Avatar,
       };
-      console.log('----',msgObj);
       const prevMsgs = [...messages];
       prevMsgs.push(msgObj);
       setMessages([...prevMsgs]);
     };
-    console.log(messages, "--");
   }, [messages]);
 
   return (
@@ -179,4 +181,4 @@ function MainChat(props) {
   );
 }
 
-export default MainChat;
+export default UserChat;

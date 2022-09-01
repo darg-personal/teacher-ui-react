@@ -23,30 +23,31 @@ function Contact(props) {
       })
       .then((response) => {
         const groups = response.data;
-        console.log(groups.results, "-------response.data-");
         const prevGroup = [];
         const temp = groups.results.length;
+
         for (let i = 0; i < temp; i++) {
           if (groups.results[i].type === "Channel") {
             const receivedObj = groups.results[i].Channel;
-            console.log(receivedObj.id,"0000");
             prevGroup.push({
               id: i,
               name: receivedObj.name,
               created_at: receivedObj.created_at,
-              typeId : receivedObj.id,
+              typeId: receivedObj.id,
               type: "Channel",
             });
           } else {
             const receivedObj = groups.results[i].user;
+            if (login_user.username != receivedObj.username){
             prevGroup.push({
               id: i,
               name: receivedObj.username,
               created_at: receivedObj.created_at,
-              typeId : receivedObj.id,
+              typeId: receivedObj.id,
               image: groups.results[i]?.user_profile.image,
               type: "user",
             });
+          }
           }
         }
         setGroup(

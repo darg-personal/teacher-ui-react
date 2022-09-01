@@ -15,8 +15,11 @@ function MainChat(props) {
   const inputRef = useRef(null);
   const scrollBottom = useRef(null);
   const [messages, setMessages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
   const chatroom = props.chatRoom;
   const chatroomId = props.chatRoomId;
+
   var ws = new WebSocket(
     `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${chatroom}`
   );
@@ -28,85 +31,121 @@ function MainChat(props) {
         target.scroll({ top: target.scrollHeight, behavior: "smooth" });
       });
     }
-  }, []);
+  }, [chatroomId]);
 
- const [page, setPage] = useState(1)
   const onScroll = () => {
     if (scrollBottom.current) {
-      const { scrollTop  } = scrollBottom.current;
+      const { scrollTop } = scrollBottom.current;
       if (scrollTop == 0) {
-        console.log("Reached to top");
-        setPage(page + 1)
-        fetchData();
-        console.log("Reached to top Again");
+        setPage(page + 1);
+        if (page * 10 <= count) {
+          updateData(page + 1);
+        }
       }
     }
   };
 
-
-
-
   function handleClick(event) {
     event.preventDefault();
-    ws.send(
-      JSON.stringify({
-        meta_attributes: "react",
-        media_link: "http://www.doogle.com/",
-        message_text: inputRef.current.value,
-        user: "user1",
-      })
-    );
+    if (inputRef.current.value !== "") {
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          media_link: "http://www.doogle.com/",
+          message_text: inputRef.current.value,
+          user: "user1",
+        })
+      );
+      document.getElementById("inp").value = "";
+    }
+
     // const input1 = document.getElementById('inp').value
-    document.getElementById("inp").value = "";
   }
 
-  function fetchData(){
+  function fetchData() {
     axios
-    .get(
-      `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=${page}`,
-      {
-        headers: {
-          Authorization: `Bearer ${Token}`,
-        },
-      }
-    )
-    .then((res) => {
-      // console.log(res);
-      const datas = JSON.stringify(res.data);
-      const message = JSON.parse(datas);
-      // console.log("4444", message.results);
-      const prevMsgs = [];
+      .get(
+        `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+          },
+        }
+      )
+      .then((res) => {
+        const datas = JSON.stringify(res.data);
+        const message = JSON.parse(datas);
+        setCount(message.count);
+        const prevMsgs = [];
+        for (let i = message.results.length - 1; i >= 0; i--) {
+          const receivedObj = message.results[i];
+          const massageTime = receivedObj?.created_at || "NA";
+          const date = new Date(massageTime);
+          const time = date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-      for (let i = message.results.length - 1; i >= 0; i--) {
-        const receivedObj = message.results[i];
-        // console.log('------------------------',receivedObj);
-        const massageTime = receivedObj?.created_at || "NA";
+          const msgObj = {
+            sender: receivedObj?.user.username || "NA",
+            message: receivedObj?.message_text || "NA",
+            time: time || "NA",
+            images: receivedObj?.user_profile.image || null,
+          };
 
-        const date = new Date(massageTime);
-        const time = date.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+          prevMsgs.push(msgObj);
+        }
+        // prevMsgs.push(...messages);
+        setMessages([...prevMsgs]);
+      });
+  }
 
-        const msgObj = {
-          // userId: receivedObj?.user.id || "NA",
-          sender: receivedObj?.user.username || "NA",
-          message: receivedObj?.message_text || "NA",
-          time: time || "NA",
-          images: receivedObj?.user_profile.image || null,
-        };
+  function updateData(value) {
+    axios
+      .get(
+        `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=${value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+          },
+        }
+      )
+      .then((res) => {
+        const datas = JSON.stringify(res.data);
+        const message = JSON.parse(datas);
+        console.log(message,"00000");
+        const prevMsgs = [];
+        for (let i = message.results.length - 1; i >= 0; i--) {
+          const receivedObj = message.results[i];
+          const massageTime = receivedObj?.created_at || "NA";
+          const date = new Date(massageTime);
+          const time = date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-        prevMsgs.push(msgObj);
-      }
-      setMessages([...prevMsgs,...messages]);
-      console.log(messages,'222222222222222222222222222');
-    });
+          const msgObj = {
+            sender: receivedObj?.user.username || "NA",
+            message: receivedObj?.message_text || "NA",
+            time: time || "NA",
+            images: receivedObj?.user_profile.image || null,
+          };
+
+          prevMsgs.push(msgObj);
+        }
+
+        setMessages([...prevMsgs, ...messages]);
+      });
   }
 
   useEffect(() => {
     ws.onopen = function open() {
+      setPage(1);
+      setMessages([]);
       console.log("web socket connection created!!");
-      fetchData();
+      setTimeout(() => {
+        fetchData();
+      }, 100);
     };
   }, [chatroom]);
 
@@ -115,26 +154,22 @@ function MainChat(props) {
       // listen to data sent from the websocket server
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
-      console.log(receivedObj, "[[[[[[[[");
       const massageTime = receivedObj?.created_at || "NA";
       const date = new Date(massageTime);
       const time = date.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
       });
-
       const msgObj = {
         sender: receivedObj?.user.username || "NA",
         message: receivedObj?.message_text || "NA",
         time: time || "NA",
         images: receivedObj?.user_profile.image || Avatar,
       };
-      console.log("----", msgObj);
       const prevMsgs = [...messages];
       prevMsgs.push(msgObj);
       setMessages([...prevMsgs]);
     };
-    console.log(messages, "--");
   }, [messages]);
 
   return (
@@ -151,34 +186,38 @@ function MainChat(props) {
           </button>
         </Link>
       </div>
-      <div className="content" id="scroll" ref={scrollBottom} onScroll={onScroll}>
+      <div
+        className="content"
+        id="scroll"
+        ref={scrollBottom}
+        onScroll={onScroll}
+      >
+        {messages.map((e, i) => {
+          return e.sender === logged_user.username ? (
+            <div key={i} className="container darker" id="right">
+              {e.images ? (
+                <img src={e.images} alt="Avatar" className="right" />
+              ) : (
+                <img src={Avatar} alt="Avatar" className="right" />
+              )}
+              <span className="name right">Me</span>
+              <p>{`${e.message}`}</p>
 
-          {messages.map((e, i) => {
-            return e.sender === logged_user.username ? (
-              <div key={i} className="container darker" id="right">
-                {e.images ? (
-                  <img src={e.images} alt="Avatar" className="right" />
-                ) : (
-                  <img src={Avatar} alt="Avatar" className="right" />
-                )}
-                <span className="name right">Me</span>
-                <p>{`${e.message}`}</p>
-
-                <span className="time-right">{e.time}</span>
-              </div>
-            ) : (
-              <div key={i} className="container" id="left">
-                {e.images ? (
-                  <img src={e.images} alt="Avatar" className="right" />
-                ) : (
-                  <img src={Avatar} alt="Avatar" className="right" />
-                )}
-                <span className="name right">{e.sender}</span>
-                <p>{`${e.message}`}</p>
-                <span className="time-left">{e.time}</span>
-              </div>
-            );
-          })}
+              <span className="time-right">{e.time}</span>
+            </div>
+          ) : (
+            <div key={i} className="container" id="left">
+              {e.images ? (
+                <img src={e.images} alt="Avatar" className="right" />
+              ) : (
+                <img src={Avatar} alt="Avatar" className="right" />
+              )}
+              <span className="name right">{e.sender}</span>
+              <p>{`${e.message}`}</p>
+              <span className="time-left">{e.time}</span>
+            </div>
+          );
+        })}
 
         <Outlet />
       </div>
