@@ -25,6 +25,7 @@ import Sms from "./pages/Sms";
 import ChatRoom from "./components/ChatRoom/ChatRoom";
 import UserFetchApp from "./components/ChatRoom/UserFetchApp";
 import MainChat from "./components/ChatRoom/MainChat";
+import UserProfile from "./pages/auth/UserProfile/UserProfile";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 function App() {
@@ -53,6 +54,7 @@ function App() {
             <Route path={"chatroom"} element={<ChatRoom />}/>
             <Route path={"usefetch"} element={<UserFetchApp />}/>
             <Route path={"sms"} element={<Sms />} />
+            <Route path={"userprofile"} element={<UserProfile />} />
           </Route>
         </Routes>
       </Router>

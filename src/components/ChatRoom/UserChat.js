@@ -13,11 +13,11 @@ function UserChat(props) {
   const inputRef = useRef(null);
   const scrollBottom = useRef(null);
   const [messages, setMessages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
   const userName = props.userName;
   const receiverId = props.userId;
   const userType = props.type;
-
-
 
   var ws = new WebSocket(
     `${utils.getWebsocketHost()}/msg/user/?token=${Token}&receiver_id=${receiverId}`
@@ -31,6 +31,18 @@ function UserChat(props) {
       });
     }
   }, []);
+
+  const onScroll = () => {
+    if (scrollBottom.current) {
+      const { scrollTop } = scrollBottom.current;
+      if (scrollTop == 0) {
+        setPage(page + 1);
+        if (page * 10 <= count) {
+          updateData(page + 1);
+        }
+      }
+    }
+  };
 
   function handleClick(event) {
     event.preventDefault();
@@ -69,6 +81,8 @@ function UserChat(props) {
         .then((res) => {
           const datas = JSON.stringify(res.data);
           const message = JSON.parse(datas);
+          console.log(message,'.........messages');
+          setCount(message.count);
           const prevMsgs = [];
 
           for (let i = message.results.length - 1; i >= 0; i--) {
@@ -93,6 +107,44 @@ function UserChat(props) {
         });
     };
   }, [userName]);
+
+  function updateData(value) {
+    axios
+      .get(
+        `${utils.getHost()}/chat/get/user/paginated_messages/?user=${receiverId}&records=10&p=${value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+          },
+        }
+      )
+      .then((res) => {
+        const datas = JSON.stringify(res.data);
+        const message = JSON.parse(datas);
+        console.log(message,'.........messages');
+        const prevMsgs = [];
+
+        for (let i = message.results.length - 1; i >= 0; i--) {
+          const receivedObj = message.results[i];
+          const massageTime = receivedObj?.created_at || "NA";
+          const date = new Date(massageTime);
+          const time = date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          const msgObj = {
+            sender: receivedObj?.from_user.username || "NA",
+            message: receivedObj?.message_text || "NA",
+            time: time || "NA",
+            images: receivedObj?.user_profile?.image || null,
+          };
+
+          prevMsgs.push(msgObj);
+        }
+        setMessages([...prevMsgs,...messages]);
+      });
+  }
 
   useEffect(() => {
     ws.onmessage = (evt) => {
@@ -132,7 +184,7 @@ function UserChat(props) {
           </button>
         </Link>
       </div>
-      <div className="content" id="scroll" ref={scrollBottom}>
+      <div className="content" id="scroll" ref={scrollBottom} onScroll={onScroll}>
         {messages.map((e, i) => {
           return e.sender === logged_user.username ? (
             <div key={i} className="container darker" id="right">

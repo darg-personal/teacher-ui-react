@@ -3,12 +3,13 @@ import "./contact.css";
 import axios from "axios";
 import { useEffect } from "react";
 import utils from "../../pages/auth/utils";
-
+import Avatar from '../../assets/Images/avatar.svg'
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
 function Contact(props) {
   const [group, setGroup] = useState([]);
-  const [isActive, setIsActive] = useState();
+  const [isActive, setIsActive] = useState(); 
+  const [loaded, setLoaded] = useState(true);
 
   useEffect(() => {
     getGroupData();
@@ -25,7 +26,6 @@ function Contact(props) {
         const groups = response.data;
         const prevGroup = [];
         const temp = groups.results.length;
-
         for (let i = 0; i < temp; i++) {
           if (groups.results[i].type === "Channel") {
             const receivedObj = groups.results[i].Channel;
@@ -34,6 +34,7 @@ function Contact(props) {
               name: receivedObj.name,
               created_at: receivedObj.created_at,
               typeId: receivedObj.id,
+              image: Avatar,
               type: "Channel",
             });
           } else {
@@ -44,7 +45,7 @@ function Contact(props) {
               name: receivedObj.username,
               created_at: receivedObj.created_at,
               typeId: receivedObj.id,
-              image: groups.results[i]?.user_profile.image,
+              image: groups.results[i].user_profile.image, 
               type: "user",
             });
           }
@@ -57,13 +58,15 @@ function Contact(props) {
         );
       })
       .catch((error) => {
-        console.log("Not Able to fetch Groups ");
+        console.log("Not Able to fetch Groups ",error);
       });
   };
 
   const handleClick = (value) => {
     setIsActive(value.name);
-    props.type({ name: value.name, type: value.type, id: value.typeId });
+    // setLoaded(true);
+    props.type({ name: value.name, type: value.type, id: value.typeId, loaded: loaded});
+
   };
 
   return (
@@ -74,16 +77,17 @@ function Contact(props) {
             key={i}
             className={e.name === isActive ? "link active" : "link"}
             onClick={() => handleClick(e)}
-          >
+            >
             <img
-              src={e.image || "https://www.w3schools.com/howto/img_avatar.png"}
+              // src={e.image}
+              src={e.image ? e.image : Avatar }
               alt="Avatar"
               className="avatar"
             />
             {e.name}
           </div>
         ))}
-      </div>
+      </div>      
     </>
   );
 }

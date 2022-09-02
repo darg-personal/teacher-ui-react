@@ -9,12 +9,13 @@ function ChatRoom() {
   const [chatRoom, setChatRoom] = useState();
   const [chatRoomId, setChatRoomId] = useState();
   const [type, setType] = useState();
-
+  const [isLoading, setIsLoading] = useState();
 
   const pull_data = (data) => {
     setChatRoom(data.name);
     setChatRoomId(data.id);
     setType(data.type);
+    setIsLoading(data.loaded)
   };
 
   return (
@@ -23,8 +24,10 @@ function ChatRoom() {
         <div className="chatroom">
           <Contact type={pull_data} />
           {type == "Channel" ? (
-            <MainChat chatRoom={chatRoom} chatRoomId={chatRoomId} type={type} />
-          ) : <UserChat userName={chatRoom} userId={chatRoomId} type={type} />}
+            <MainChat chatRoom={chatRoom} chatRoomId={chatRoomId} type={type} isLoading={isLoading}/>
+          ) : type == "user" ? (
+            <UserChat userName={chatRoom} userId={chatRoomId} type={type} />
+          ) : null}
         </div>
       ) : (
         <Navigate replace to="/login" />

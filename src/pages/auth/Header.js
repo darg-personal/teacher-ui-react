@@ -5,12 +5,13 @@ import "../../css/auth/Dashboard.scss";
 import Dashboard from "./Dashboard";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import utils from "./utils";
 
 const Header = () => {
   let navigate = useNavigate();
   let Token = localStorage.getItem("token");
 
-  let api = "http://127.0.0.1:8000/s3_uploader/user/profile_update/";
+  let api = `${utils.getHost()}/s3_uploader/user/profile_update/`;
   const [profileSrc, updateprofileSrc] = useState(null);
 
   axios
@@ -43,7 +44,7 @@ const Header = () => {
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
-          <Dropdown.Item href="#/action-1">Settings</Dropdown.Item>
+          <Dropdown.Item onClick={()=> navigate('/userprofile')}>Settings</Dropdown.Item>
           <Dropdown.Item href="#/action-2">Activity Log</Dropdown.Item>
           <Dropdown.Item href="#/action-3">Messages</Dropdown.Item>
           <Dropdown.Divider />

@@ -1,24 +1,27 @@
 import React, { createRef, useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import "./mainChat.css";
 import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
-
+import Loader from "./Loader";
 // console.log(Token,"***************************************");
 function MainChat(props) {
   let Token = localStorage.getItem("token");
   let logged_user = JSON.parse(localStorage.getItem("user"));
-
   const inputRef = useRef(null);
   const scrollBottom = useRef(null);
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
+  const [load, setLoad] = useState();
+
   const chatroom = props.chatRoom;
   const chatroomId = props.chatRoomId;
+  const isLoading = props.isLoading;
+  console.log(isLoading, "..............isLoading");
 
   var ws = new WebSocket(
     `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${chatroom}`
@@ -113,7 +116,7 @@ function MainChat(props) {
       .then((res) => {
         const datas = JSON.stringify(res.data);
         const message = JSON.parse(datas);
-        console.log(message,"00000");
+        console.log(message, "00000");
         const prevMsgs = [];
         for (let i = message.results.length - 1; i >= 0; i--) {
           const receivedObj = message.results[i];
@@ -142,7 +145,7 @@ function MainChat(props) {
     ws.onopen = function open() {
       setPage(1);
       setMessages([]);
-      console.log("web socket connection created!!");
+      console.log("web socket connection created for channel!!");
       setTimeout(() => {
         fetchData();
       }, 100);
@@ -186,6 +189,7 @@ function MainChat(props) {
           </button>
         </Link>
       </div>
+
       <div
         className="content"
         id="scroll"
@@ -221,6 +225,7 @@ function MainChat(props) {
 
         <Outlet />
       </div>
+
       <div className="box">
         <form>
           <input

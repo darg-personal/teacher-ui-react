@@ -1,0 +1,135 @@
+.upload-body-centered {
+  font-family: 'Hind Guntur', sans-serif;
+  color: #052a42;
+  display: flex;
+  justify-content: center;
+  background: #052a42;
+  background-repeat: no-repeat, no-repeat;
+  background-position: 200% -40%;
+  background-size: 80%;
+}
+
+.card-upload {
+  flex: 1;
+  width: 300px;
+  height: 100%;
+  padding: 25px;
+  margin-top: 40px;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  box-shadow: 15px 10px 25px 0px #083e63;
+  background: #fff;
+  background-image: url('http://localhost:3006/static/media/teacherlogo.dbd31585b00ca2ce5c82.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: 5% -5%, 100% -1%;
+  background-size: 40%, 50%;
+  animation: open .5s;
+}
+
+@keyframes open {
+  0% {
+    background-position: 166% 0%, 220% -69%;
+  }
+  100% {
+    background-position: 5% -5%, 100% -1%;
+  }
+}
+
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  align-self: center;
+  padding: 6px;
+  cursor: pointer;
+  background: linear-gradient(270deg, #021777, #e7891c);
+  margin-bottom: 25px;
+}
+
+.img-wrap {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.img-upload {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  justify-content: center;
+}
+
+.img-upload:before {
+  /* content: "blur"; */
+  font-size: 90px;
+  position: absolute;
+  padding-top: 80px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #63d3a6;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: .5s ease;
+  background-color: #fff;
+}
+
+.img-upload:hover:before {
+  opacity: 1;
+}
+
+.button-upload {
+  position: relative;
+  color: #054231;
+  letter-spacing: 1px;
+  margin: 20px;
+  font-size: 18px;
+  padding: 10px;
+  text-align: center;
+  transition: 0.5s;
+  border-radius: 10px;
+  cursor: pointer;
+  border-radius: 25px;
+  border: none;
+  background: #4ad36d;
+}
+
+.button-upload:hover {
+  left: 0;
+  color: #fff;
+  width: auto;
+  box-shadow: 0px 0px 20px 0px #063c5f;
+}
+
+.button-upload:focus {
+  outline: none;
+}
+
+.input-text {
+  height: 10;
+  width: 100%;
+  margin: 2px;
+  align-content: center;
+  justify-content: center;
+  align-self: center;
+  border-width: 1px;
+  border-radius: 10px;
+  border-color: #63d3a6;
+}
+
+.custom-background{
+background-color: #054231;
+background: scroll;
+margin-top: 10px;
+}
