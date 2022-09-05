@@ -6,18 +6,22 @@ import "./mainChat.css";
 import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
+import Loader from "./Loader";
 
 function UserChat(props) {
   let Token = localStorage.getItem("token");
-  let logged_user = JSON.parse(localStorage.getItem("user"));
+  let loggedUser = JSON.parse(localStorage.getItem("user"));
   const inputRef = useRef(null);
   const scrollBottom = useRef(null);
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
-  const [count, setCount] = useState(0);
+  const [messageCount, setMessageCount] = useState(0);
+  const [load, setLoad] = useState(false);
   const userName = props.userName;
   const receiverId = props.userId;
   const userType = props.type;
+
+  console.log(userName, "....userName...");
 
   var ws = new WebSocket(
     `${utils.getWebsocketHost()}/msg/user/?token=${Token}&receiver_id=${receiverId}`
@@ -37,7 +41,8 @@ function UserChat(props) {
       const { scrollTop } = scrollBottom.current;
       if (scrollTop == 0) {
         setPage(page + 1);
-        if (page * 10 <= count) {
+        if (page * 10 <= messageCount) {
+          setLoad(true);
           updateData(page + 1);
         }
       }
@@ -46,24 +51,38 @@ function UserChat(props) {
 
   function handleClick(event) {
     event.preventDefault();
-    ws.send(
-      JSON.stringify({
-        meta_attributes: "react",
-        media_link: "http://www.doogle.com/",
-        message_text: inputRef.current.value,
-
-      })
-    )
-      let date = new Date();
-      let timeNow = date.toLocaleTimeString("en-US", {
+    if (inputRef.current.value !== "") {
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          media_link: "http://www.doogle.com/",
+          message_text: inputRef.current.value,
+        })
+      );
+      let messageDate = new Date();
+      let timeNow = messageDate.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
       });
-    let a = { sender: logged_user.username, message: inputRef.current.value, time: timeNow, images: 'https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png' }
-    const prevMsgs = [...messages];
-    prevMsgs.push(a);
-    setMessages([...prevMsgs]);
-    document.getElementById("inp").value = "";
+      const date = messageDate.toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+      let a = {
+        sender: loggedUser.username,
+        message: inputRef.current.value,
+        time: timeNow,
+        date: date,
+        images:
+          "https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png",
+      };
+      const prevMsgs = [...messages];
+      prevMsgs.push(a);
+      setMessages([...prevMsgs]);
+      document.getElementById("inp").value = "";
+    }
   }
 
   useEffect(() => {
@@ -79,31 +98,44 @@ function UserChat(props) {
           }
         )
         .then((res) => {
-          const datas = JSON.stringify(res.data);
-          const message = JSON.parse(datas);
-          console.log(message,'.........messages');
-          setCount(message.count);
+          const responseData = JSON.stringify(res.data);
+          const message = JSON.parse(responseData);
+          console.log(message, ".........messages");
+          setMessageCount(message.count);
           const prevMsgs = [];
 
           for (let i = message.results.length - 1; i >= 0; i--) {
             const receivedObj = message.results[i];
             const massageTime = receivedObj?.created_at || "NA";
-            const date = new Date(massageTime);
-            const time = date.toLocaleTimeString("en-US", {
+            const messageDate = new Date(massageTime);
+            const time = messageDate.toLocaleTimeString("en-US", {
               hour: "2-digit",
               minute: "2-digit",
+            });
+            const date = messageDate.toLocaleDateString("en-US", {
+              weekday: "short",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
             });
 
             const msgObj = {
               sender: receivedObj?.from_user.username || "NA",
               message: receivedObj?.message_text || "NA",
               time: time || "NA",
-              images: receivedObj?.user_profile?.image || null,
+              date: date || "NA",
+              profile: receivedObj?.user_profile?.image || Avatar,
             };
 
             prevMsgs.push(msgObj);
           }
           setMessages([...prevMsgs]);
+        })
+        .then(() => {
+          setLoad(false);
+        })
+        .catch((error) => {
+          console.log("error : ", error);
         });
     };
   }, [userName]);
@@ -119,30 +151,38 @@ function UserChat(props) {
         }
       )
       .then((res) => {
-        const datas = JSON.stringify(res.data);
-        const message = JSON.parse(datas);
-        console.log(message,'.........messages');
+        const responseData = JSON.stringify(res.data);
+        const message = JSON.parse(responseData);
+        console.log(message, ".........messages");
         const prevMsgs = [];
 
         for (let i = message.results.length - 1; i >= 0; i--) {
           const receivedObj = message.results[i];
           const massageTime = receivedObj?.created_at || "NA";
-          const date = new Date(massageTime);
-          const time = date.toLocaleTimeString("en-US", {
+          const messageDate = new Date(massageTime);
+          const time = messageDate.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
+          });
+          const date = messageDate.toLocaleDateString("en-US", {
+            weekday: "short",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
           });
 
           const msgObj = {
             sender: receivedObj?.from_user.username || "NA",
             message: receivedObj?.message_text || "NA",
             time: time || "NA",
-            images: receivedObj?.user_profile?.image || null,
+            date: date || "NA",
+            profile: receivedObj?.user_profile?.image || null,
           };
 
           prevMsgs.push(msgObj);
         }
-        setMessages([...prevMsgs,...messages]);
+        setLoad(false);
+        setMessages([...prevMsgs, ...messages]);
       });
   }
 
@@ -151,22 +191,31 @@ function UserChat(props) {
       // listen to data sent from the websocket server
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
-      const massageTime = receivedObj?.created_at || "NA";
-      const date = new Date(massageTime);
-      const time = date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      if (receiverId === receivedObj.from_user.id) {
+        const massageTime = receivedObj?.created_at || "NA";
+        const messageDate = new Date(massageTime);
+        const time = messageDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const date = messageDate.toLocaleDateString("en-US", {
+          weekday: "short",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
 
-      const msgObj = {
-        sender: receivedObj?.from_user.username || "NA",
-        message: receivedObj?.message_text || "NA",
-        time: time || "NA",
-        images: receivedObj?.user_profile.image|| Avatar,
-      };
-      const prevMsgs = [...messages];
-      prevMsgs.push(msgObj);
-      setMessages([...prevMsgs]);
+        const msgObj = {
+          sender: receivedObj?.from_user.username || "NA",
+          message: receivedObj?.message_text || "NA",
+          time: time || "NA",
+          date: date || "NA",
+          profile: receivedObj?.user_profile.image || Avatar,
+        };
+        const prevMsgs = [...messages];
+        prevMsgs.push(msgObj);
+        setMessages([...prevMsgs]);
+      }
     };
   }, [messages]);
 
@@ -184,30 +233,40 @@ function UserChat(props) {
           </button>
         </Link>
       </div>
-      <div className="content" id="scroll" ref={scrollBottom} onScroll={onScroll}>
+      {load ? <Loader /> : null}
+      <div
+        className="content"
+        id="scroll"
+        ref={scrollBottom}
+        onScroll={onScroll}
+      >
         {messages.map((e, i) => {
-          return e.sender === logged_user.username ? (
+          return e.sender === loggedUser.username ? (
             <div key={i} className="container darker" id="right">
-              {e.images ? (
-                <img src={e.images} alt="Avatar" className="right" />
+              {e.profile ? (
+                <img src={e.profile} alt="Avatar" className="right" />
               ) : (
                 <img src={Avatar} alt="Avatar" className="right" />
               )}
               <span className="name right">Me</span>
               <p>{`${e.message}`}</p>
 
-              <span className="time-right">{e.time}</span>
+              <span className="time-right">
+                {e.time} {e.date}
+              </span>
             </div>
           ) : (
             <div key={i} className="container" id="left">
-              {e.images ? (
-                <img src={e.images} alt="Avatar" className="right" />
+              {e.profile ? (
+                <img src={e.profile} alt="Avatar" className="right" />
               ) : (
                 <img src={Avatar} alt="Avatar" className="right" />
               )}
               <span className="name right">{e.sender}</span>
               <p>{`${e.message}`}</p>
-              <span className="time-left">{e.time}</span>
+              <span className="time-left">
+                {e.time} {e.date}
+              </span>
             </div>
           );
         })}

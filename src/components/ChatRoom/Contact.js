@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import "./contact.css";
 import axios from "axios";
 import { useEffect } from "react";
+// import MainChat from "./MainChat";
 import utils from "../../pages/auth/utils";
 import Avatar from '../../assets/Images/avatar.svg'
+
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
 function Contact(props) {
   const [group, setGroup] = useState([]);
-  const [isActive, setIsActive] = useState(); 
-  const [loaded, setLoaded] = useState(true);
+  const [isActive, setIsActive] = useState();
 
   useEffect(() => {
     getGroupData();
@@ -34,7 +35,7 @@ function Contact(props) {
               name: receivedObj.name,
               created_at: receivedObj.created_at,
               typeId: receivedObj.id,
-              image: Avatar,
+              // image: Avatar,
               type: "Channel",
             });
           } else {
@@ -45,7 +46,7 @@ function Contact(props) {
               name: receivedObj.username,
               created_at: receivedObj.created_at,
               typeId: receivedObj.id,
-              image: groups.results[i].user_profile.image, 
+              // image: groups.results[i].user_profile.image || Avatar, 
               type: "user",
             });
           }
@@ -63,10 +64,9 @@ function Contact(props) {
   };
 
   const handleClick = (value) => {
+    console.log(value,'.......value');
     setIsActive(value.name);
-    // setLoaded(true);
-    props.type({ name: value.name, type: value.type, id: value.typeId, loaded: loaded});
-
+    props.type({ name: value.name, type: value.type, id: value.typeId });
   };
 
   return (
@@ -77,7 +77,7 @@ function Contact(props) {
             key={i}
             className={e.name === isActive ? "link active" : "link"}
             onClick={() => handleClick(e)}
-            >
+          >
             <img
               // src={e.image}
               src={e.image ? e.image : Avatar }
@@ -87,7 +87,7 @@ function Contact(props) {
             {e.name}
           </div>
         ))}
-      </div>      
+      </div>
     </>
   );
 }

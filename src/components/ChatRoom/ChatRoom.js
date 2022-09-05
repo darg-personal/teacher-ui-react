@@ -8,14 +8,14 @@ const Token = localStorage.getItem("token");
 function ChatRoom() {
   const [chatRoom, setChatRoom] = useState();
   const [chatRoomId, setChatRoomId] = useState();
-  const [type, setType] = useState();
-  const [isLoading, setIsLoading] = useState();
-
+  const [type, setType] = useState(); 
+  const [queue, setQueue] = useState([]); 
+  localStorage.setItem("queue",queue)
   const pull_data = (data) => {
     setChatRoom(data.name);
     setChatRoomId(data.id);
-    setType(data.type);
-    setIsLoading(data.loaded)
+    setType(data.type); 
+   
   };
 
   return (
@@ -24,7 +24,7 @@ function ChatRoom() {
         <div className="chatroom">
           <Contact type={pull_data} />
           {type == "Channel" ? (
-            <MainChat chatRoom={chatRoom} chatRoomId={chatRoomId} type={type} isLoading={isLoading}/>
+            <MainChat chatRoom={chatRoom} chatRoomId={chatRoomId} type={type}/>
           ) : type == "user" ? (
             <UserChat userName={chatRoom} userId={chatRoomId} type={type} />
           ) : null}

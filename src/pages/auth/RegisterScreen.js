@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import utils from "./utils";
 
 const RegisterScreen = () => {
     const navigate = useNavigate();
@@ -33,7 +34,7 @@ const RegisterScreen = () => {
     async function SignUp() {
         let items = [...fields]
         let valu = { "name": items[0].value, "email": items[1].value, 'password': items[2].value }
-        await axios.post("http://localhost:8000/s3_uploader/user/register/", valu).then(resp => {
+        await axios.post(`${utils.getHost()}/s3_uploader/user/register/`, valu).then(resp => {
             navigate("/");
         }).catch(resp => {
             alert("try to sign up with another Email or username")
