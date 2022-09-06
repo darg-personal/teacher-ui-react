@@ -158,7 +158,7 @@ const LoginScreen = () => {
 
             <div className={"centered-data"}>
               <div className={"forgot-password-section"}>
-                <Link to={"/"}>Forgot password?</Link>
+              <Link to={"/ForgetPassword"}>Forgot password?</Link>
               </div>
 
               <div className={"button-container"}>

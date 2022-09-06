@@ -26,6 +26,10 @@ const Header = () => {
     localStorage.clear();
     navigate("/login");
   };
+
+  const handleChangePassword = () => {
+    navigate("/changepassword");
+  };
   return (
     // <div className="header-main">
     <div className="action-wrap">
@@ -44,7 +48,17 @@ const Header = () => {
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
-          <Dropdown.Item onClick={()=> navigate('/userprofile')}>Settings</Dropdown.Item>
+          <Dropdown.Item onClick={() => navigate("/userprofile")}>
+            Settings
+          </Dropdown.Item>
+
+          <Dropdown.Item
+            onClick={() => {
+              handleChangePassword();
+            }}
+          >
+            Change Password
+          </Dropdown.Item>
           <Dropdown.Item href="#/action-2">Activity Log</Dropdown.Item>
           <Dropdown.Item href="#/action-3">Messages</Dropdown.Item>
           <Dropdown.Divider />

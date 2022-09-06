@@ -26,6 +26,8 @@ import ChatRoom from "./components/ChatRoom/ChatRoom";
 import UserFetchApp from "./components/ChatRoom/UserFetchApp";
 import MainChat from "./components/ChatRoom/MainChat";
 import UserProfile from "./pages/auth/UserProfile/UserProfile";
+import ChangePassword from "./pages/auth/ChangePassword";
+import ForgetPassword from './pages/auth/ForgetPassword';
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 function App() {
@@ -39,6 +41,8 @@ function App() {
             <Route index element={<InitView />} />
             <Route path={"login"} element={<LoginScreen />} />
             <Route path={"register"} element={<RegisterScreen />} />
+            <Route path={"changepassword"} element={<ChangePassword/>} /> 
+            <Route path={"forgetpassword"} element={<ForgetPassword />} />
             <Route path={"importleads"} element={<ImportLeads />} />
             <Route path={"dashboard"} element={<Home />} />
             <Route path={"student_dashboard"} element={<Student_Dashboard />} />
