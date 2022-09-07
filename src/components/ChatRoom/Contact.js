@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "./contact.css";
 import axios from "axios";
 import { useEffect } from "react";
-// import MainChat from "./MainChat";
 import utils from "../../pages/auth/utils";
 import Avatar from '../../assets/Images/avatar.svg'
 
@@ -12,6 +11,8 @@ function Contact(props) {
   const [group, setGroup] = useState([]);
   const [isActive, setIsActive] = useState();
 
+ const messageCount = props.receiveMessage;
+//  console.log(messageCount,'.........messageCount');
   useEffect(() => {
     getGroupData();
   }, []);
@@ -38,7 +39,8 @@ function Contact(props) {
               // image: Avatar,
               type: "Channel",
             });
-          } else {
+          } 
+          else {
             const receivedObj = groups.results[i].user;
             if (login_user.username != receivedObj.username){
             prevGroup.push({
@@ -85,7 +87,12 @@ function Contact(props) {
               className="avatar"
             />
             {e.name}
-          </div>
+
+            {
+              e.name !== isActive ? <span className="message-count">{messageCount}</span> : null
+            }
+            </div>
+
         ))}
       </div>
     </>

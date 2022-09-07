@@ -24,33 +24,13 @@
     background-color: #666;
     color: white;
   }
-  /* Style the active class, and buttons on mouse-over */
-  /* .active, .btn:hover {
-    background-color: #666;
-    color: white;
-  } */
-  /* Sidebar links */
+*/
   .sidebar a {
     display: block;
     color: black;
     padding: 16px;
     text-decoration: none;
   }
-
-  /* Active/current link */
-  /* .sidebar a.active {
-    background-color: #555; 
-    color: white;
-  } */
-
-  /* Links on mouse-over */
-  /* .sidebar a:hover:not(.active) {
-    background-color: #555;
-    color: white;
-  } */
-
-  /* Page content. The value of the margin-left property should match the value of the sidebar's width property */
-
 
   /* On screens that are less than 700px wide, make the sidebar into a topbar */
   @media screen and (max-width: 700px) {
@@ -86,4 +66,14 @@
   }
   img{
     margin-right: 8px;
+  }
+  
+  div .message-count{
+    background-color:green;
+    text-align: center;
+    width: 23px;
+    padding: 2px;
+    font-size: 10px;
+    border-radius: 50%;
+    float: right;
   }

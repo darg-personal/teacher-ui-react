@@ -8,6 +8,7 @@ const Token = localStorage.getItem("token");
 function ChatRoom() {
   const [chatRoom, setChatRoom] = useState();
   const [chatRoomId, setChatRoomId] = useState();
+  const [receiveMessage, setReceiveMessage] = useState();
   const [type, setType] = useState(); 
   const [queue, setQueue] = useState([]); 
   localStorage.setItem("queue",queue)
@@ -17,14 +18,18 @@ function ChatRoom() {
     setType(data.type); 
    
   };
+  const receiveMessages = (data) =>{
+    setReceiveMessage(data.receiveMessageCount)
+    console.log(data.receiveMessageCount,'.........data');
+  }
 
   return (
     <>
       {Token ? (
         <div className="chatroom">
-          <Contact type={pull_data} />
+          <Contact type={pull_data} receiveMessage={receiveMessage}/>
           {type == "Channel" ? (
-            <MainChat chatRoom={chatRoom} chatRoomId={chatRoomId} type={type}/>
+            <MainChat chatRoom={chatRoom} chatRoomId={chatRoomId} type={type} receiveMessages={receiveMessages}/>
           ) : type == "user" ? (
             <UserChat userName={chatRoom} userId={chatRoomId} type={type} />
           ) : null}
