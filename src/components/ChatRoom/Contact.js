@@ -12,12 +12,16 @@ function Contact(props) {
   const [isActive, setIsActive] = useState();
 
  const messageCount = props.receiveMessage;
-//  console.log(messageCount,'.........messageCount');
-  useEffect(() => {
+ console.log("Contact function hit");
+ 
+ useEffect(() => {
+    console.log("useEffect getGroupData function called");
     getGroupData();
   }, []);
 
   const getGroupData = () => {
+ console.log("getGroupData function hit");
+
     axios
       .get(`${utils.getHost()}/chat/get/user_connected_list/`, {
         headers: {
