@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../css/auth/auth.scss";
 import { Link } from "react-router-dom";
 import Modal from "../../components/AuthModal/Modal";
@@ -6,8 +6,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import swal from "sweetalert";
 import utils from "./utils";
+import Home from "./home";
 
 const LoginScreen = () => {
+  let Token = localStorage.getItem("token");
   let navigate = useNavigate();
   let loginFields = [
     {
@@ -45,7 +47,7 @@ const LoginScreen = () => {
     fieldData[index].hasError = value === "";
     updateFields(fieldData);
   };
-  
+
   const handleFormSubmit = (event) => {
     event.preventDefault();
 
@@ -67,10 +69,10 @@ const LoginScreen = () => {
     updateSendingRequest(true);
 
     axios.post(
-        // "http://192.168.1.37:8000/s3_uploader/user/login",
-        `${utils.getHost()}/s3_uploader/user/login`,
-        requestObject
-      )
+      // "http://192.168.1.37:8000/s3_uploader/user/login",
+      `${utils.getHost()}/s3_uploader/user/login`,
+      requestObject
+    )
       .then((response) => {
         console.log({ response });
         console.log("_______________", response.data.user);
@@ -114,80 +116,89 @@ const LoginScreen = () => {
       });
   };
 
-  return (
-    <div className={"login-section page-container"}>
-      <div className={"auth-container"}>
-        <div className={"auth-logo"}>
-          <img
-            src={require("../../assets/teacherlogo.png")}
-            alt={"Teacher logo"}
-          />
-        </div>
+  useEffect(() => {
+    if (Token)
+      navigate('/dashboard')
+  },[])
 
-        <div className={"auth-content"}>
-          <div className={"auth-header"}>
-            <h4>Login</h4>
-            <div className={"header-text"}>
-              Don't have an account yet? <Link to={"/register"}>Sign Up</Link>
-            </div>
+  return (
+    <>
+    {!Token ?
+      <div className={"login-section page-container"}>
+        <div className={"auth-container"}>
+          <div className={"auth-logo"}>
+            <img
+              src={require("../../assets/teacherlogo.png")}
+              alt={"Teacher logo"}
+            />
           </div>
 
-          <form
-            method={"post"}
-            action={""}
-            onSubmit={(event) => handleFormSubmit(event)}
-          >
-            <div className={"input-list centered-data"}>
-              {fields.map((field, index) => {
-                return (
-                  <div className={`input-control`} key={index}>
-                    <input
-                      type={field.type}
-                      value={field.value}
-                      name={field.name}
-                      onChange={(event) =>
-                        setFieldValue(event.target.value, index)
-                      }
-                      placeholder={field.placeholder}
-                      className={`${field.hasError ? "input-error" : ""}`}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className={"centered-data"}>
-              <div className={"forgot-password-section"}>
-              <Link to={"/ForgetPassword"}>Forgot password?</Link>
-              </div>
-
-              <div className={"button-container"}>
-                <button
-                  type={"submit"}
-                  disabled={
-                    fields.filter((field) => field.value === "").length > 0
-                  }
-                >
-                  Log in
-                </button>
+          <div className={"auth-content"}>
+            <div className={"auth-header"}>
+              <h4>Login</h4>
+              <div className={"header-text"}>
+                Don't have an account yet? <Link to={"/register"}>Sign Up</Link>
               </div>
             </div>
-          </form>
+
+            <form
+              method={"post"}
+              action={""}
+              onSubmit={(event) => handleFormSubmit(event)}
+            >
+              <div className={"input-list centered-data"}>
+                {fields.map((field, index) => {
+                  return (
+                    <div className={`input-control`} key={index}>
+                      <input
+                        type={field.type}
+                        value={field.value}
+                        name={field.name}
+                        onChange={(event) =>
+                          setFieldValue(event.target.value, index)
+                        }
+                        placeholder={field.placeholder}
+                        className={`${field.hasError ? "input-error" : ""}`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className={"centered-data"}>
+                <div className={"forgot-password-section"}>
+                  <Link to={"/ForgetPassword"}>Forgot password?</Link>
+                </div>
+
+                <div className={"button-container"}>
+                  <button
+                    type={"submit"}
+                    disabled={
+                      fields.filter((field) => field.value === "").length > 0
+                    }
+                  >
+                    Log in
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
 
-      {sendingRequest ? (
-        <Modal
-          text={feedbackData.process}
-          feedbackText={feedbackData.feedback}
-          closable={feedbackData.closable}
-          onClose={() => {
-            clearTimeout(resetTimeout.current);
-            updateSendingRequest(false);
-          }}
-        />
-      ) : null}
-    </div>
+        {sendingRequest ? (
+          <Modal
+            text={feedbackData.process}
+            feedbackText={feedbackData.feedback}
+            closable={feedbackData.closable}
+            onClose={() => {
+              clearTimeout(resetTimeout.current);
+              updateSendingRequest(false);
+            }}
+          />
+        ) : null}
+      </div>
+      : <p>Loading ....</p> }
+    </>
   );
 };
 

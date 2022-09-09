@@ -56,8 +56,7 @@ function App() {
             <Route path={"lesson_list_new"} element={<Lesson_list_new />} />
             <Route path={"users"} element={<Users />} />
             <Route path={"leads"} element={<Leads />} />
-            <Route path={"chatroom"} element={<ChatRoom />}/>
-            <Route path={"websocket"} element={<Socket />}/>
+            <Route path={"chatroom"} element={<Socket />}/> 
             <Route path={"usefetch"} element={<UserFetchApp />}/>
             <Route path={"sms"} element={<Sms />} />
             <Route path={"userprofile"} element={<UserProfile />} />

@@ -1,0 +1,35 @@
+  .card-upload1 {
+    flex: 1;
+    width: 300px;
+    height: 100%;
+    padding: 25px;
+    margin-top: 1px;
+    display: flex;
+    justify-content: center;
+    background: white;
+    background-repeat: no-repeat, no-repeat;
+    background-position: 5% -5%, 100% -1%;
+    background-size: 40%, 40%;
+    animation: open .5s;
+  }
+ 
+  .img-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 50%;
+  }
+  
+  .header-user{
+    background: #fff;
+    align-items: center;  
+  }
+  li {
+    float: left;
+  }
+  
+  
+  
+  
+  

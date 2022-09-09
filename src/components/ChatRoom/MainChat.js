@@ -7,10 +7,14 @@ import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
-
+import { useNavigate } from "react-router-dom";
+import { BiDotsVerticalRounded } from "react-icons/bi";
+import { AiOutlineArrowLeft } from "react-icons/ai";
+import { Dropdown } from "react-bootstrap";
 function MainChat(props) {
-  // LocalStorage
+
   let Token = localStorage.getItem("token");
+  let navigate = useNavigate();
   let loggedUser = JSON.parse(localStorage.getItem("user"));
 
   // Variables
@@ -25,84 +29,69 @@ function MainChat(props) {
   // Props
   const chatroom = props.chatRoom;
   const ws = props.websocket;
-  console.log(ws,"-=-=-=-=-=-=-=");
   const chatroomId = props.chatRoomId;
-  // console.log(ws, "======-------=====++")
-  // var ws = new WebSocket(
-  //   `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${chatroom}`
-  // ); 
+  const type = props.type;
+  const getChatImage = props.getChatImage;
+
   useEffect(() => {
-    // ws.onopen = function open() {
-      setPage(1);
+    setPage(1);
+    console.log(`web socket connection created for channel ${chatroom}!!`);
+    axios
+      .get(
+        `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+          },
+        }
+      )
+      .then((res) => {
+        const responseData = JSON.stringify(res.data);
+        const message = JSON.parse(responseData);
+        setMessageCount(message.count);
+        const prevMsgs = [];
+        for (let i = message.results.length - 1; i >= 0; i--) {
+          const receivedObj = message.results[i];
+          const receivedDate = receivedObj?.created_at || "NA";
+          const messageDate = new Date(receivedDate);
+          const time = messageDate.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          const date = messageDate.toLocaleDateString("en-US", {
+            weekday: "short",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
 
-      console.log(`web socket connection created for channel ${chatroom}!!`);
-      axios
-        .get(
-          `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=1`,
-          {
-            headers: {
-              Authorization: `Bearer ${Token}`,
-            },
-          }
-        )
-        .then((res) => {
-          const responseData = JSON.stringify(res.data);
-          const message = JSON.parse(responseData);
-          setMessageCount(message.count);
-          const prevMsgs = [];
-          for (let i = message.results.length - 1; i >= 0; i--) {
-            const receivedObj = message.results[i];
-            const receivedDate = receivedObj?.created_at || "NA";
-            const messageDate = new Date(receivedDate);
-            const time = messageDate.toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            const date = messageDate.toLocaleDateString("en-US", {
-              weekday: "short",
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            });
+          const msgObj = {
+            sender: receivedObj?.user.username || "NA",
+            message: receivedObj?.message_text || "NA",
+            time: time || "NA",
+            date: date || "NA",
+            profile: receivedObj?.user_profile.image || null,
+          };
 
-            const msgObj = {
-              sender: receivedObj?.user.username || "NA",
-              message: receivedObj?.message_text || "NA",
-              time: time || "NA",
-              date: date || "NA",
-              profile: receivedObj?.user_profile.image || null,
-            };
-
-            prevMsgs.push(msgObj);
-          }
-          // prevMsgs.push(...messages);
-          setMessages([...prevMsgs]);
-        })
-        .then(() => {
-          setLoad(false);
-        })
-        .catch((error) => {
-          console.log("error : ", error);
-        });
-    // };
+          prevMsgs.push(msgObj);
+        }
+        setMessages([...prevMsgs]);
+      })
+      .catch((error) => {
+        console.log("error : ", error);
+      }).finally(() => {
+        setLoad(false);
+      })
   }, [chatroom]);
 
-  // function handleMessageCount(value) {
-  //   setReceiveMessageCount(value + 1);
-  //   // props.receiveMessages({ receiveMessageCount: receiveMessageCount });
-  // }
-
-  // onMessage
   useEffect(() => {
     ws.onmessage = (evt) => {
-      // listen to data sent from the websocket server
       console.log("=========on message========");
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
-console.log(chatroom , receivedObj.channel.name);
-      // handleMessageCount(receiveMessageCount);
-      if (chatroom === receivedObj.channel.name) {
-        console.log("receivedObj...........", receivedObj);
+      console.log(receivedObj.channel, "=========on message========");
+
+      if (chatroomId === receivedObj.channel.id) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const time = messageDate.toLocaleTimeString("en-US", {
@@ -129,14 +118,14 @@ console.log(chatroom , receivedObj.channel.name);
     };
   }, [messages]);
 
-  // Send button
   function handleClick(event) {
     event.preventDefault();
     if (inputRef.current.value !== "") {
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
-          media_link: "http://www.doogle.com/",
+          message_type: 'text',
+          media_link: null,
           message_text: inputRef.current.value,
           user: "user1",
         })
@@ -159,7 +148,6 @@ console.log(chatroom , receivedObj.channel.name);
       .then((res) => {
         const responseData = JSON.stringify(res.data);
         const message = JSON.parse(responseData);
-        console.log(message, "00000");
         const prevMsgs = [];
         for (let i = message.results.length - 1; i >= 0; i--) {
           const receivedObj = message.results[i];
@@ -188,7 +176,9 @@ console.log(chatroom , receivedObj.channel.name);
         }
         setLoad(false);
         setMessages([...prevMsgs, ...messages]);
-      });
+      }).finally(() => {
+        setLoad(false);
+      })
   }
   //onScroll
   const onScroll = () => {
@@ -215,16 +205,43 @@ console.log(chatroom , receivedObj.channel.name);
   return (
     <>
       {/* Page content */}
-      <div className="header">
-        <Link to="/dashboard">
-          {" "}
-          <button
-            type="button"
-            className="btn btn-secondary position-fixed top-0 end-0"
-          >
-            Back to Home
-          </button>
-        </Link>
+      <ul className="profile-header">
+        <div className="header-chat">
+          <div className="classes">
+            <div>
+              <AiOutlineArrowLeft
+                style={{ color: "#fff", height: "30" }}
+                onClick={() => {
+                  navigate("/dashboard");
+                }}
+              />
+            </div>
+            <li onClick={() => props.show({ show: true, type: type })}>
+              <img src={getChatImage} alt="Avatar" className="avatar" />
+            </li>
+
+            <li className="" style={{color : 'white',fontWeight:'bold'}} >{chatroom}</li>
+          </div>
+        </div>
+      </ul>
+      <div className="position-fixed  end-0">
+        <div className="three-dots">
+          <i className="bi bi-three-dots-vertical"></i>
+
+          <Dropdown>
+            <Dropdown.Toggle variant="white" id="dropdown-basic">
+              <BiDotsVerticalRounded
+                id="dropdown-basic"
+                style={{ color: "#FFF" }}
+              ></BiDotsVerticalRounded>
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu className="drop">
+              <Dropdown.Item>Settings</Dropdown.Item>
+              <Dropdown.Item>Details</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
       </div>
       {load ? <Loader /> : null}
       <div
@@ -234,34 +251,41 @@ console.log(chatroom , receivedObj.channel.name);
         onScroll={onScroll}
       >
         {messages.map((e, i) => {
-          return e.sender === loggedUser.username ? (
-            <div key={i} className="container darker" id="right">
-              {e.profile ? (
-                <img src={e.profile} alt="Avatar" className="right" />
-              ) : (
-                <img src={Avatar} alt="Avatar" className="right" />
-              )}
-              <span className="name right">Me</span>
-              <p>{`${e.message}`}</p>
+          return (<>
+            {/* <div key={i} className="container darker" id="center">
+            {e.date}
+           </div> */}
+            {e.sender === loggedUser.username ? (
+              <div key={i} className="container darker" id="right">
+                {e.profile ? (
+                  <img src={e.profile} alt="Avatar" className="right responsive-image" />
+                ) : (
+                  <img src={Avatar} alt="Avatar" className="right responsive-image" />
+                )}
+                <span className="name right">Me</span>
+                <p>{`${e.message}`}</p>
 
-              <span className="time-right">
-                {e.time} {e.date}
-              </span>
-            </div>
-          ) : (
-            <div key={i} className="container" id="left">
-              {e.profile ? (
-                <img src={e.profile} alt="Avatar" className="right" />
-              ) : (
-                <img src={Avatar} alt="Avatar" className="right" />
-              )}
-              <span className="name right">{e.sender}</span>
-              <p>{`${e.message}`}</p>
-              <span className="time-left">
-                {e.time} {e.date}
-              </span>
-            </div>
-          );
+                <span className="time-right">
+                  {e.time}
+                </span>
+              </div>
+            ) : (
+              <div key={i} className="container" id="left">
+                {e.profile ? (
+                  <img src={e.profile} alt="Avatar" className="right responsive-image" />
+                ) : (
+                  <img src={Avatar} alt="Avatar" className="right responsive-image" />
+                )}
+                <span className="name right">{e.sender}</span>
+                <p>{`${e.message}`}</p>
+                <span className="time-left">
+                  {e.time}
+                </span>
+              </div>
+            )}
+          </>
+
+          )
         })}
 
         <Outlet />
