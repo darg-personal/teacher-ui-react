@@ -35,14 +35,12 @@ function getHost() {
     var WEBSOCKET_HOST = '';
     if (window.location.origin.includes("localhost")) {
         WEBSOCKET_HOST = 'ws://localhost:8000';
-        // WEBSOCKET_HOST = 'ws://192.168.29.147:8000';
-        // WEBSOCKET_HOST = 'ws://192.168.1.30:8000';
+        
         
       }
       else{
-        // WEBSOCKET_HOST = 'ws://192.168.1.30:8000';
-        // WEBSOCKET_HOST = 'ws://192.168.29.147:8000';
-        WEBSOCKET_HOST = 'ws://18.117.227.68:8041';
+        WEBSOCKET_HOST = 'wss://api.dreampotential.org';
+        // WEBSOCKET_HOST = 'ws://18.117.227.68:8041';
       }
     return  WEBSOCKET_HOST
   }
