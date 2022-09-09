@@ -28,6 +28,7 @@ import MainChat from "./components/ChatRoom/MainChat";
 import UserProfile from "./pages/auth/UserProfile/UserProfile";
 import ChangePassword from "./pages/auth/ChangePassword";
 import ForgetPassword from './pages/auth/ForgetPassword';
+import { Socket } from "./components/ChatRoom/Socket";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 function App() {
@@ -55,7 +56,7 @@ function App() {
             <Route path={"lesson_list_new"} element={<Lesson_list_new />} />
             <Route path={"users"} element={<Users />} />
             <Route path={"leads"} element={<Leads />} />
-            <Route path={"chatroom"} element={<ChatRoom />}/>
+            <Route path={"chatroom"} element={<Socket />}/> 
             <Route path={"usefetch"} element={<UserFetchApp />}/>
             <Route path={"sms"} element={<Sms />} />
             <Route path={"userprofile"} element={<UserProfile />} />

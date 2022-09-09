@@ -7,13 +7,15 @@ import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
-
+import { useNavigate } from "react-router-dom";
+import { BiDotsVerticalRounded } from "react-icons/bi";
+import { AiOutlineArrowLeft } from "react-icons/ai";
+import { Dropdown } from "react-bootstrap";
 function MainChat(props) {
-  // LocalStorage
+
   let Token = localStorage.getItem("token");
+  let navigate = useNavigate();
   let loggedUser = JSON.parse(localStorage.getItem("user"));
-  // const connectionStorage = JSON.parse(localStorage.getItem("localStorageGroup"));
-  // console.log("===connectionStorage_First Time====",connectionStorage);
 
   // Variables
   const inputRef = useRef(null);
@@ -26,91 +28,14 @@ function MainChat(props) {
 
   // Props
   const chatroom = props.chatRoom;
+  const ws = props.websocket;
   const chatroomId = props.chatRoomId;
+  const type = props.type;
+  const getChatImage = props.getChatImage;
 
-  // if (!connectionStorage ["group"].includes(chatroom)) {
-  //   // function to remove duplicate
-  //           function removeDuplicates(queue) {
-  //            return queue.filter((item, index) => queue.indexOf(item) === index);
-  //            }
-  //   var chatroomList = JSON.parse(window.localStorage.getItem("meta"));
-  //   chatroomList["group"].push(chatroom);
-  //   chatroomList["group"] = removeDuplicates(chatroomList["group"]);
-  //   chatroomList = JSON.parse(localStorage.getItem("meta"));
-  //   var ws = new WebSocket(
-  //     `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${chatroom}`
-  //   );
-  // } else {
-  // }//end if close
-// connectionStorage={
-//   "group":{"class8":"ws","class9":"ws"},
-//   "user":{}
-// }
-// console.log("===connectionStorage====",connectionStorage['group']);
-  var ws = new WebSocket(
-    `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${chatroom}`
-  ); 
-//   connectionStorage["group"][chatroom] = ws
-  // localStorage.setItem("localStorageGroup", JSON.stringify(connectionStorage));
-  // localStorage.setItem("localStorageGroup",JSON.stringify(connectionStorage));
-  // console.log("localStorageGroup.getItem",localStorage.getItem("localStorageGroup"));
-  
   useEffect(() => {
-            ws.onopen = function open()
-             {
-              setPage(1);
-
-              console.log(`web socket connection created for channel${chatroom}!!`);
-            };
-            fetchData();
-  }, [chatroom]);
-   
-  function handleMessageCount(value) {
-    console.log(value, ".......value");
-    setReceiveMessageCount(value + 1);
-    console.log(receiveMessageCount, ".......messagecount");
-    props.receiveMessages({ receiveMessageCount: receiveMessageCount });
-  }
-
-
-  // onMessage 
-  useEffect(() => {
-    ws.onmessage = (evt) => {
-      // listen to data sent from the websocket server
-      const message = JSON.parse(JSON.stringify(evt.data));
-      const receivedObj = JSON.parse(message);
-      
-      handleMessageCount(receiveMessageCount);
-      if (chatroom === receivedObj.channel.name) {
-        console.log("receivedObj...........", receivedObj);
-        const receivedDate = receivedObj?.created_at || "NA";
-        const messageDate = new Date(receivedDate);
-        const time = messageDate.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        const date = messageDate.toLocaleDateString("en-US", {
-          weekday: "short",
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        });
-        const msgObj = {
-          sender: receivedObj?.user.username || "NA",
-          message: receivedObj?.message_text || "NA",
-          time: time || "NA",
-          date: date || "NA",
-          profile: receivedObj?.user_profile.image || Avatar,
-        };
-        const prevMsgs = [...messages];
-        prevMsgs.push(msgObj);
-        setMessages([...prevMsgs]);
-      }
-    };
-  }, [messages]);
-
-  // Pagination Api call
-  function fetchData() {
+    setPage(1);
+    console.log(`web socket connection created for channel ${chatroom}!!`);
     axios
       .get(
         `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=1`,
@@ -150,37 +75,69 @@ function MainChat(props) {
 
           prevMsgs.push(msgObj);
         }
-        // prevMsgs.push(...messages);
         setMessages([...prevMsgs]);
-      })
-      .then(() => {
-        setLoad(false);
       })
       .catch((error) => {
         console.log("error : ", error);
-      });
-  }
+      }).finally(() => {
+        setLoad(false);
+      })
+  }, [chatroom]);
 
-  // Send button
+  useEffect(() => {
+    ws.onmessage = (evt) => {
+      console.log("=========on message========");
+      const message = JSON.parse(JSON.stringify(evt.data));
+      const receivedObj = JSON.parse(message);
+      console.log(receivedObj.channel, "=========on message========");
+
+      if (chatroomId === receivedObj.channel.id) {
+        const receivedDate = receivedObj?.created_at || "NA";
+        const messageDate = new Date(receivedDate);
+        const time = messageDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const date = messageDate.toLocaleDateString("en-US", {
+          weekday: "short",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+        const msgObj = {
+          sender: receivedObj?.user.username || "NA",
+          message: receivedObj?.message_text || "NA",
+          time: time || "NA",
+          date: date || "NA",
+          profile: receivedObj?.user_profile.image || Avatar,
+        };
+        const prevMsgs = [...messages];
+        prevMsgs.push(msgObj);
+        setMessages([...prevMsgs]);
+      }
+    };
+  }, [messages]);
+
   function handleClick(event) {
     event.preventDefault();
     if (inputRef.current.value !== "") {
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
-          media_link: "http://www.doogle.com/",
+          message_type: 'text',
+          media_link: null,
           message_text: inputRef.current.value,
           user: "user1",
         })
-        );
-        document.getElementById("inp").value = "";
+      );
+      document.getElementById("inp").value = "";
     }
   }
-  
+
   //OnScroll fetch more data from pagination api
   function updateData(value) {
     axios
-    .get(
+      .get(
         `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=${value}`,
         {
           headers: {
@@ -191,7 +148,6 @@ function MainChat(props) {
       .then((res) => {
         const responseData = JSON.stringify(res.data);
         const message = JSON.parse(responseData);
-        console.log(message, "00000");
         const prevMsgs = [];
         for (let i = message.results.length - 1; i >= 0; i--) {
           const receivedObj = message.results[i];
@@ -215,12 +171,14 @@ function MainChat(props) {
             date: date || "NA",
             profile: receivedObj?.user_profile.image || null,
           };
-          
+
           prevMsgs.push(msgObj);
         }
         setLoad(false);
         setMessages([...prevMsgs, ...messages]);
-      });
+      }).finally(() => {
+        setLoad(false);
+      })
   }
   //onScroll
   const onScroll = () => {
@@ -246,17 +204,44 @@ function MainChat(props) {
   }, []);
   return (
     <>
-    {/* Page content */}
-    <div className="header">
-        <Link to="/dashboard">
-          {" "}
-          <button
-            type="button"
-            className="btn btn-secondary position-fixed top-0 end-0"
-            >
-            Back to Home
-          </button>
-          </Link>
+      {/* Page content */}
+      <ul className="profile-header">
+        <div className="header-chat">
+          <div className="classes">
+            <div>
+              <AiOutlineArrowLeft
+                style={{ color: "#fff", height: "30" }}
+                onClick={() => {
+                  navigate("/dashboard");
+                }}
+              />
+            </div>
+            <li onClick={() => props.show({ show: true, type: type })}>
+              <img src={getChatImage} alt="Avatar" className="avatar" />
+            </li>
+
+            <li className="" style={{color : 'white',fontWeight:'bold'}} >{chatroom}</li>
+          </div>
+        </div>
+      </ul>
+      <div className="position-fixed  end-0">
+        <div className="three-dots">
+          <i className="bi bi-three-dots-vertical"></i>
+
+          <Dropdown>
+            <Dropdown.Toggle variant="white" id="dropdown-basic">
+              <BiDotsVerticalRounded
+                id="dropdown-basic"
+                style={{ color: "#FFF" }}
+              ></BiDotsVerticalRounded>
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu className="drop">
+              <Dropdown.Item>Settings</Dropdown.Item>
+              <Dropdown.Item>Details</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
       </div>
       {load ? <Loader /> : null}
       <div
@@ -264,36 +249,43 @@ function MainChat(props) {
         id="scroll"
         ref={scrollBottom}
         onScroll={onScroll}
-        >
+      >
         {messages.map((e, i) => {
-          return e.sender === loggedUser.username ? (
-            <div key={i} className="container darker" id="right">
-            {e.profile ? (
-              <img src={e.profile} alt="Avatar" className="right" />
-              ) : (
-                <img src={Avatar} alt="Avatar" className="right" />
-              )}
-              <span className="name right">Me</span>
-              <p>{`${e.message}`}</p>
+          return (<>
+            {/* <div key={i} className="container darker" id="center">
+            {e.date}
+           </div> */}
+            {e.sender === loggedUser.username ? (
+              <div key={i} className="container darker" id="right">
+                {e.profile ? (
+                  <img src={e.profile} alt="Avatar" className="right responsive-image" />
+                ) : (
+                  <img src={Avatar} alt="Avatar" className="right responsive-image" />
+                )}
+                <span className="name right">Me</span>
+                <p>{`${e.message}`}</p>
 
-              <span className="time-right">
-                {e.time} {e.date}
-              </span>
-            </div>
-          ) : (
-            <div key={i} className="container" id="left">
-            {e.profile ? (
-                <img src={e.profile} alt="Avatar" className="right" />
-              ) : (
-                <img src={Avatar} alt="Avatar" className="right" />
-              )}
-              <span className="name right">{e.sender}</span>
-              <p>{`${e.message}`}</p>
-              <span className="time-left">
-                {e.time} {e.date}
-              </span>
-            </div>
-          );
+                <span className="time-right">
+                  {e.time}
+                </span>
+              </div>
+            ) : (
+              <div key={i} className="container" id="left">
+                {e.profile ? (
+                  <img src={e.profile} alt="Avatar" className="right responsive-image" />
+                ) : (
+                  <img src={Avatar} alt="Avatar" className="right responsive-image" />
+                )}
+                <span className="name right">{e.sender}</span>
+                <p>{`${e.message}`}</p>
+                <span className="time-left">
+                  {e.time}
+                </span>
+              </div>
+            )}
+          </>
+
+          )
         })}
 
         <Outlet />

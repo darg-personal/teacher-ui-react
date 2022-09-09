@@ -80,7 +80,7 @@ float: right;
 .box{
   position: fixed;
   width: 75%;
-  padding: 10px 15px;
+  padding: 0px 15px;
   margin-left: 23%;
 
 }
@@ -126,3 +126,68 @@ float: right;
 }
 /* .chat-content
 } */
+.responsive-image {
+  margin: 0px;
+  height: 25px;
+  width: 25px;
+}
+
+.drop{
+  background-color: red;
+}
+
+.header-chat{
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0px;
+}
+
+.classes{
+  display: flex;
+}
+
+.profile-header {
+  list-style-type: none;
+  margin: 0;
+  padding: 8px 8px;
+  overflow: hidden;
+  background-color: #333;
+  width: 80%;
+  float: right;
+}
+.profile-header button{
+  float: left;
+}
+
+li {
+  float: left;
+  list-style: none;
+  margin-left: 10px;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 15px 15px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #111;
+}
+
+.avatar {
+  vertical-align: middle;
+  width: 30px;
+  height: 30px;
+  border-radius: 60%;
+}
+.toggle{
+  margin-left: 90%;
+  z-index: 1;
+}
+.upleft{
+margin-top: 10px;
+align-self: flex-end;
+}

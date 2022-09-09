@@ -12,12 +12,16 @@ function Contact(props) {
   const [isActive, setIsActive] = useState();
 
  const messageCount = props.receiveMessage;
-//  console.log(messageCount,'.........messageCount');
-  useEffect(() => {
+ console.log("Contact function hit");
+ 
+ useEffect(() => {
+    console.log("useEffect getGroupData function called");
     getGroupData();
   }, []);
 
   const getGroupData = () => {
+ console.log("getGroupData function hit");
+
     axios
       .get(`${utils.getHost()}/chat/get/user_connected_list/`, {
         headers: {
@@ -36,19 +40,19 @@ function Contact(props) {
               name: receivedObj.name,
               created_at: receivedObj.created_at,
               typeId: receivedObj.id,
-              // image: Avatar,
+              image: receivedObj.image || Avatar,
               type: "Channel",
             });
           } 
           else {
             const receivedObj = groups.results[i].user;
-            if (login_user.username != receivedObj.username){
+            if (login_user.username !== receivedObj.username){
             prevGroup.push({
               id: i,
               name: receivedObj.username,
               created_at: receivedObj.created_at,
               typeId: receivedObj.id,
-              // image: groups.results[i].user_profile.image || Avatar, 
+              image: groups.results[i].user_profile.image || Avatar, 
               type: "user",
             });
           }
@@ -66,9 +70,8 @@ function Contact(props) {
   };
 
   const handleClick = (value) => {
-    console.log(value,'.......value');
     setIsActive(value.name);
-    props.type({ name: value.name, type: value.type, id: value.typeId });
+    props.type({ name: value.name, type: value.type, id: value.typeId, image:value.image });
   };
 
   return (
@@ -88,9 +91,9 @@ function Contact(props) {
             />
             {e.name}
 
-            {
+            {/* {
               e.name !== isActive ? <span className="message-count">{messageCount}</span> : null
-            }
+            } */}
             </div>
 
         ))}
