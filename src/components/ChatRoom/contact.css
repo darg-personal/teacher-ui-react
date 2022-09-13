@@ -15,6 +15,7 @@
     background-color: #b9b4b4;
     cursor: pointer;
     font-size: 18px;
+    display: flex;
   }
   .active {
     background-color: #222;

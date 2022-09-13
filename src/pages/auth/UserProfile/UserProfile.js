@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
 // import utils from '../utils';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import './userProfile.css'
 import utils from '../utils';
 let Token = localStorage.getItem("token");
@@ -92,39 +92,48 @@ function UserProfile() {
   }
 
   return (
-    <div className='upload-body-centered'>
-      <div className="card-upload">
-        <form >
-          <h1 >Profile Card</h1>
-          <ImgUpload onChange={photoUpload} src={state.imagePreviewUrl} />
-          <p>Name :</p>
-          <input className="input-text"
-            id="name"
-            type="text"
-            value={userName}
-            onChange={(e) => { setUserName(e.target.value) }}
-          />
-          <p style={{ marginTop: '5%' }}>Number :</p>
-          {/* <input className="input-text"
-            id="number"
-            type="text"
-            value={phoneNumber}
-            onChange={(e) => { setPhoneNumber(e.target.value) }}
-          /> */}
-          <p>{phoneNumber}</p>
-          {isSelected ?
-            <p type="click" className="button-upload" onClick={(data) => {
-              handleSubmission()
-            }}>Save </p>
-            :
-            <p type="click" className="button-upload" onClick={(data) => {
-              navigate('/dashboard' )
-            }} style={{background: '#dbd94c'}}>GoBack </p>
-          }
-        </form>
-      </div>
+    <>
+      {
+        Token ? (
+          <div className='upload-body-centered'>
+            <div className="card-upload">
+              <form >
+                <h1 >Profile Card</h1>
+                <ImgUpload onChange={photoUpload} src={state.imagePreviewUrl} />
+                <p>Name :</p>
+                <input className="input-text"
+                  id="name"
+                  type="text"
+                  value={userName}
+                  onChange={(e) => { setUserName(e.target.value) }}
+                />
+                <p style={{ marginTop: '5%' }}>Number :</p>
+                {/* <input className="input-text"
+                id="number"
+                type="text"
+                value={phoneNumber}
+                onChange={(e) => { setPhoneNumber(e.target.value) }}
+              /> */}
+                <p>{phoneNumber}</p>
+                {isSelected ?
+                  <p type="click" className="button-upload" onClick={(data) => {
+                    handleSubmission()
+                  }}>Save </p>
+                  :
+                  <p type="click" className="button-upload" onClick={(data) => {
+                    navigate('/dashboard')
+                  }} style={{ background: '#dbd94c' }}>GoBack </p>
+                }
+              </form>
+            </div>
 
-    </div>
+          </div>
+        ) : (
+          <Navigate replace to="/login" />
+        )
+      }
+    </>
+
   )
 }
 

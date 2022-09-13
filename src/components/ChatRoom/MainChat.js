@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { useRef } from "react";
 import { Link, Outlet } from "react-router-dom";
 import "./mainChat.css";
-import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
@@ -11,6 +10,11 @@ import { useNavigate } from "react-router-dom";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Dropdown } from "react-bootstrap";
+import IconButton from "@mui/material/IconButton";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+
 function MainChat(props) {
 
   let Token = localStorage.getItem("token");
@@ -25,6 +29,13 @@ function MainChat(props) {
   const [messageCount, setMessageCount] = useState(0);
   const [receiveMessageCount, setReceiveMessageCount] = useState(1);
   const [load, setLoad] = useState(false);
+  const [selectedFile, setSelectedFile] = useState();
+  const [isSelected, setIsSelected] = useState(false);
+  const [state, setState] = useState({
+    file: "",
+    filePreviewUrl:
+      null,
+  });
 
   // Props
   const chatroom = props.chatRoom;
@@ -54,6 +65,7 @@ function MainChat(props) {
           const receivedObj = message.results[i];
           const receivedDate = receivedObj?.created_at || "NA";
           const messageDate = new Date(receivedDate);
+          const message_type = receivedObj?.message_type;
           const time = messageDate.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
@@ -71,6 +83,8 @@ function MainChat(props) {
             time: time || "NA",
             date: date || "NA",
             profile: receivedObj?.user_profile.image || null,
+            message_type: message_type || "message/text",
+            media_link: receivedObj?.media_link || null,
           };
 
           prevMsgs.push(msgObj);
@@ -94,6 +108,8 @@ function MainChat(props) {
       if (chatroomId === receivedObj.channel.id) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
+        const message_type = receivedObj?.message_type;
+
         const time = messageDate.toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit",
@@ -110,6 +126,8 @@ function MainChat(props) {
           time: time || "NA",
           date: date || "NA",
           profile: receivedObj?.user_profile.image || Avatar,
+          message_type: message_type || "message/text",
+          media_link: receivedObj?.media_link || null,
         };
         const prevMsgs = [...messages];
         prevMsgs.push(msgObj);
@@ -118,22 +136,46 @@ function MainChat(props) {
     };
   }, [messages]);
 
-  function handleClick(event) {
+  async function handleClick(event) {
     event.preventDefault();
-    if (inputRef.current.value !== "") {
+    let context_type;
+    let file_url;
+    if (isSelected) {
+      let formData = new FormData();
+      formData.append("file", selectedFile);
+      await axios
+        .post(`${utils.getHost()}/s3_uploader/upload`, formData)
+        .then((resp) => {
+          console.log(resp.data.content_type);
+          context_type = resp.data.content_type;
+          file_url = resp.data.file_url;
+        })
+        .then(() => {
+          setState({ file: false });
+        })
+        .catch((resp) => {
+          setState({ file: false });
+
+          alert("connection is breaked");
+        });
+    } else {
+      context_type = null;
+      file_url = null;
+    }
+    if (inputRef.current.value !== "" || isSelected) {
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
-          message_type: 'text',
-          media_link: null,
-          message_text: inputRef.current.value,
-          user: "user1",
+          message_type: context_type ? context_type : "message/text",
+          media_link: file_url ? file_url : null,
+          message_text: inputRef.current.value ? inputRef.current.value : "",
         })
       );
+      setIsSelected(false);
+      setState({ file: false });
       document.getElementById("inp").value = "";
     }
   }
-
   //OnScroll fetch more data from pagination api
   function updateData(value) {
     axios
@@ -153,6 +195,8 @@ function MainChat(props) {
           const receivedObj = message.results[i];
           const massageTime = receivedObj?.created_at || "NA";
           const messageDate = new Date(massageTime);
+          const message_type = receivedObj?.message_type;
+
           const time = messageDate.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
@@ -170,6 +214,8 @@ function MainChat(props) {
             time: time || "NA",
             date: date || "NA",
             profile: receivedObj?.user_profile.image || null,
+            message_type: message_type || "message/text",
+            media_link: receivedObj?.media_link || null,
           };
 
           prevMsgs.push(msgObj);
@@ -202,6 +248,59 @@ function MainChat(props) {
       });
     }
   }, []);
+
+  const ImageView = ({ image, text }) => {
+    console.log(image, text, "-=-");
+    return (
+      <div class="share-pic">
+        <img
+          className="share-pic-text"
+          src={image}
+        // alt="Geeks Image"
+        />
+        <p>{text !== "NA" ? text : null}</p>
+      </div>
+    );
+  };
+
+  const ImgUpload = ({ onChange, src }) => {
+    return (
+      <IconButton color="primary" aria-label="upload picture" component="label">
+        <input hidden accept="image/*" type="file" onChange={onChange} />
+        <AttachFileIcon />
+      </IconButton>
+    );
+  };
+
+  const ImageShow = () => {
+    console.log("iisiisiii");
+    return (
+      <div className="image-show-view">
+        <label className="centered-view">
+          <img  
+            src={state.filePreviewUrl}
+            style={{ height: "80%", width: "80%" }}
+          />
+        </label>
+      </div>
+    );
+  };
+
+  const photoUpload = (event) => {
+    event.preventDefault();
+    const reader = new FileReader();
+    const file = event.target.files[0];
+    setSelectedFile(event.target.files[0]);
+    setIsSelected(true);
+    reader.onloadend = () => {
+      setState({
+        file: file,
+        filePreviewUrl: reader.result,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <>
       {/* Page content */}
@@ -217,10 +316,12 @@ function MainChat(props) {
               />
             </div>
             <li onClick={() => props.show({ show: true, type: type })}>
-              <img src={getChatImage} alt="Avatar" className="avatar" />
+              <ListItemAvatar>
+                <Avatar alt={chatroom} src={getChatImage} />
+              </ListItemAvatar>
             </li>
 
-            <li className="" style={{color : 'white',fontWeight:'bold'}} >{chatroom}</li>
+            <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{chatroom}</li>
           </div>
         </div>
       </ul>
@@ -244,55 +345,72 @@ function MainChat(props) {
         </div>
       </div>
       {load ? <Loader /> : null}
-      <div
-        className="content"
-        id="scroll"
-        ref={scrollBottom}
-        onScroll={onScroll}
-      >
-        {messages.map((e, i) => {
-          return (<>
-            {/* <div key={i} className="container darker" id="center">
-            {e.date}
-           </div> */}
-            {e.sender === loggedUser.username ? (
-              <div key={i} className="container darker" id="right">
-                {e.profile ? (
-                  <img src={e.profile} alt="Avatar" className="right responsive-image" />
+
+      {state.file ? (
+        <ImageShow />
+      ) : (
+
+        <div
+          className="content"
+          id="scroll"
+          ref={scrollBottom}
+          onScroll={onScroll}
+        >
+          {messages.map((e, i) => {
+            return (
+              <div>
+                {e.sender === loggedUser.username ? (
+                  <div>
+                    <div key={i} className="container darker" id="right">
+                      <ListItemAvatar style={{ float: 'right' }}>
+                        <Avatar alt={e.sender} src={e.profile} style={{
+                          marginLeft: '10px',
+                          height: '35px',
+                          width: '35px'
+                        }} />
+                      </ListItemAvatar>
+                      <span className="name right">Me</span>
+                      {e.media_link ? (
+                        <ImageView image={e.media_link} text={`${e.message}`} />
+                      ) : (
+                        <p>{`${e.message}`}</p>
+                      )}
+
+                      <span className="time-right">{e.time}</span>
+                    </div>
+                  </div>
                 ) : (
-                  <img src={Avatar} alt="Avatar" className="right responsive-image" />
+                  <>
+                    <div key={i} className="container" id="left">
+                      <span className="name right">{e.sender}</span>
+                      <ListItemAvatar>
+                        <Avatar alt={e.sender} src={e.profile} style={{
+                          marginLeft: '10px',
+                          height: '35px',
+                          width: '35px'
+                        }} />
+                      </ListItemAvatar>
+                      {e.media_link ? (
+                        <ImageView image={e.media_link} text={`${e.message}`} />
+                      ) : (
+                        <p>{`${e.message}`}</p>
+                      )}
+                      <span className="time-left">{e.time}</span>
+                    </div>
+
+                  </>
                 )}
-                <span className="name right">Me</span>
-                <p>{`${e.message}`}</p>
-
-                <span className="time-right">
-                  {e.time}
-                </span>
               </div>
-            ) : (
-              <div key={i} className="container" id="left">
-                {e.profile ? (
-                  <img src={e.profile} alt="Avatar" className="right responsive-image" />
-                ) : (
-                  <img src={Avatar} alt="Avatar" className="right responsive-image" />
-                )}
-                <span className="name right">{e.sender}</span>
-                <p>{`${e.message}`}</p>
-                <span className="time-left">
-                  {e.time}
-                </span>
-              </div>
-            )}
-          </>
+            );
+          })}
 
-          )
-        })}
-
-        <Outlet />
-      </div>
+          <Outlet />
+        </div>
+      )}
 
       <div className="box">
         <form>
+          <ImgUpload onChange={photoUpload} src={state.filePreviewUrl} />
           <input
             ref={inputRef}
             className="input_text"

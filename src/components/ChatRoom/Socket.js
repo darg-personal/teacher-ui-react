@@ -3,10 +3,10 @@ import utils from "../../pages/auth/utils";
 import MainChat from "./MainChat";
 import UserChat from "./UserChat";
 import Contact from "./Contact";
-import { Navigate } from "react-router-dom";
 import { AiFillCodeSandboxSquare } from "react-icons/ai";
 import UserGroup from "./UserGroup";
 import Avatar from "../../assets/Images/avatar.svg";
+import { Navigate } from "react-router-dom";
 
 let Token = localStorage.getItem("token");
 export class Socket extends Component {

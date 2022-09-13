@@ -4,10 +4,15 @@ import Sidebar from '../../pages/auth/Sidebar'
 import { Button, Container, Table } from 'react-bootstrap'
 import { FaPlus } from 'react-icons/fa'
 import lesson_list from "../../css/lesson/lesson_list.scss"
+import { Navigate } from "react-router-dom";
 
+let Token = localStorage.getItem("token");
 export default function Lesson_list() {
   return (
-    <div>
+    <>
+    {
+      Token ?(
+        <div>
         <div className="dashboard-wrapper">
         <Sidebar />
             <div className="header-main">
@@ -54,5 +59,11 @@ export default function Lesson_list() {
             </div>
             </div>
     </div>
+      ):(
+        <Navigate replace to="/login" />
+      )
+    }
+    </>
+
   )
 }

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import utils from "./utils";
 import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 let Token = localStorage.getItem("token");
 
@@ -74,67 +75,77 @@ const ChangePassword = () => {
   };
   // console.log(fields, "===============");
   return (
-    <div className={"login-section page-container"}>
-      <div className={"auth-container"}>
-        <div className={"auth-logo"}>
-          <img
-            src={require("../../assets/teacherlogo.png")}
-            alt={"Teacher logo"}
-          />
-        </div>
-        <div className={"auth-content"}>
-          <div className={"auth-header"}>
-            <h4>Change Password</h4>
-          </div>
-
-          <div className={"input-list centered-data"}>
-            {fields.map((field, index) => {
-              return (
-                <div className={`input-control`} key={index}>
-                  <input
-                    type={field.type}
-                    value={field.value}
-                    name={field.name}
-                    onChange={(event) =>
-                      updateFieldValue(event.target.value, index)
-                    }
-                    placeholder={field.placeholder}
-                    className={`${field.hasError ? "input-error" : ""}`}
-                  />
+    <>
+      {
+        Token ? (
+          <div className={"login-section page-container"}>
+            <div className={"auth-container"}>
+              <div className={"auth-logo"}>
+                <img
+                  src={require("../../assets/teacherlogo.png")}
+                  alt={"Teacher logo"}
+                />
+              </div>
+              <div className={"auth-content"}>
+                <div className={"auth-header"}>
+                  <h4>Change Password</h4>
                 </div>
-              );
-            })}
-          </div>
 
-          <div className={"centered-data"}>
-            {/* <div className={"button-container"}> */}
-            {isSelected ? (
-              <p
-                type="click"
-                className="button-upload"
-                onClick={(data) => {
-                  changePass();
-                }}
-              >
-                Save{" "}
-              </p>
-            ) : (
-              <p
-                type="click"
-                className="button-upload"
-                onClick={(data) => {
-                  navigate("/dashboard");
-                }}
-                style={{ background: "#00A300" }}
-              >
-                GoBack{" "}
-              </p>
-            )}
-            {/* </div> */}
+                <div className={"input-list centered-data"}>
+                  {fields.map((field, index) => {
+                    return (
+                      <div className={`input-control`} key={index}>
+                        <input
+                          type={field.type}
+                          value={field.value}
+                          name={field.name}
+                          onChange={(event) =>
+                            updateFieldValue(event.target.value, index)
+                          }
+                          placeholder={field.placeholder}
+                          className={`${field.hasError ? "input-error" : ""}`}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className={"centered-data"}>
+                  {/* <div className={"button-container"}> */}
+                  {isSelected ? (
+                    <p
+                      type="click"
+                      className="button-upload"
+                      onClick={(data) => {
+                        changePass();
+                      }}
+                    >
+                      Save{" "}
+                    </p>
+                  ) : (
+                    <p
+                      type="click"
+                      className="button-upload"
+                      onClick={(data) => {
+                        navigate("/dashboard");
+                      }}
+                      style={{ background: "#00A300" }}
+                    >
+                      GoBack{" "}
+                    </p>
+                  )}
+                  {/* </div> */}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        ) : (
+          <Navigate replace to="/login" />
+
+        )
+      }
+    </>
+
   );
 };
 

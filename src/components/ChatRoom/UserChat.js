@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { useRef } from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
 import "./mainChat.css";
-import Avatar from "../../assets/Images/avatar.svg";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
@@ -11,6 +10,10 @@ import { useNavigate } from "react-router-dom";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { Dropdown } from "react-bootstrap";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 function UserChat(props) {
   let Token = localStorage.getItem("token");
@@ -27,7 +30,13 @@ function UserChat(props) {
   const receiverId = props.userId;
   const type = props.type;
   const getChatImage = props.getChatImage;
-
+  const [selectedFile, setSelectedFile] = useState();
+  const [isSelected, setIsSelected] = useState(false);
+  const [state, setState] = useState({
+    file: "",
+    filePreviewUrl:
+      "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true",
+  });
 
   var ws = props.websocket
 
@@ -53,14 +62,39 @@ function UserChat(props) {
     }
   };
 
-  function handleClick(event) {
+  async function handleClick(event) {
     event.preventDefault();
-    if (inputRef.current.value !== "") {
+    let context_type;
+    let file_url;
+    if (isSelected) {
+      let formData = new FormData();
+      formData.append("file", selectedFile);
+      await axios
+        .post(`${utils.getHost()}/s3_uploader/upload`, formData)
+        .then((resp) => {
+          console.log(resp.data.content_type);
+          context_type = resp.data.content_type;
+          file_url = resp.data.file_url;
+        })
+        .then(() => {
+          setState({ file: false });
+        })
+        .catch((resp) => {
+          setState({ file: false });
+
+          alert("connection is breaked");
+        });
+    } else {
+      context_type = null;
+      file_url = null;
+    }
+    if (inputRef.current.value !== "" || isSelected) {
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
-          media_link: "http://www.doogle.com/",
-          message_text: inputRef.current.value,
+          message_type: context_type ? context_type : "message/text",
+          media_link: file_url ? file_url : null,
+          message_text: inputRef.current.value ? inputRef.current.value : "",
         })
       );
       let messageDate = new Date();
@@ -79,12 +113,15 @@ function UserChat(props) {
         message: inputRef.current.value,
         time: timeNow,
         date: date,
-        images:
-          "https://cdn.icon-icons.com/icons2/2643/PNG/512/male_boy_person_people_avatar_icon_159358.png",
+        media_link: file_url ? file_url : null,
+        message_type: context_type ? context_type : "message/text",
+        profile: getChatImage,
       };
       const prevMsgs = [...messages];
       prevMsgs.push(a);
       setMessages([...prevMsgs]);
+      setIsSelected(false);
+      setState({ file: false });
       document.getElementById("inp").value = "";
     }
   }
@@ -110,6 +147,8 @@ function UserChat(props) {
           const receivedObj = message.results[i];
           const massageTime = receivedObj?.created_at || "NA";
           const messageDate = new Date(massageTime);
+          const message_type = receivedObj?.message_type;
+
           const time = messageDate.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
@@ -127,6 +166,8 @@ function UserChat(props) {
             time: time || "NA",
             date: date || "NA",
             profile: receivedObj?.user_profile?.image || Avatar,
+            message_type: message_type || "message/text",
+            media_link: receivedObj?.media_link || null,
           };
 
           prevMsgs.push(msgObj);
@@ -160,6 +201,8 @@ function UserChat(props) {
           const receivedObj = message.results[i];
           const massageTime = receivedObj?.created_at || "NA";
           const messageDate = new Date(massageTime);
+          const message_type = receivedObj?.message_type;
+
           const time = messageDate.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
@@ -177,6 +220,8 @@ function UserChat(props) {
             time: time || "NA",
             date: date || "NA",
             profile: receivedObj?.user_profile?.image || null,
+            message_type: message_type || "message/text",
+            media_link: receivedObj?.media_link || null,
           };
 
           prevMsgs.push(msgObj);
@@ -196,6 +241,8 @@ function UserChat(props) {
       if (receiverId === receivedObj.from_user.id) {
         const massageTime = receivedObj?.created_at || "NA";
         const messageDate = new Date(massageTime);
+        const message_type = receivedObj?.message_type;
+
         const time = messageDate.toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit",
@@ -212,7 +259,9 @@ function UserChat(props) {
           message: receivedObj?.message_text || "NA",
           time: time || "NA",
           date: date || "NA",
-          profile: receivedObj?.user_profile.image || Avatar,
+          profile: receivedObj?.user_profile.image || null,
+          message_type: message_type || "message/text",
+          media_link: receivedObj?.media_link || null,
         };
         const prevMsgs = [...messages];
         prevMsgs.push(msgObj);
@@ -220,6 +269,58 @@ function UserChat(props) {
       }
     };
   }, [messages]);
+
+  const ImageView = ({ image, text }) => {
+    console.log(image, text, "-=-");
+    return (
+      <div class="share-pic">
+        <img
+          className="share-pic-text"
+          src={image}
+        // alt="Geeks Image"
+        />
+        <p>{text !== "NA" ? text : null}</p>
+      </div>
+    );
+  };
+
+  const ImgUpload = ({ onChange, src }) => {
+    return (
+      <IconButton color="primary" aria-label="upload picture" component="label">
+        <input hidden accept="image/*" type="file" onChange={onChange} />
+        <AttachFileIcon />
+      </IconButton>
+    );
+  };
+
+  const ImageShow = () => {
+    console.log("iisiisiii");
+    return (
+      <div className="image-show-view">
+        <label className="centered-view">
+          <img
+            src={state.filePreviewUrl}
+            style={{ height: "80%", width: "80%" }}
+          />
+        </label>
+      </div>
+    );
+  };
+
+  const photoUpload = (event) => {
+    event.preventDefault();
+    const reader = new FileReader();
+    const file = event.target.files[0];
+    setSelectedFile(event.target.files[0]);
+    setIsSelected(true);
+    reader.onloadend = () => {
+      setState({
+        file: file,
+        filePreviewUrl: reader.result,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <>
@@ -236,10 +337,12 @@ function UserChat(props) {
               />
             </div>
             <li onClick={() => props.show({ show: true, type: type })}>
-              <img src={getChatImage} alt="Avatar" className="avatar" />
+              <ListItemAvatar>
+                <Avatar alt={userName} src={getChatImage} />
+              </ListItemAvatar>
             </li>
 
-            <li className="" style={{color : 'white' , fontWeight:'bold'}} >{userName}</li>
+            <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{userName}</li>
           </div>
         </div>
       </ul>
@@ -263,47 +366,64 @@ function UserChat(props) {
         </div>
       </div>
       {load ? <Loader /> : null}
-      <div
-        className="content"
-        id="scroll"
-        ref={scrollBottom}
-        onScroll={onScroll}
-      >
-        {messages.map((e, i) => {
-          return e.sender === loggedUser.username ? (
-            <div key={i} className="container darker" id="right">
-              {e.profile ? (
-                <img src={e.profile} alt="Avatar" className="right responsive-image" />
-              ) : (
-                <img src={Avatar} alt="Avatar" className="right responsive-image" />
-              )}
-              <span className="name right">Me</span>
-              <p>{`${e.message}`}</p>
 
-              <span className="time-right">
-                {e.time}
-              </span>
-            </div>
-          ) : (
-            <div key={i} className="container" id="left">
-              {e.profile ? (
-                <img src={e.profile} alt="Avatar" className="right responsive-image" />
-              ) : (
-                <img src={Avatar} alt="Avatar" className="right responsive-image" />
-              )}
-              <span className="name right">{e.sender}</span>
-              <p>{`${e.message}`}</p>
-              <span className="time-left">
-                {e.time}
-              </span>
-            </div>
-          );
-        })}
+      {state.file ? (
+        <ImageShow />
+      ) : (
+        <div
+          className="content"
+          id="scroll"
+          ref={scrollBottom}
+          onScroll={onScroll}
+        >
+          {messages.map((e, i) => {
+            return e.sender === loggedUser.username ? (
+              <div key={i} className="container darker" id="right">
+                <ListItemAvatar style={{ float: 'right' }}>
+                  <Avatar alt={e.sender} src={e.profile} style={{
+                          marginLeft: '10px',
+                          height: '35px',
+                          width: '35px'
+                        }}  />
+                </ListItemAvatar>
+                <span className="name right">Me</span>
+                {e.media_link ? (
+                  <ImageView image={e.media_link} text={`${e.message}`} />
+                ) :
+                  <p>{`${e.message}`}</p>
+                }
+                <span className="time-right">
+                  {e.time}
+                </span>
+              </div>
+            ) : (
+              <div key={i} className="container" id="left">
+                <ListItemAvatar style={{display:'flex'}}>
+                  <Avatar alt={e.sender} src={e.profile}  style={{
+                    marginLeft: '10px',
+                    height: '35px',
+                    width: '35px', 
+                  }} />
+                  <span className="name left" style={{margin:'8px'}}>{e.sender}</span>
+                </ListItemAvatar>
+                {e.media_link ? (
+                  <ImageView image={e.media_link} text={`${e.message}`} />
+                ) :
+                  <p style={{float:'right'}}>{`${e.message}`}</p>
+                }
+                <span className="time-left">
+                  {e.time}
+                </span>
+              </div>
+            );
+          })}
 
-        <Outlet />
-      </div>
+          <Outlet />
+        </div>
+      )}
       <div className="box">
         <form>
+          <ImgUpload onChange={photoUpload} src={state.filePreviewUrl} />
           <input
             ref={inputRef}
             className="input_text"

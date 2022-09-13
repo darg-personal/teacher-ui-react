@@ -4,7 +4,7 @@
   width: 100vw;
 }
 /* Chat containers */
-.container {
+.container{
   border: 2px solid #dedede;
   background-color: #f1f1f1;
   border-radius: 5px;
@@ -14,7 +14,7 @@
 }
 
 /* Darker chat container */
-.darker {
+.darker{
   border-color: #ccc;
   background-color: rgb(70, 68, 68);
   color: white;
@@ -22,52 +22,54 @@
 
 
 /* Style time text */
-.time-right {
+.time-right{
   float: left;
+  margin-top: 8px;
   color: #aaa;
 }
 
 /* Style time text */
-.time-left {
+.time-left{
   float: left;
+  margin-top: 8px;
   color: rgb(192, 182, 182);
 
 }
 
-input {
+input{
   width: 75%;
   padding: 12px 20px;
   margin-top: 25%;
   border: 2px solid #555;
 }
 
-    /* Style images */
-.container img {
-float: left;
-max-width: 40px;
-/* width: 100%; */
-margin-right: 20px;
-border-radius: 50%;
+/* Style images */
+/* .container img{ */
+.message-avatar{
+  float: left;
+  max-width: 40px;
+  margin-right: 20px;
+  border-radius: 50%;
 }
 
 
 /* Style the right image */
-.container img.right {
-float: right;
-margin-left: 20px;
-margin-right:0;
+.container img.right{
+  float: right;
+  margin-left: 20px;
+  margin-right:0;
 }
 
 /* avatar name */
 .name{
-color: rgb(255, 255, 255);
-font-size: 15px;
+  color: rgb(255, 255, 255);
+  font-size: 15px;
 }
 .container span.right{
-float: right;
+  float: right;
 }
 
-.content {
+.content{
   margin-left: 25%;
   padding: 1px 16px;
   height: 85%;
@@ -100,7 +102,7 @@ float: right;
 #right{
   float: right;
   font-size: 18px;
-  font-weight: bold; 
+  font-weight: bold;
   border-radius: 15px;
   width: 60%;
 }
@@ -109,24 +111,27 @@ float: right;
   float: left;
   background-color: #555;
   font-size: 18px;
-  font-weight: bold; 
+  font-weight: bold;
   border-radius: 15px;
   margin-right: 10%;
   width: 60%;
 
 }
-#left img {
+
+#left img{
   float: left;
   margin-left: 10px;
   /* margin-right:0; */
 }
+
 #left p{
   margin-left: 80px;
-  color: white;  
+  color: white;
 }
+
 /* .chat-content
 } */
-.responsive-image {
+.responsive-image{
   margin: 0px;
   height: 25px;
   width: 25px;
@@ -146,7 +151,7 @@ float: right;
   display: flex;
 }
 
-.profile-header {
+.profile-header{
   list-style-type: none;
   margin: 0;
   padding: 8px 8px;
@@ -155,17 +160,18 @@ float: right;
   width: 80%;
   float: right;
 }
+
 .profile-header button{
   float: left;
 }
 
-li {
+li{
   float: left;
   list-style: none;
   margin-left: 10px;
 }
 
-li a {
+li a{
   display: block;
   color: white;
   text-align: center;
@@ -173,21 +179,52 @@ li a {
   text-decoration: none;
 }
 
-li a:hover {
+li a:hover{
   background-color: #111;
 }
 
-.avatar {
+.avatar{
   vertical-align: middle;
   width: 30px;
   height: 30px;
   border-radius: 60%;
 }
+
 .toggle{
   margin-left: 90%;
   z-index: 1;
 }
+
 .upleft{
-margin-top: 10px;
-align-self: flex-end;
+  margin-top: 10px;
+  align-self: flex-end;
+}
+
+.share-pic{
+  width: 450px;
+  height: 200px;
+  padding: 5px 10px;
+  margin: 10px 10px;
+}
+
+.share-pic-text{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 100% 0;
+  object-position: 0 100%;
+}
+
+
+.centered-view{
+  justify-content: center;
+  align-items: center;
+  margin-left: 50%;
+
+}
+
+.image-show-view{
+  height: 85%;
+  width: 100%;
+  background: #333;
 }
