@@ -1,12 +1,15 @@
 .chatroom{
-  box-sizing: border-box;
+  /* border-radius: 5px;
+} */
+
+box-sizing: border-box;
   height: 100vh;
   width: 100vw;
 }
 /* Chat containers */
 .container{
   border: 2px solid #dedede;
-  background-color: #f1f1f1;
+  background-color: hwb(0 95% 5%);
   border-radius: 5px;
   padding: 5px 10px;
   margin: 10px 10px;
@@ -24,16 +27,10 @@
 /* Style time text */
 .time-right{
   float: left;
-  margin-top: 8px;
-  color: #aaa;
-}
-
-/* Style time text */
-.time-left{
-  float: left;
-  margin-top: 8px;
-  color: rgb(192, 182, 182);
-
+  /* margin-top: 8px; */
+  margin-left: 5px;
+  color: rgb(255, 255, 255);
+  font-size: 13px;
 }
 
 input{
@@ -57,7 +54,7 @@ input{
 .container img.right{
   float: right;
   margin-left: 20px;
-  margin-right:0;
+  margin-right: 0;
 }
 
 /* avatar name */
@@ -65,6 +62,7 @@ input{
   color: rgb(255, 255, 255);
   font-size: 15px;
 }
+
 .container span.right{
   float: right;
 }
@@ -72,24 +70,29 @@ input{
 .content{
   margin-left: 25%;
   padding: 1px 16px;
-  height: 85%;
+  height: 80%;
   width: 75%;
   overflow-y: auto;
   overflow-wrap: break-word;
+  /* background-color: #aaa; */
+
 }
 
 
 .box{
   position: fixed;
   width: 75%;
-  padding: 0px 15px;
+  margin-top: 5px;
+  padding: 0px 5px;
   margin-left: 23%;
 
 }
+
 .input_text{
   height: 59px;
   border-radius: 10px;
 }
+
 .btn-outline-success{
   height: 55px;
   width: 100px;
@@ -104,7 +107,15 @@ input{
   font-size: 18px;
   font-weight: bold;
   border-radius: 15px;
-  width: 60%;
+  max-width: 40%;
+}
+
+#center{
+  display: flex;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 15px;
+  width: 100%;
 }
 
 #left{
@@ -113,8 +124,8 @@ input{
   font-size: 18px;
   font-weight: bold;
   border-radius: 15px;
-  margin-right: 10%;
-  width: 60%;
+  /* margin-right: 10%; */
+  width: 40%;
 
 }
 
@@ -143,27 +154,20 @@ input{
 
 .header-chat{
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   padding: 2px 0px;
 }
 
-.classes{
-  display: flex;
-}
-
 .profile-header{
+  position: relative;
   list-style-type: none;
-  margin: 0;
-  padding: 8px 8px;
+  padding: 16px 10px;
   overflow: hidden;
   background-color: #333;
-  width: 80%;
+  width: 79%;
   float: right;
 }
 
-.profile-header button{
-  float: left;
-}
 
 li{
   float: left;
@@ -224,7 +228,23 @@ li a:hover{
 }
 
 .image-show-view{
-  height: 85%;
+  display: flex;
+  margin-right: 20px;
+  justify-content: center;
+  background: #aaa;
+}
+
+.user-add-remove{
+  height: 28px;
+  background-color: #aaa;
+  text-align: center;
+  margin-inline: 30%;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+
+#chatheader{
   width: 100%;
-  background: #333;
+  overflow: auto;
 }

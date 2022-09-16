@@ -12,18 +12,17 @@ let login_user = JSON.parse(localStorage.getItem("user"));
 function Contact(props) {
   const [group, setGroup] = useState([]);
   const [isActive, setIsActive] = useState();
-
-  const messageCount = props.receiveMessage;
-  console.log("Contact function hit");
+  const activeUser = props.activeUser;
 
   useEffect(() => {
-    console.log("useEffect getGroupData function called");
+    setIsActive(activeUser.chatRoom)
+  }, [activeUser])
+
+  useEffect(() => {
     getGroupData();
   }, []);
 
   const getGroupData = () => {
-    console.log("getGroupData function hit");
-
     axios
       .get(`${utils.getHost()}/chat/get/user_connected_list/`, {
         headers: {
@@ -44,6 +43,7 @@ function Contact(props) {
               typeId: receivedObj.id,
               image: receivedObj.image || Avatar,
               type: "Channel",
+              isConnected: groups.results[i].designation
             });
           }
           else {
@@ -56,6 +56,7 @@ function Contact(props) {
                 typeId: receivedObj.id,
                 image: groups.results[i].user_profile.image || Avatar,
                 type: "user",
+                isConnected: 'joined'
               });
             }
           }
@@ -73,11 +74,14 @@ function Contact(props) {
 
   const handleClick = (value) => {
     setIsActive(value.name);
-    props.type({ name: value.name, type: value.type, id: value.typeId, image: value.image });
+    props.type({
+      name: value.name, type: value.type, id: value.typeId, image: value.image,
+      isConnected: value.isConnected
+    });
   };
 
   return (
-    <>
+    <div >
       <div className="sidebar">
         {group.map((e, i) => (
           <div
@@ -94,7 +98,7 @@ function Contact(props) {
 
         ))}
       </div>
-    </>
+    </div>
   );
 }
 

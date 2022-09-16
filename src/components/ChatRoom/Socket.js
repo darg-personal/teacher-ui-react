@@ -19,18 +19,20 @@ export class Socket extends Component {
             type: null,
             chatroomObj: [],
             temp: null,
-            image: null ,
-            show: false
+            image: null,
+            show: false,
+            isConnected: true
         };
     }
 
-    pull_data = (data) => {
+    pull_data = (response) => {
+        let data = response
         this.setState({ chatRoom: data.name });
         this.setState({ chatRoomId: data.id });
         this.setState({ type: data.type });
         this.setState({ show: false });
         this.setState({ image: data.image });
-
+        this.setState({ isConnected: data.isConnected });
         this.check(data.name, data.id, data.type)
     };
 
@@ -98,9 +100,18 @@ export class Socket extends Component {
         }
     };
 
+    updateGroupinfo = (data)=>
+    {
+        this.setState({ show: false });
+        this.setState({ isConnected: data.isConnected });
+    }
+    reDirect =(data)=>
+    {
+        this.pull_data(data)
+    }
     chatMethod = () => {
-        if (this.state.show) {
-           return <UserGroup name={this.state.chatRoom} chatRoomId={this.state.chatRoomId} type={this.state.type} show={this.getUserInfo} image={this.state.image}/>
+        if (this.state.show && this.state.isConnected==='joined') {
+            return <UserGroup name={this.state.chatRoom} chatRoomId={this.state.chatRoomId} type={this.state.type} show={this.getUserInfo} image={this.state.image} websocket={this.state.temp} updateGrupinfo={this.updateGroupinfo} reDirect={this.reDirect}/>
         }
         else {
             if (this.state.type === 'Channel' & this.state.temp !== null) {
@@ -110,8 +121,9 @@ export class Socket extends Component {
                     type={this.state.type}
                     websocket={this.state.temp}
                     getChatImage={this.state.image}
+                    isConnected={this.state.isConnected}
                     show={this.getUserInfo}
-                    
+
                 />)
             }
             if (this.state.type === 'user' & this.state.temp !== null) {
@@ -121,6 +133,7 @@ export class Socket extends Component {
                     type={this.state.type}
                     websocket={this.state.temp}
                     getChatImage={this.state.image}
+                    isConnected={this.state.isConnected}
                     show={this.getUserInfo}
                 />)
             }
@@ -129,14 +142,17 @@ export class Socket extends Component {
 
     getUserInfo = (data) => {
         this.setState({ show: data.show });
+        if (data.websocket)
+            this.setState({ temp: data.websocket })
+        this.setState({ chatRoomId: data.chatroomId })
     };
-    
+
     render() {
         return (
             <>
                 {Token ? (
                     <div className="chatroom">
-                        <Contact type={this.pull_data} />
+                        <Contact type={this.pull_data} activeUser={this.state}/>
                         {this.chatMethod()}
                     </div>
                 ) : (

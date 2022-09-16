@@ -9,11 +9,13 @@ import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { Dropdown } from "react-bootstrap";
+import { Card, Dropdown } from "react-bootstrap";
 import IconButton from "@mui/material/IconButton";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import CardHeader from "react-bootstrap/esm/CardHeader";
+import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
 
 function MainChat(props) {
 
@@ -43,7 +45,7 @@ function MainChat(props) {
   const chatroomId = props.chatRoomId;
   const type = props.type;
   const getChatImage = props.getChatImage;
-
+  const isConnected = props.isConnected;
   useEffect(() => {
     setPage(1);
     console.log(`web socket connection created for channel ${chatroom}!!`);
@@ -146,7 +148,6 @@ function MainChat(props) {
       await axios
         .post(`${utils.getHost()}/s3_uploader/upload`, formData)
         .then((resp) => {
-          console.log(resp.data.content_type);
           context_type = resp.data.content_type;
           file_url = resp.data.file_url;
         })
@@ -249,43 +250,6 @@ function MainChat(props) {
     }
   }, []);
 
-  const ImageView = ({ image, text }) => {
-    console.log(image, text, "-=-");
-    return (
-      <div class="share-pic">
-        <img
-          className="share-pic-text"
-          src={image}
-        // alt="Geeks Image"
-        />
-        <p>{text !== "NA" ? text : null}</p>
-      </div>
-    );
-  };
-
-  const ImgUpload = ({ onChange, src }) => {
-    return (
-      <IconButton color="primary" aria-label="upload picture" component="label">
-        <input hidden accept="image/*" type="file" onChange={onChange} />
-        <AttachFileIcon />
-      </IconButton>
-    );
-  };
-
-  const ImageShow = () => {
-    console.log("iisiisiii");
-    return (
-      <div className="image-show-view">
-        <label className="centered-view">
-          <img  
-            src={state.filePreviewUrl}
-            style={{ height: "80%", width: "80%" }}
-          />
-        </label>
-      </div>
-    );
-  };
-
   const photoUpload = (event) => {
     event.preventDefault();
     const reader = new FileReader();
@@ -301,53 +265,47 @@ function MainChat(props) {
     reader.readAsDataURL(file);
   };
 
+
+  const ChatOptions = () => {
+    return (
+      <div className="three-dots">
+        <i className="bi bi-three-dots-vertical"></i>
+        <Dropdown>
+          <Dropdown.Toggle variant="white" id="dropdown-basic">
+            <BiDotsVerticalRounded
+              id="dropdown-basic"
+              style={{ color: "#FFF" }}
+            ></BiDotsVerticalRounded>
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu className="drop">
+            <Dropdown.Item>Settings</Dropdown.Item>
+            <Dropdown.Item>Details</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+    )
+  }
+
   return (
-    <>
-      {/* Page content */}
-      <ul className="profile-header">
-        <div className="header-chat">
-          <div className="classes">
-            <div>
-              <AiOutlineArrowLeft
-                style={{ color: "#fff", height: "30" }}
-                onClick={() => {
-                  navigate("/dashboard");
-                }}
-              />
+    <div className="chatroom">
+      <div className="profile-header">
+            <div className="header-chat">
+                    <ListItemAvatar onClick={() => props.show({ show: true, type: type,chatroomId:chatroomId, websocket:ws })}>
+                        <Avatar alt={chatroom} src={getChatImage} />
+                    </ListItemAvatar>
+                <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{chatroom}</li>
+
             </div>
-            <li onClick={() => props.show({ show: true, type: type })}>
-              <ListItemAvatar>
-                <Avatar alt={chatroom} src={getChatImage} />
-              </ListItemAvatar>
-            </li>
-
-            <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{chatroom}</li>
-          </div>
         </div>
-      </ul>
+        
       <div className="position-fixed  end-0">
-        <div className="three-dots">
-          <i className="bi bi-three-dots-vertical"></i>
-
-          <Dropdown>
-            <Dropdown.Toggle variant="white" id="dropdown-basic">
-              <BiDotsVerticalRounded
-                id="dropdown-basic"
-                style={{ color: "#FFF" }}
-              ></BiDotsVerticalRounded>
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu className="drop">
-              <Dropdown.Item>Settings</Dropdown.Item>
-              <Dropdown.Item>Details</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
+        <ChatOptions />
       </div>
       {load ? <Loader /> : null}
 
       {state.file ? (
-        <ImageShow />
+        <ImageShow filePreviewUrl={state.filePreviewUrl} />
       ) : (
 
         <div
@@ -358,59 +316,49 @@ function MainChat(props) {
         >
           {messages.map((e, i) => {
             return (
-              <div>
-                {e.sender === loggedUser.username ? (
-                  <div>
-                    <div key={i} className="container darker" id="right">
-                      <ListItemAvatar style={{ float: 'right' }}>
-                        <Avatar alt={e.sender} src={e.profile} style={{
-                          marginLeft: '10px',
-                          height: '35px',
-                          width: '35px'
-                        }} />
-                      </ListItemAvatar>
-                      <span className="name right">Me</span>
-                      {e.media_link ? (
-                        <ImageView image={e.media_link} text={`${e.message}`} />
-                      ) : (
-                        <p>{`${e.message}`}</p>
-                      )}
-
-                      <span className="time-right">{e.time}</span>
+              <div style={{
+                marginTop: '2%',
+                overflow: 'auto'
+              }} >
+                {e.message_type === 'group-info-update' ?
+                  <div key={i} id="center">
+                    <div className=" user-add-remove" >
+                      <p >{`${e.message}`}</p>
                     </div>
                   </div>
-                ) : (
-                  <>
-                    <div key={i} className="container" id="left">
-                      <span className="name right">{e.sender}</span>
-                      <ListItemAvatar>
-                        <Avatar alt={e.sender} src={e.profile} style={{
-                          marginLeft: '10px',
-                          height: '35px',
-                          width: '35px'
-                        }} />
-                      </ListItemAvatar>
-                      {e.media_link ? (
-                        <ImageView image={e.media_link} text={`${e.message}`} />
-                      ) : (
-                        <p>{`${e.message}`}</p>
-                      )}
-                      <span className="time-left">{e.time}</span>
-                    </div>
-
-                  </>
-                )}
+                  :
+                  <div>
+                    {e.sender === loggedUser.username ? (
+                      <div key={i}>
+                        {e.media_link ? (
+                          <ImageView image={e.media_link} profile={e.profile} text={e.message} sender={e.sender} time={e.time} />
+                        ) : (
+                          <TextView sender={'Me'} profile={e.profile} text={e.message} time={e.time} />
+                        )}
+                      </div>
+                    ) : (
+                      <div key={i} >
+                        {e.media_link ? (
+                          <ImageView image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
+                        ) : (
+                          <TextView sender={e.sender} profile={e.profile} text={e.message} time={e.time} float={'left'} />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                }
+                {/* <hr/> */}
               </div>
             );
           })}
 
           <Outlet />
         </div>
-      )}
-
+      )
+      }
+      {isConnected === 'joined' ? 
       <div className="box">
         <form>
-          <ImgUpload onChange={photoUpload} src={state.filePreviewUrl} />
           <input
             ref={inputRef}
             className="input_text"
@@ -419,12 +367,20 @@ function MainChat(props) {
             placeholder="Enter Text Here..."
             onKeyDown={(e) => e.key === "Enter" && handleClick}
           />
+          <ImgUpload onChange={photoUpload} />
           <button onClick={handleClick} className="btn btn-outline-success">
             send
           </button>
         </form>
       </div>
-    </>
+      : 
+      <Card style={{marginLeft:'25%', alignSelf:'center'}}>
+       <p style={{ alignSelf:'center'}}>
+         Please Join The Group to chat 
+        </p>
+      </Card>
+      }
+    </div >
   );
 }
 

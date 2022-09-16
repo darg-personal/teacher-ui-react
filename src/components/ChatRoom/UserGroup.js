@@ -8,6 +8,7 @@ import Card from "react-bootstrap/Card";
 import { ImCross } from "react-icons/im";
 
 let Token = localStorage.getItem("token");
+let loggedUser = JSON.parse(localStorage.getItem("user"));
 
 function UserGroup(props) {
   const navigate = useNavigate();
@@ -15,7 +16,9 @@ function UserGroup(props) {
   const type = props.type;
   const chatRoomId = props.chatRoomId;
   const image = props.image;
+  const ws = props.websocket;
   const [users, setUsers] = useState([]);
+  const [isActive, setIsActive] = useState();
 
   const ImgUpload = ({ src }) => (
     <div>
@@ -28,19 +31,25 @@ function UserGroup(props) {
   );
 
   function getUsers() {
+    console.log({ chatRoomId });
     axios
-      .get(`${utils.getHost()}/chat/get/channel/user_list/${chatRoomId}`, {
-        headers: {
-          Authorization: `Bearer ${Token}`,
-        },
-      })
+      .get(`${utils.getHost()}/chat/get/channel/user_list/${chatRoomId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+          },
+        })
       .then((res) => {
         const responseData = JSON.stringify(res.data);
         const message = JSON.parse(responseData);
+        console.log(message, "09t7374j");
         let value = [];
         for (var i = 0; i < message.length; i++) {
-          value.push({ 'user': message[i]?.user.username,
-           'image': message[i]?.user_profile.image });
+          value.push({
+            'user': message[i]?.user.username,
+            'image': message[i]?.user_profile.image,
+            'id': message[i]?.user.id,
+          });
         }
         setUsers(value);
       });
@@ -49,6 +58,35 @@ function UserGroup(props) {
   useEffect(() => {
     getUsers();
   }, []);
+
+  function userinfo(value) {
+    props.reDirect({ name: value.user, image: value.image, id: value.id, type: 'user' });
+  }
+
+  let exitGroup = () => {
+    axios
+      .patch(`${utils.getHost()}/chat/get/channelmember/${chatRoomId}`,
+        { 'designation': "leave" },
+        {
+          headers: {
+            Authorization: `Bearer ${Token}`,
+          },
+        })
+      .then((res) => {
+        const responseData = JSON.stringify(res.data);
+        const message = JSON.parse(responseData);
+        ws.send(
+          JSON.stringify({
+            meta_attributes: "react",
+            message_type: "group-info-update",
+            media_link: null,
+            message_text: `${loggedUser.username} leave group`,
+          })
+        );
+      }).then(() => {
+        props.updateGrupinfo({ show: false, isConnected: 'leave' });
+      })
+  }
   return (
     <>
       <Card
@@ -62,14 +100,12 @@ function UserGroup(props) {
         }}
       >
         <Card.Body>
-          <Card.Text
-            onClick={() => {
-              props.show({ show: false });
-            }}
-          >
+          <Card.Text>
             <ul className="header-user">
               <li >
-                <ImCross />
+                <ImCross onClick={() => {
+                  props.show({ show: false });
+                }} />
               </li>
             </ul>
             <p style={{ margin: '10' }}>&emsp; Contact info</p>
@@ -102,37 +138,37 @@ function UserGroup(props) {
         </Card.Body>
       </Card>
       {type === 'Channel' ?
-      <Card
-        style={{ margin: "3px", width: "30rem", left: "35%", height: "auto" }}
-      >
+        <Card
+          style={{ margin: "3px", width: "30rem", left: "35%", height: "auto" }}
+        >
           <Card.Body>
             User's
             <hr></hr>
-            {users.map((e,i) => {
+            {users.map((user, i) => {
               return (
                 <>
-                <div key={i} >
-
-                  <Card.Text onClick={getUsers}>
-                    <img src={e.image} height={20} width={20} />
-                    {e.user}
-                  </Card.Text>
-                  <hr></hr>
-                </div>
+                  <div key={i} onClick={() => { userinfo(user) }}>
+                    <Card.Text onClick={getUsers}>
+                      <img src={user.image} height={20} width={20} />
+                      {user.user}
+                    </Card.Text>
+                    <hr></hr>
+                  </div>
                 </>
               );
             })}
           </Card.Body>
-      </Card>
-          : null}
+        </Card>
+        : null}
       <Card
         style={{ margin: "3px", width: "30rem", left: "35%", height: "7.5rem" }}
       >
         <Card.Body>
           <Card.Text>Block {name}</Card.Text>
           <Card.Text>Report {name}</Card.Text>
-          <Card.Text>{/* Delete chat */}</Card.Text>
-        </Card.Body>
+          {type === 'Channel' ?
+            <Card.Text style={{ color: "blue" }} onClick={exitGroup}>Exit Group</Card.Text>
+            : null} </Card.Body>
       </Card>
     </>
   );
