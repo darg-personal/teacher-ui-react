@@ -34,7 +34,7 @@ const RegisterScreen = () => {
     async function SignUp() {
         let items = [...fields]
         let valu = { "name": items[0].value, "email": items[1].value, 'password': items[2].value }
-        await axios.post(`${utils.getHost()}/s3_uploader/user/register/`, valu).then(resp => {
+        await axios.post(`${utils.getHost()}/profile/user/register/`, valu).then(resp => {
             navigate("/");
         }).catch(resp => {
             alert("try to sign up with another Email or username")

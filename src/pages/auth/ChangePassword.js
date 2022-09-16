@@ -31,7 +31,7 @@ const ChangePassword = () => {
   const [isSelected, setIsSelected] = useState(false);
 
   //  axios
-  //   .post("http://localhost:8000/s3_uploader/user/change-password", valu)
+  //   .post("http://localhost:8000/profile/user/change-password", valu)
   //   .then((resp) => {
   //     navigate("/");
   //   })
@@ -60,7 +60,7 @@ const ChangePassword = () => {
 
     // console.log("---====", valu);
     axios
-      .put(`${utils.getHost()}/s3_uploader/user/change-password`, valu, {
+      .put(`${utils.getHost()}/profile/user/change-password`, valu, {
         headers: {
           Authorization: `Bearer ${Token}`,
         },

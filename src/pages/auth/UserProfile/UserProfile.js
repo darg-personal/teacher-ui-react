@@ -7,7 +7,7 @@ import utils from '../utils';
 let Token = localStorage.getItem("token");
 
 function UserProfile() {
-  let api = `${utils.getHost()}/s3_uploader/user/profile_update/`;
+  let api = `${utils.getHost()}/profile/user/profile_update/`;
 
   const navigate = useNavigate();
 
