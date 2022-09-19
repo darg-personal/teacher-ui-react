@@ -1,0 +1,77 @@
+.list {
+    margin: 50px;
+    padding: 100px;
+    width: 5%;
+    background-color: #b9b4b4;
+    height: 50%;
+    overflow: auto;
+  }
+
+  .link {
+    border: none;
+    outline: none;
+    padding: 15px 19px;
+    background-color: #b9b4b4;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+  }
+  .active {
+    background-color: #222;
+    color: white;
+  }
+  .link:hover {
+    background-color: #666;
+    color: white;
+  }
+*/
+  .list a {
+    display: block;
+    color: black;
+    padding: 16px;
+    text-decoration: none;
+  }
+
+  @media screen and (max-width: 700px) {
+    .list {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .list a {
+      float: left;
+    }
+    div.content {
+      margin-left: 0;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    .list a {
+      text-align: center;
+      float: none;
+    }
+  }
+
+  svg {
+    margin-left: 10px;
+  }
+  .avatar {
+    vertical-align: middle;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+  }
+  img{
+    margin-right: 8px;
+  }
+  
+  div .message-count{
+    background-color:green;
+    text-align: center;
+    width: 23px;
+    padding: 2px;
+    font-size: 10px;
+    border-radius: 50%;
+    float: right;
+  }

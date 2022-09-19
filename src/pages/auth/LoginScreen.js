@@ -119,85 +119,85 @@ const LoginScreen = () => {
   useEffect(() => {
     if (Token)
       navigate('/dashboard')
-  },[])
+  }, [])
 
   return (
     <>
-    {!Token ?
-      <div className={"login-section page-container"}>
-        <div className={"auth-container"}>
-          <div className={"auth-logo"}>
-            <img
-              src={require("../../assets/teacherlogo.png")}
-              alt={"Teacher logo"}
-            />
-          </div>
-
-          <div className={"auth-content"}>
-            <div className={"auth-header"}>
-              <h4>Login</h4>
-              <div className={"header-text"}>
-                Don't have an account yet? <Link to={"/register"}>Sign Up</Link>
-              </div>
+      {!Token ?
+        <div className={"login-section page-container"}>
+          <div className={"auth-container"}>
+            <div className={"auth-logo"}>
+              <img
+                src={require("../../assets/teacherlogo.png")}
+                alt={"Teacher logo"}
+              />
             </div>
 
-            <form
-              method={"post"}
-              action={""}
-              onSubmit={(event) => handleFormSubmit(event)}
-            >
-              <div className={"input-list centered-data"}>
-                {fields.map((field, index) => {
-                  return (
-                    <div className={`input-control`} key={index}>
-                      <input
-                        type={field.type}
-                        value={field.value}
-                        name={field.name}
-                        onChange={(event) =>
-                          setFieldValue(event.target.value, index)
-                        }
-                        placeholder={field.placeholder}
-                        className={`${field.hasError ? "input-error" : ""}`}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className={"centered-data"}>
-                <div className={"forgot-password-section"}>
-                  <Link to={"/ForgetPassword"}>Forgot password?</Link>
-                </div>
-
-                <div className={"button-container"}>
-                  <button
-                    type={"submit"}
-                    disabled={
-                      fields.filter((field) => field.value === "").length > 0
-                    }
-                  >
-                    Log in
-                  </button>
+            <div className={"auth-content"}>
+              <div className={"auth-header"}>
+                <h4>Login</h4>
+                <div className={"header-text"}>
+                  Don't have an account yet? <Link to={"/register"}>Sign Up</Link>
                 </div>
               </div>
-            </form>
+
+              <form
+                method={"post"}
+                action={""}
+                onSubmit={(event) => handleFormSubmit(event)}
+              >
+                <div className={"input-list centered-data"}>
+                  {fields.map((field, index) => {
+                    return (
+                      <div className={`input-control`} key={index}>
+                        <input
+                          type={field.type}
+                          value={field.value}
+                          name={field.name}
+                          onChange={(event) =>
+                            setFieldValue(event.target.value, index)
+                          }
+                          placeholder={field.placeholder}
+                          className={`${field.hasError ? "input-error" : ""}`}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className={"centered-data"}>
+                  <div className={"forgot-password-section"}>
+                    <Link to={"/ForgetPassword"}>Forgot password?</Link>
+                  </div>
+
+                  <div className={"button-container"}>
+                    <button
+                      type={"submit"}
+                      disabled={
+                        fields.filter((field) => field.value === "").length > 0
+                      }
+                    >
+                      Log in
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
 
-        {sendingRequest ? (
-          <Modal
-            text={feedbackData.process}
-            feedbackText={feedbackData.feedback}
-            closable={feedbackData.closable}
-            onClose={() => {
-              clearTimeout(resetTimeout.current);
-              updateSendingRequest(false);
-            }}
-          />
-        ) : null}
-      </div>
-      : <p>Loading ....</p> }
+          {sendingRequest ? (
+            <Modal
+              text={feedbackData.process}
+              feedbackText={feedbackData.feedback}
+              closable={feedbackData.closable}
+              onClose={() => {
+                clearTimeout(resetTimeout.current);
+                updateSendingRequest(false);
+              }}
+            />
+          ) : null}
+        </div>
+        : <p>Loading ....</p>}
     </>
   );
 };

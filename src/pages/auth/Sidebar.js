@@ -45,7 +45,8 @@ const SideData = [
   { icon: <BsFillCreditCardFill />, path:"#", student: "Braintree" },
   { icon: <BsTelephoneFill />, path:"#", student: "RingLess Voice-Mail" },
   { icon: <TiMessages />, path:"/chatroom", student: "Chat Room" },
-
+  { icon: <TiMessages />, path:"/orginization", student: "Orginization" },
+  
 ];
 
 const Sidebar = ({handleClickHere})=> {
@@ -73,8 +74,8 @@ const Sidebar = ({handleClickHere})=> {
             <FaBars />
           </div>
           
-          {SideData.map((data) => (
-            <Link to={data.path}>
+          {SideData.map((data,i) => (
+            <Link to={data.path} key={i}>
             <div className="student-wrap" >
               <div>{data.icon}</div>
 
