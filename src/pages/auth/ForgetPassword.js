@@ -31,7 +31,7 @@ const RegisterScreen = () => {
         let items = [...fields]
         let valu =  {"email": items[0].value}
         // console.log(valu,"+++++++++++++++++++++++++++++++");
-        await axios.post(`${utils.getHost()}/s3_uploader/user/password_reset/`, valu).then(resp => {
+        await axios.post(`${utils.getHost()}/profile/user/password_reset/`, valu).then(resp => {
             navigate("/");
         }).catch(resp => {
             alert("try to reset another Email")

@@ -71,7 +71,7 @@ function UserChat(props) {
       let formData = new FormData();
       formData.append("file", selectedFile);
       await axios
-        .post(`${utils.getHost()}/s3_uploader/upload`, formData)
+        .post(`${utils.getHost()}/profile/upload`, formData)
         .then((resp) => {
           console.log(resp.data.content_type);
           context_type = resp.data.content_type;
@@ -128,8 +128,12 @@ function UserChat(props) {
   }
 
   useEffect(() => {
-    console.log(`web socket connection created for ${userName}!!`);
-    axios
+    console.log(`web socket connection created for ${userName},${receiverId}!!`);
+    fetchData()
+  }, [userName,receiverId]);
+
+  async function fetchData (){
+    await axios
       .get(
         `${utils.getHost()}/chat/get/user/paginated_messages/?user=${receiverId}&records=10`,
         {
@@ -143,7 +147,7 @@ function UserChat(props) {
         const message = JSON.parse(responseData);
         setMessageCount(message.count);
         const prevMsgs = [];
-
+        if(message?.results?.length)
         for (let i = message.results.length - 1; i >= 0; i--) {
           const receivedObj = message.results[i];
           const massageTime = receivedObj?.created_at || "NA";
@@ -181,8 +185,7 @@ function UserChat(props) {
       .catch((error) => {
         console.log("error : ", error);
       });
-  }, [userName]);
-
+  }
   function updateData(value) {
     axios
       .get(
@@ -343,10 +346,10 @@ function UserChat(props) {
         >
           {messages.map((e, i) => {
             return (
-              <div style={{marginTop:  '2%',
+              <div key={i} style={{marginTop:  '2%',
               overflow: 'auto'}}>
                 {e.sender === loggedUser.username ? (
-                  <div key={i}>
+                  <div >
                     {e.media_link ? (
                       <ImageView image={e.media_link} profile={e.profile} text={e.message} sender={e.sender} time={e.time} />
                     ) : (
@@ -354,7 +357,7 @@ function UserChat(props) {
                     )}
                   </div>
                 ) : (
-                  <div key={i} >
+                  <div  >
                     {e.media_link ? (
                       <ImageView image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
                     ) : (

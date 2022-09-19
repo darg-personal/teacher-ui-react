@@ -229,7 +229,9 @@ li a:hover{
 
 .image-show-view{
   display: flex;
-  margin-right: 20px;
+  margin-left: 25%;
+  height: auto;
+  width: auto;
   justify-content: center;
   background: #aaa;
 }

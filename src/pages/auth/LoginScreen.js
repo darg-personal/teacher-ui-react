@@ -69,8 +69,7 @@ const LoginScreen = () => {
     updateSendingRequest(true);
 
     axios.post(
-      // "http://192.168.1.37:8000/s3_uploader/user/login",
-      `${utils.getHost()}/s3_uploader/user/login`,
+      `${utils.getHost()}/profile/user/login`,
       requestObject
     )
       .then((response) => {

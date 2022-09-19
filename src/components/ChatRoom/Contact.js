@@ -20,7 +20,7 @@ function Contact(props) {
 
   useEffect(() => {
     getGroupData();
-  }, []);
+  }, [activeUser]);
 
   const getGroupData = () => {
     axios
@@ -56,7 +56,7 @@ function Contact(props) {
                 typeId: receivedObj.id,
                 image: groups.results[i].user_profile.image || Avatar,
                 type: "user",
-                isConnected: 'joined'
+                isConnected: 1
               });
             }
           }

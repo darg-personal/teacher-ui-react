@@ -30,9 +30,9 @@ function UserGroup(props) {
     </div>
   );
 
-  function getUsers() {
+  async function getUsers() {
     console.log({ chatRoomId });
-    axios
+    await axios
       .get(`${utils.getHost()}/chat/get/channel/user_list/${chatRoomId}`,
         {
           headers: {
@@ -41,32 +41,32 @@ function UserGroup(props) {
         })
       .then((res) => {
         const responseData = JSON.stringify(res.data);
-        const message = JSON.parse(responseData);
-        console.log(message, "09t7374j");
-        let value = [];
-        for (var i = 0; i < message.length; i++) {
-          value.push({
-            'user': message[i]?.user.username,
-            'image': message[i]?.user_profile.image,
-            'id': message[i]?.user.id,
+        const tempUsers = JSON.parse(responseData);
+        console.log(tempUsers, "09t7374j");
+        let localUserUpdate = [];
+        for (var i = 0; i < tempUsers?.length; i++) {
+          localUserUpdate.push({
+            'user': tempUsers[i]?.user.username,
+            'image': tempUsers[i]?.image,
+            'id': tempUsers[i]?.user.id,
           });
         }
-        setUsers(value);
+        setUsers(localUserUpdate);
       });
   }
 
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [name,chatRoomId,image]);
 
   function userinfo(value) {
-    props.reDirect({ name: value.user, image: value.image, id: value.id, type: 'user' });
+    props.reDirect({ name: value.user, image: value.image, id: value.id, type: 'user', websocket:ws });
   }
 
   let exitGroup = () => {
     axios
       .patch(`${utils.getHost()}/chat/get/channelmember/${chatRoomId}`,
-        { 'designation': "leave" },
+        { 'designation': -1 },
         {
           headers: {
             Authorization: `Bearer ${Token}`,
@@ -84,7 +84,7 @@ function UserGroup(props) {
           })
         );
       }).then(() => {
-        props.updateGrupinfo({ show: false, isConnected: 'leave' });
+        props.updateGrupinfo({ show: false, isConnected: -1, user:name });
       })
   }
   return (
@@ -147,7 +147,7 @@ function UserGroup(props) {
             {users.map((user, i) => {
               return (
                 <>
-                  <div key={i} onClick={() => { userinfo(user) }}>
+                  <div key={i+user} onClick={() => { userinfo(user) }}>
                     <Card.Text onClick={getUsers}>
                       <img src={user.image} height={20} width={20} />
                       {user.user}

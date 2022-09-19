@@ -64,6 +64,7 @@ function OrgChannel(props) {
             }
         );
     }
+    let navigate = useNavigate();
 
     return (
         <>
@@ -75,7 +76,7 @@ function OrgChannel(props) {
                                 updateShow()
                             }}>Back </Button>
                             <Card >
-                                <p style={{ fontSize: '25px',fontFamily:'bold' , alignSelf:'center'}}> {orgName}</p>
+                                <p style={{ fontSize: '25px', fontFamily: 'bold', alignSelf: 'center' }}> {orgName}</p>
                             </Card>
                             <p className="button-upload-org" style={{ float: 'right' }} onClick={() => setShowAddChannelPage(true)}>Add New Channel</p>
                             <hr style={{ width: '100%' }}></hr>
@@ -88,7 +89,8 @@ function OrgChannel(props) {
                                             <div style={{
                                                 background: 'darkblue', height: '100px',
                                                 width: '80%', color: "white", padding: '5px', borderRadius: '10px'
-                                            }}>
+                                            }}
+                                            >
                                                 <ListItemAvatar style={{ display: 'flex' }}>
                                                     <Avatar alt={e.name} src={e.profile} style={{
                                                         alignItems: 'center',
@@ -100,9 +102,17 @@ function OrgChannel(props) {
                                                 </ListItemAvatar>
                                                 <p style={{ justifyContent: 'center', margin: '10px 55px' }}>About Section</p>
                                                 {!e.requested ?
-                                                    <Button style={{ float: 'right', justifyContent: 'center', margin: '-60px 10px' }} onClick={() => {
-                                                        changeReqType(e)
-                                                    }}>Request</Button>
+                                                    <Link
+                                                        to={`/user_request`}
+                                                        state={{
+                                                            e:e
+                                                        }}
+                                                    >
+                                                        <Button style={{
+                                                            float: 'right', justifyContent: 'center',
+                                                            margin: '-60px 10px'
+                                                        }} >Request</Button>
+                                                    </Link>
                                                     :
                                                     <>
                                                         <span style={{ float: 'right', justifyContent: 'center', margin: '-50px 10px' }}>x Cancel</span>

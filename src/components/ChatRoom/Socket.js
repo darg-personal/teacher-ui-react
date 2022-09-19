@@ -21,7 +21,8 @@ export class Socket extends Component {
             temp: null,
             image: null,
             show: false,
-            isConnected: true
+            isConnected: true,
+            userStatus: {}
         };
     }
 
@@ -32,14 +33,13 @@ export class Socket extends Component {
         this.setState({ type: data.type });
         this.setState({ show: false });
         this.setState({ image: data.image });
-        this.setState({ isConnected: data.isConnected });
-        this.check(data.name, data.id, data.type)
+        this.check(data.name, data.id, data.type, data.isConnected)
     };
 
     timeout = 250;
 
-    connect = (cRoom, userId, type) => {
-        this.setState({ temp: null })
+    connect = (cRoom, userId, type, isConnected) => {
+        this.setState({ temp: null})
         const ws = []
         if (type == 'Channel')
             ws.push(new WebSocket(
@@ -55,9 +55,14 @@ export class Socket extends Component {
         getSocket.onopen = () => {
             var chatroom = cRoom;
             var wsdict = this.state.ws;
+            var userst = this.state.userStatus;
             wsdict[chatroom] = getSocket;
+            userst[chatroom] = isConnected;
             this.setState({ ws: wsdict });
             this.setState({ temp: getSocket })
+            this.setState({ userStatus : userst })
+            this.setState({ isConnected: isConnected })
+
             that.timeout = 250; // reset timer to 250 on open of websocket connection
             clearTimeout(connectInterval); // clear Interval on on open of websocket connection
         };
@@ -84,34 +89,39 @@ export class Socket extends Component {
         };
     };
 
-    check = (cRoom, id, type) => {
-        const { ws } = this.state;
+    check = (cRoom, id, type, isConnected) => {
+        const { ws, userStatus } = this.state;
+        console.log(ws, userStatus, "---0",isConnected);
         if (cRoom in ws) {
             if (!ws[cRoom] || ws[cRoom].readyState == WebSocket.CLOSED) {
                 if (cRoom)
                     this.connect(cRoom, id, type);
             }
             this.setState({ temp: ws[cRoom] })
+            this.setState({ isConnected: userStatus[cRoom] })
         }
         else {
             console.log(' key not exiest');
             if (cRoom)
-                this.connect(cRoom, id, type);
+                this.connect(cRoom, id, type, isConnected);
         }
     };
 
-    updateGroupinfo = (data)=>
-    {
+    updateGroupinfo = (data) => {
         this.setState({ show: false });
-        this.setState({ isConnected: data.isConnected });
+        this.state.userStatus[data.user] = data.isConnected
+        this.setState({ isConnected: data.isConnected })
     }
-    reDirect =(data)=>
-    {
+    reDirect = (data) => {
         this.pull_data(data)
     }
     chatMethod = () => {
-        if (this.state.show && this.state.isConnected==='joined') {
-            return <UserGroup name={this.state.chatRoom} chatRoomId={this.state.chatRoomId} type={this.state.type} show={this.getUserInfo} image={this.state.image} websocket={this.state.temp} updateGrupinfo={this.updateGroupinfo} reDirect={this.reDirect}/>
+        if (this.state.show && this.state.isConnected == 1) {
+            return <UserGroup name={this.state.chatRoom} chatRoomId={this.state.chatRoomId}
+                type={this.state.type} show={this.getUserInfo} image={this.state.image}
+                websocket={this.state.temp} updateGrupinfo={this.updateGroupinfo}
+                reDirect={this.reDirect}
+            />
         }
         else {
             if (this.state.type === 'Channel' & this.state.temp !== null) {
@@ -152,7 +162,7 @@ export class Socket extends Component {
             <>
                 {Token ? (
                     <div className="chatroom">
-                        <Contact type={this.pull_data} activeUser={this.state}/>
+                        <Contact type={this.pull_data} activeUser={this.state} />
                         {this.chatMethod()}
                     </div>
                 ) : (

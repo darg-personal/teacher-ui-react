@@ -1,3 +1,4 @@
+import React from "react";
 import { Avatar, IconButton, ListItemAvatar } from "@mui/material";
 import { Card } from "react-bootstrap";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -66,7 +67,7 @@ export function ImgUpload({ onChange, src }) {
 
 export function ImageShow({ filePreviewUrl }) {
     return (
-        <div className="container image-show-view">
+        <div className="image-show-view">
             <img
                 src={filePreviewUrl}
                 height={'40%'}
@@ -76,7 +77,7 @@ export function ImageShow({ filePreviewUrl }) {
     );
 };
 
-export function ChatHeader({ name, props, type, image, ws=null }) {
+export function ChatHeader({ name, props, type, image, ws = null }) {
     return (
         <div className="profile-header">
             <div className="header-chat">
@@ -89,9 +90,9 @@ export function ChatHeader({ name, props, type, image, ws=null }) {
                 }}
               />
             </div> */}
-                    <ListItemAvatar onClick={() => props.show({ show: true, type: type, websocket:ws })}>
-                        <Avatar alt={name} src={image} />
-                    </ListItemAvatar>
+                <ListItemAvatar onClick={() => props.show({ show: true, type: type, websocket: ws })}>
+                    <Avatar alt={name} src={image} />
+                </ListItemAvatar>
                 <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{name}</li>
 
             </div>

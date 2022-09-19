@@ -15,6 +15,8 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
+import CancelSharpIcon from "@mui/icons-material/CancelSharp";
+
 import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
 
 function MainChat(props) {
@@ -107,7 +109,7 @@ function MainChat(props) {
       const receivedObj = JSON.parse(message);
       console.log(receivedObj.channel, "=========on message========");
 
-      if (chatroomId === receivedObj.channel.id) {
+      if (chatroomId === receivedObj.channel.id && isConnected == 1) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const message_type = receivedObj?.message_type;
@@ -146,7 +148,7 @@ function MainChat(props) {
       let formData = new FormData();
       formData.append("file", selectedFile);
       await axios
-        .post(`${utils.getHost()}/s3_uploader/upload`, formData)
+        .post(`${utils.getHost()}/profile/upload`, formData)
         .then((resp) => {
           context_type = resp.data.content_type;
           file_url = resp.data.file_url;
@@ -290,22 +292,31 @@ function MainChat(props) {
   return (
     <div className="chatroom">
       <div className="profile-header">
-            <div className="header-chat">
-                    <ListItemAvatar onClick={() => props.show({ show: true, type: type,chatroomId:chatroomId, websocket:ws })}>
-                        <Avatar alt={chatroom} src={getChatImage} />
-                    </ListItemAvatar>
-                <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{chatroom}</li>
+        <div className="header-chat">
+          <ListItemAvatar onClick={() => props.show({ show: true, type: type, chatroomId: chatroomId, websocket: ws })}>
+            <Avatar alt={chatroom} src={getChatImage} />
+          </ListItemAvatar>
+          <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{chatroom}</li>
 
-            </div>
         </div>
-        
+      </div>
+
       <div className="position-fixed  end-0">
         <ChatOptions />
       </div>
       {load ? <Loader /> : null}
 
       {state.file ? (
-        <ImageShow filePreviewUrl={state.filePreviewUrl} />
+        <>
+        <CancelSharpIcon style={{ flex:1,marginLeft:'90%', position: 'relative' }} onClick={() => {
+          setState({
+            file: null,
+            filePreviewUrl: null,
+          });
+        }} color="primary"
+          fontSize="large" />
+          <ImageShow filePreviewUrl={state.filePreviewUrl} />
+        </>
       ) : (
 
         <div
@@ -356,29 +367,29 @@ function MainChat(props) {
         </div>
       )
       }
-      {isConnected === 'joined' ? 
-      <div className="box">
-        <form>
-          <input
-            ref={inputRef}
-            className="input_text"
-            id="inp"
-            type="text"
-            placeholder="Enter Text Here..."
-            onKeyDown={(e) => e.key === "Enter" && handleClick}
-          />
-          <ImgUpload onChange={photoUpload} />
-          <button onClick={handleClick} className="btn btn-outline-success">
-            send
-          </button>
-        </form>
-      </div>
-      : 
-      <Card style={{marginLeft:'25%', alignSelf:'center'}}>
-       <p style={{ alignSelf:'center'}}>
-         Please Join The Group to chat 
-        </p>
-      </Card>
+      { isConnected == 1 ?
+        <div className="box">
+          <form>
+            <input
+              ref={inputRef}
+              className="input_text"
+              id="inp"
+              type="text"
+              placeholder="Enter Text Here..."
+              onKeyDown={(e) => e.key === "Enter" && handleClick}
+            />
+            <ImgUpload onChange={photoUpload} />
+            <button onClick={handleClick} className="btn btn-outline-success">
+              send
+            </button>
+          </form>
+        </div>
+        :
+        <Card style={{ marginLeft: '25%', alignSelf: 'center' }}>
+          <p style={{ alignSelf: 'center' }}>
+            Please Join The Group to chat
+          </p>
+        </Card>
       }
     </div >
   );
