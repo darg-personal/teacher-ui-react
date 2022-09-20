@@ -7,10 +7,7 @@ import Sidebar from "../../pages/auth/Sidebar";
 import Header from "../../pages/auth/Header";
 import "./orginization.css";
 import "../../css/auth/auth.scss";
-import Modal from "../../components/AuthModal/Modal";
-import swal from "sweetalert";
 import "./addorg.css";
-
 
 import { Button, Container } from "react-bootstrap";
 import { Avatar, ListItemAvatar } from "@mui/material";
@@ -18,6 +15,7 @@ import { ImageShow } from "../ChatRoom/templates/MainChat/Chat";
 export default function Orginization() {
     let Token = localStorage.getItem("token");
     let navigate = useNavigate();
+    let login_user = JSON.parse(localStorage.getItem("user"));
 
     const [data, setData] = useState([])
     const [input, setInput] = useState('')
@@ -26,7 +24,7 @@ export default function Orginization() {
     const [orgId, setOrgId] = useState(null)
     const [orgName, setOrgName] = useState(null)
     const [showOrg, setAddOrg] = useState(false)
-    async function getData() {
+    async function getOrginizations() {
         axios
             .get(`${utils.getHost()}/chat/get/org`, {
                 headers: {
@@ -39,7 +37,8 @@ export default function Orginization() {
                 let val = []
                 console.log(data);
                 for (let i = 0; i < data.length; i++) {
-                    val.push({ "orgId": data[i]?.id, "orgName": data[i]?.meta_attributes, "owner": data[i]?.user.username })
+                    if (data[i]?.user.username === login_user.username)
+                        val.push({ "orgId": data[i]?.id, "orgName": data[i]?.meta_attributes, "owner": data[i]?.user.username })
                 }
                 setData(val)
                 setOutput(val)
@@ -47,7 +46,7 @@ export default function Orginization() {
     }
 
     useEffect(() => {
-        getData()
+        getOrginizations()
     }, [])
 
     useEffect(() => {
@@ -67,8 +66,7 @@ export default function Orginization() {
     const updateShow = (data) => {
         setShow(data.show)
     }
-    const goBack = () =>
-    {
+    const goBack = () => {
         setShow(false)
         setAddOrg(false)
     }
@@ -91,43 +89,55 @@ export default function Orginization() {
                                                     setShow(true)
                                                     setAddOrg(true)
                                                 }}>ADD New Orginization </p>
-                                            {/* <input onChange={e => setInput(e.target.value)}
-                                                type="text" placeholder='Search orgnization' aria-label="Search "
-                                            /> */}
+                                            <p type="click"
+                                                style={{ float: 'right', backgroundColor: 'transparent' }}
+                                                className="button-upload-org" onClick={(data) => {
+                                                    getOrginizations()
+                                                }}>Refresh </p>
                                         </div>
                                         <hr style={{ width: '100%' }}></hr>
                                         <div className='output'>
-                                            {output.map((e, i) => (
-                                                <div key={i}>
-                                                    <div style={{ background: 'skyblue', height: '90px', width: '80%', color: "white", padding: '5px', borderRadius: '10px' }}>
-                                                        <ListItemAvatar >
-                                                            <Avatar alt={e.orgName} src={e.owner} style={{
-                                                                // padding: '5px',
-                                                                alignItems: 'center',
-                                                                height: '35px',
-                                                                width: '35px'
-                                                            }} />
-                                                        </ListItemAvatar>
-                                                        <div style={{
-                                                            marginTop: "-25px",
-                                                            paddingLeft: "80px"
-                                                        }} onClick={() =>
-                                                            getChannels(e)
-                                                        }>
-                                                            <p >ORGINIZATION: {e.orgName}</p>
-                                                            <p >OWNER:  {e.owner}</p>
-                                                        </div>
+                                            {output.length > 0 ?
+                                                <>
+                                                    {output.map((e, i) => (
+                                                        <div key={i}>
+                                                            <div style={{
+                                                                background: 'skyblue', height: '90px',
+                                                                width: '80%', color: "white", padding: '5px',
+                                                                borderRadius: '10px'
+                                                            }}>
+                                                                <ListItemAvatar >
+                                                                    <Avatar alt={e.orgName} src={e.owner} style={{
+                                                                        // padding: '5px',
+                                                                        alignItems: 'center',
+                                                                        height: '35px',
+                                                                        width: '35px'
+                                                                    }} />
+                                                                </ListItemAvatar>
+                                                                <div style={{
+                                                                    marginTop: "-25px",
+                                                                    paddingLeft: "80px"
+                                                                }} onClick={() =>
+                                                                    getChannels(e)
+                                                                }>
+                                                                    <p >ORGINIZATION: {e.orgName}</p>
+                                                                    <p >OWNER:  {e.owner}</p>
+                                                                </div>
 
-                                                    </div>
-                                                    <hr style={{ width: '100%' }}></hr>
-                                                </div>
-                                            ))}
+                                                            </div>
+                                                            <hr style={{ width: '100%' }}></hr>
+                                                        </div>
+                                                    ))}
+                                                </>
+                                                :  
+                                                    <p>Looks like You don't have Orginization</p>                
+                                                    }
                                         </div>
                                     </Container>
                                     :
                                     <>
                                         {showOrg ?
-                                            <AddOrg goBack={goBack}/>
+                                            <AddOrg goBack={goBack} />
                                             :
                                             <OrgChannel orgId={orgId} orgName={orgName} back={updateShow} />
                                         }
@@ -162,14 +172,8 @@ export const AddOrg = (props) => {
         },
     ];
 
-    let feedbackObject = {
-        process: "",
-        feedback: "",
-        closable: false,
-    };
 
     const [fields, updateFields] = useState(loginFields);
-    let resetTimeout = useRef(null);
 
     const setFieldValue = (value, index) => {
         let fieldData = [...fields];
@@ -180,38 +184,12 @@ export const AddOrg = (props) => {
 
     const handleFormSubmit = (event) => {
         event.preventDefault();
-
         let requestObject = {};
-
         fields.forEach((field) => {
             requestObject[field.name] = field.value;
         });
     };
 
-    function getUsers() {
-        axios
-            .get(`${utils.getHost()}/chat/get/org`, {
-                headers: {
-                    Authorization: `Bearer ${Token}`,
-                },
-            })
-            .then((res) => {
-                const responseData = JSON.stringify(res.data);
-                const message = JSON.parse(responseData);
-                let value = [];
-                for (var i = 0; i < message.length; i++) {
-                    //   value.push({
-                    // user: message[i]?.user.meta_attributes,
-                    //    'image': message[i]?.user_profile.image ,
-                    // id: message[i]?.user.id,
-                    //   });
-                }
-            });
-    }
-
-    useEffect(() => {
-        getUsers();
-    }, []);
 
     function addorg() {
         let items = [...fields];
@@ -229,6 +207,7 @@ export const AddOrg = (props) => {
             .then((response) => {
 
                 alert('Orginization is Added')
+                props.goBack()
             })
             .catch((error) => {
                 let errorFeedback = {

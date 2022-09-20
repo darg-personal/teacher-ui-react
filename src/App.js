@@ -32,6 +32,7 @@ import { Socket } from "./components/ChatRoom/Socket";
 import Orginization from "./components/Orginization/Orginization";
 import OrgChannel from "./components/Orginization/OrginazationChannel";
 import UserRequest from "./components/Orginization/channelPage";
+import SearchChannelAndUser from "./components/SearchChannelAndUser/SearchChannelAndUser";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 function App() {
@@ -66,6 +67,7 @@ function App() {
             <Route path={"orginization"} element={<Orginization />} />
             <Route path={"orginization_channel"} element={<OrgChannel />} />
             <Route path={"user_request"} element={<UserRequest />} />
+            <Route path={"channels"} element={<SearchChannelAndUser />} />
 
             
           </Route>

@@ -14,13 +14,13 @@ const Header = () => {
   let api = `${utils.getHost()}/profile/user/profile_update/`;
   const [profileSrc, updateprofileSrc] = useState(null);
 
-  axios
-    .get(api, { headers: { Authorization: `Bearer ${Token}` } })
-    .then((data) => {
-      const value = data.data;
-      updateprofileSrc(value?.image);
-    })
-    .catch((error) => console.log(error));
+  // axios
+  //   .get(api, { headers: { Authorization: `Bearer ${Token}` } })
+  //   .then((data) => {
+  //     const value = data.data;
+  //     updateprofileSrc(value?.image);
+  //   })
+  //   .catch((error) => console.log(error));
 
   const logout = () => {
     localStorage.clear();

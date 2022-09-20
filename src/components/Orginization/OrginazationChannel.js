@@ -11,6 +11,7 @@ import Sidebar from "../../pages/auth/Sidebar";
 import Header from "../../pages/auth/Header";
 import { ImageShow, ImgUpload } from "../ChatRoom/templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
+import UserRequest from "./channelPage";
 let Token = localStorage.getItem("token");
 let loggedUser = JSON.parse(localStorage.getItem("user"));
 
@@ -19,9 +20,15 @@ function OrgChannel(props) {
     const orgName = props.orgName
 
     const [users, setUsers] = useState([]);
-    const [showAddChannelPage, setShowAddChannelPage] = useState(false);
+    const [channelId, setChannelId] = useState(null);
+    const [channelName, setChannelName] = useState(null);
+    const [orgData, setOrgData] = useState({ orgId: null, channelId: null,orgName:null, channelName : null });
 
-    async function getUsers() {
+
+    const [showAddChannelPage, setShowAddChannelPage] = useState(false);
+    const [requestPageVisible, setRequestPageVisible] = useState(false);
+
+    async function getChannels() {
         await axios
             .get(`${utils.getHost()}/chat/get/channel`, {
                 headers: {
@@ -42,97 +49,113 @@ function OrgChannel(props) {
     }
 
     useEffect(() => {
-        getUsers();
+        getChannels();
     }, []);
 
     const updateShow = () => {
         props.back({ show: false })
     }
 
-    const changeReqType = (data) => {
-        let formData = new FormData();
-        formData.append('request_type', 'requested');
-        formData.append('user', loggedUser.id);
-        formData.append('Channel', data.channelId);
-        formData.append('org', data.orgId);
-
-        axios.post(
-            `${utils.getHost()}/chat/userRequest/`,
-            formData,
-            {
-                headers: { Authorization: ` Bearer ${Token}` },
-            }
-        );
+    const navigateToRequestPage = (data) => {
+        setChannelId(data.channelId);
+        setChannelName(data.channelName)
+        
+        setRequestPageVisible(true)
     }
-    let navigate = useNavigate();
 
+
+    const isAddedUser = (data) =>
+    {
+        console.log({data});
+    }
+
+    function Channels() {
+        return <>
+            <div style={{
+                margin: 0,
+                padding: 0,
+                width: '25%',
+                overflow: 'auto',
+            }}>
+
+                {users.length > 0 ?
+                    <>
+                        {users.map((e, i) => (
+                            <div key={i}>
+                                <div style={{
+                                    background: 'darkblue', height: 'auto',
+                                    marginLeft: '10px',
+                                    color: "white", padding: '5px', borderRadius: '10px'
+                                }}
+                                >
+                                    <ListItemAvatar style={{ display: 'flex' }}>
+                                        <Avatar alt={e.name} src={e.profile} style={{
+                                            alignItems: 'center',
+                                            margin: '5px',
+                                            height: '35px',
+                                            width: '35px'
+                                        }} />
+                                        <p style={{ float: 'right', justifyContent: 'center', margin: '10px 10px' }}>{e.name}</p>
+                                    </ListItemAvatar>
+                                    <p style={{ justifyContent: 'center', margin: '10px 55px' }}>About Section</p>
+                                    {!e.requested ?
+
+                                        <Button style={{
+                                            float: 'right', justifyContent: 'center',
+                                            margin: '-60px 10px'
+                                        }}
+                                            onClick={() => {
+                                                navigateToRequestPage(e)
+                                            }}
+                                        >Request</Button>
+                                        :
+                                        <>
+                                            <span style={{ float: 'right', justifyContent: 'center', margin: '-50px 10px' }}>x Cancel</span>
+                                            <span style={{ float: 'right', justifyContent: 'center', margin: '-50px 100px' }}>Requested</span>
+                                        </>
+                                    }
+                                </div>
+                                <hr style={{ width: '100%' }}></hr>
+                            </div>
+                        ))}
+                    </> :
+                    <p>Channel's Not Exist</p>
+                }
+            </div>
+        </>
+    }
     return (
         <>
-            <div className='App'>
-                <Container>
-                    {!showAddChannelPage ?
-                        <>
+            <div >
+                {!showAddChannelPage ?
+                    <>
+                        <Container>
                             <Button style={{ justifyContent: 'center', margin: '-50px 10px' }} onClick={() => {
                                 updateShow()
                             }}>Back </Button>
                             <Card >
                                 <p style={{ fontSize: '25px', fontFamily: 'bold', alignSelf: 'center' }}> {orgName}</p>
                             </Card>
-                            <p className="button-upload-org" style={{ float: 'right' }} onClick={() => setShowAddChannelPage(true)}>Add New Channel</p>
+                            <p className="button-upload-org" style={{ float: 'right' }}
+                                onClick={() => setShowAddChannelPage(true)}>Add New Channel</p>
+
+                            <p className="button-upload-org" style={{ float: 'left' }}
+                                onClick={() => getChannels()}>Refresh</p>
                             <hr style={{ width: '100%' }}></hr>
 
+                        </Container>
+                        <div style={{ display: 'flex' }}>
+                            <Channels />
 
-                            {users.length > 0 ?
-                                <div className='output'>
-                                    {users.map((e, i) => (
-                                        <div key={i}>
-                                            <div style={{
-                                                background: 'darkblue', height: '100px',
-                                                width: '80%', color: "white", padding: '5px', borderRadius: '10px'
-                                            }}
-                                            >
-                                                <ListItemAvatar style={{ display: 'flex' }}>
-                                                    <Avatar alt={e.name} src={e.profile} style={{
-                                                        alignItems: 'center',
-                                                        margin: '5px',
-                                                        height: '35px',
-                                                        width: '35px'
-                                                    }} />
-                                                    <p style={{ float: 'right', justifyContent: 'center', margin: '10px 10px' }}>{e.name}</p>
-                                                </ListItemAvatar>
-                                                <p style={{ justifyContent: 'center', margin: '10px 55px' }}>About Section</p>
-                                                {!e.requested ?
-                                                    <Link
-                                                        to={`/user_request`}
-                                                        state={{
-                                                            e:e
-                                                        }}
-                                                    >
-                                                        <Button style={{
-                                                            float: 'right', justifyContent: 'center',
-                                                            margin: '-60px 10px'
-                                                        }} >Request</Button>
-                                                    </Link>
-                                                    :
-                                                    <>
-                                                        <span style={{ float: 'right', justifyContent: 'center', margin: '-50px 10px' }}>x Cancel</span>
-                                                        <span style={{ float: 'right', justifyContent: 'center', margin: '-50px 100px' }}>Requested</span>
-                                                    </>
-                                                }
-                                            </div>
-                                            <hr style={{ width: '100%' }}></hr>
-                                        </div>
-                                    ))}
-                                </div>
-                                :
-                                <p>Channel's Not Exist</p>
-                            }
-                        </>
+                            {requestPageVisible ?
+                                <UserRequest channelId={channelId} channelName={channelName} orgId={orgId} orgName={orgName}  />
+                                : null}
+                        </div>
+                    </>
 
-                        :
-                        <CreateChannelPage goBack={updateShow} />
-                    }
-                </Container>
+                    :
+                    <CreateChannelPage goBack={updateShow} />
+                }
             </div>
         </>
     )

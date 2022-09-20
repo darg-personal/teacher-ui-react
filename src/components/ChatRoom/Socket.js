@@ -28,6 +28,7 @@ export class Socket extends Component {
 
     pull_data = (response) => {
         let data = response
+        console.log({data});
         this.setState({ chatRoom: data.name });
         this.setState({ chatRoomId: data.id });
         this.setState({ type: data.type });

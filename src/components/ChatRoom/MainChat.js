@@ -64,7 +64,9 @@ function MainChat(props) {
         const responseData = JSON.stringify(res.data);
         const message = JSON.parse(responseData);
         setMessageCount(message.count);
+        console.log(message.count);
         const prevMsgs = [];
+        if(message.count > 0)
         for (let i = message.results.length - 1; i >= 0; i--) {
           const receivedObj = message.results[i];
           const receivedDate = receivedObj?.created_at || "NA";
