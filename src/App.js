@@ -33,6 +33,7 @@ import Orginization from "./components/Orginization/Orginization";
 import OrgChannel from "./components/Orginization/OrginazationChannel";
 import UserRequest from "./components/Orginization/channelPage";
 import SearchChannelAndUser from "./components/SearchChannelAndUser/SearchChannelAndUser";
+import CreatePassword from "./pages/auth/CreatePassword";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 function App() {
@@ -68,7 +69,7 @@ function App() {
             <Route path={"orginization_channel"} element={<OrgChannel />} />
             <Route path={"user_request"} element={<UserRequest />} />
             <Route path={"channels"} element={<SearchChannelAndUser />} />
-
+            <Route path={"CreatePassword"} element={<CreatePassword />} />
             
           </Route>
         </Routes>

@@ -10,12 +10,18 @@ import "../../css/auth/auth.scss";
 import { Button, Container } from "react-bootstrap";
 import { Avatar, ListItemAvatar } from "@mui/material";
 
+const requestType = {
+    cancel: "0",
+    Joined: '1',
+    Requested: "2"
+}
 
 export default function SearchChannelAndUser() {
     let Token = localStorage.getItem("token");
     let login_user = JSON.parse(localStorage.getItem("user"));
 
     const [output, setOutput] = useState([])
+    const [status, setStatus] = useState(2)
 
     async function getOrginizations() {
         axios
@@ -31,13 +37,13 @@ export default function SearchChannelAndUser() {
                 let tempData = data.results
                 console.log(login_user.id);
                 for (let i = 0; i < tempData.length; i++) {
-                    if(tempData[i]?.org?.user?.username !== login_user.username )
-                    val.push({
-                        "image": tempData[i]?.image,
-                        "orgId": tempData[i]?.org?.id, "orgName": tempData[i]?.org?.meta_attributes, "ChannelId": tempData[i]?.id,
-                        "ChannelName": tempData[i]?.name,
-                        "owner": tempData[i]?.org?.user?.username, "about": tempData[i]?.about
-                    })
+                    if (tempData[i]?.org?.user?.username !== login_user.username)
+                        val.push({
+                            "image": tempData[i]?.image,
+                            "orgId": tempData[i]?.org?.id, "orgName": tempData[i]?.org?.meta_attributes, "ChannelId": tempData[i]?.id,
+                            "ChannelName": tempData[i]?.name,
+                            "owner": tempData[i]?.org?.user?.username, "about": tempData[i]?.about
+                        })
 
                 }
 
@@ -50,18 +56,18 @@ export default function SearchChannelAndUser() {
         getOrginizations()
     }, [])
 
-     const senRequest = async(data) =>
-    {
-console.log(data);
-let value = {org: data.orgId,Channel:data.ChannelId, user:login_user.id }
-        await axios.post(
+    const senRequest = async (data) => {
+        let value = { org: data.orgId, Channel: data.ChannelId, user: login_user.id }
+        const res = await axios.post(
             `${utils.getHost()}/chat/userRequest/${login_user.id}`,
-               value ,
+            value,
             {
-              // headers: { Authorization: `${user_token}` },
-              headers: { Authorization: ` Bearer ${Token}`},
+                headers: { Authorization: ` Bearer ${Token}` },
             }
-          );
+        );
+        setStatus(res?.data?.request_type)
+        console.log('request data', res?.data?.request_type)
+
     }
 
     return (
@@ -74,17 +80,21 @@ let value = {org: data.orgId,Channel:data.ChannelId, user:login_user.id }
                             <Header />
                             <div className='App'>
                                 <Container>
-                                    <div className='search-bar' >
-                                        <p type="click"
-                                            style={{ float: 'left', backgroundColor: 'transparent' }}
-                                            className="button-upload-org" onClick={(data) => {
-                                                getOrginizations()
-                                            }}>Refresh </p>
+                                    <div className="d-flex justify-content-center">
+                                    <h3>Groups / Users</h3>
+                                    </div>
+                                    <div className='d-flex' style={{marginLeft:'15px'}} >
                                         <input onChange={e => console.log("setInput(e.target.value)")}
                                             type="text" placeholder='Search User/Group/...' aria-label="Search "
-                                        />
+                                    />
+                                        <p type="click"
+                                            style={{ backgroundColor: 'transparent' }}
+                                            className=" button-upload-org justify-content-right" onClick={(data) => {
+                                                getOrginizations()
+                                            }}>Refresh </p>
                                     </div>
                                     <hr style={{ width: '100%' }}></hr>
+                                    {output.length >0 ?
                                     <div className='output'>
                                         {output.map((e, i) => (
                                             <div key={i}>
@@ -104,12 +114,20 @@ let value = {org: data.orgId,Channel:data.ChannelId, user:login_user.id }
                                                     <div style={{
                                                         marginTop: "-25px",
                                                         paddingLeft: "80px"
-                                                    }} onClick={() => { senRequest(e) }
-                                                    }>
+                                                    }} >
                                                         <span >Channel Name : {e.ChannelName}</span>
-                                                        <span style={{ float: 'right' }} >
-                                                            <Button >Request</Button>
-                                                        </span>
+                                                        {requestType.Requested == status ?
+                                                            <span style={{ float: 'right' }} >
+                                                                <Button onClick={() => { senRequest(e) }
+                                                                }>Request</Button>
+                                                            </span> : requestType.Joined == status ?
+                                                                <span style={{ float: 'right' }} >
+                                                                    <Button onClick={() => { senRequest(e) }
+                                                                    }>Joined</Button>
+                                                                </span> : <span style={{ float: 'right' }} >
+                                                                    <Button onClick={() => { senRequest(e) }
+                                                                    }>Cancel</Button>
+                                                                </span>}
                                                         <p >ORGINIZATION: {e.orgName}</p>
                                                         <span style={{ float: 'right' }} >About : {e.about}</span>
                                                         <p >OWNER:  {e.owner}</p>
@@ -120,6 +138,11 @@ let value = {org: data.orgId,Channel:data.ChannelId, user:login_user.id }
                                             </div>
                                         ))}
                                     </div>
+                                    : 
+                                    <div className="d-flex justify-content-center">
+                                        <h1>No Groups/ User To Show</h1>
+                                    </div>
+}
                                 </Container>
 
 

@@ -58,15 +58,9 @@ function OrgChannel(props) {
 
     const navigateToRequestPage = (data) => {
         setChannelId(data.channelId);
-        setChannelName(data.channelName)
+        setChannelName(data.name)
         
         setRequestPageVisible(true)
-    }
-
-
-    const isAddedUser = (data) =>
-    {
-        console.log({data});
     }
 
     function Channels() {
@@ -107,7 +101,7 @@ function OrgChannel(props) {
                                             onClick={() => {
                                                 navigateToRequestPage(e)
                                             }}
-                                        >Request</Button>
+                                        > {'show >'} </Button>
                                         :
                                         <>
                                             <span style={{ float: 'right', justifyContent: 'center', margin: '-50px 10px' }}>x Cancel</span>
@@ -118,6 +112,7 @@ function OrgChannel(props) {
                                 <hr style={{ width: '100%' }}></hr>
                             </div>
                         ))}
+                        <span className="d-flex justify-content-center">---end---</span>
                     </> :
                     <p>Channel's Not Exist</p>
                 }
@@ -148,7 +143,10 @@ function OrgChannel(props) {
                             <Channels />
 
                             {requestPageVisible ?
-                                <UserRequest channelId={channelId} channelName={channelName} orgId={orgId} orgName={orgName}  />
+                                <UserRequest channelId={channelId}
+                                 channelName={channelName}
+                                  orgId={orgId} 
+                                  orgName={orgName}  />
                                 : null}
                         </div>
                     </>

@@ -20,7 +20,6 @@ import Teacherlogo from "../../assets/teacherlogo.png";
 import { Link } from "react-router-dom";
 
 const SideData = [
-  { icon: <TiMessages />, path: "/channels", student: "search" },
   { icon: <AiFillDashboard />, path: "/dashboard", student: "Student Classes" },
   { icon: <AiFillDashboard />, path: "/student_dashboard", student: "Dashboard" },
   { icon: <FaGraduationCap />, path: "/teacher", student: "Teachers" },
@@ -46,15 +45,16 @@ const SideData = [
   { icon: <BsFillCreditCardFill />, path: "#", student: "Braintree" },
   { icon: <BsTelephoneFill />, path: "#", student: "RingLess Voice-Mail" },
   { icon: <TiMessages />, path: "/chatroom", student: "Chat Room" },
-  { icon: <TiMessages />, path: "/orginization", student: "Orginization" },
+  { icon: <HiUserGroup />, path: "/orginization", student: "Orginization" },
+  { icon: <FaUserAlt />, path: "/channels", student: "Groups" },
 ];
 
 const Sidebar = ({ handleClickHere }) => {
-
+  
   //   hideBar = (event) => {
-  //     const bar = document.getElementsByClassName("sidebar-wrap   ");
-
-  //     for (const b of bar) {
+    //     const bar = document.getElementsByClassName("sidebar-wrap   ");
+    
+    //     for (const b of bar) {
   //       b.classList.toggle("collapsed");
   //     }
   //     // event.target.classList.toggle(styles.collapsed);

@@ -80,6 +80,7 @@ const LoginScreen = () => {
         console.log("________token_______", response.data);
         if (response.status === 200) {
           console.log("======if=======", token);
+          getUserImage(token)
           localStorage.setItem("token", token);
           localStorage.setItem("user", JSON.stringify(response.data.user));
           window.location.href = "/dashboard";
@@ -116,6 +117,16 @@ const LoginScreen = () => {
       });
   };
 
+  const getUserImage = (token) => {
+  let api = `${utils.getHost()}/profile/user/profile_update/`;
+    axios
+      .get(api, { headers: { Authorization: `Bearer ${token}` } })
+      .then((data) => {
+        const value = data.data;
+        localStorage.setItem("loginUserImage", value?.image);
+      })
+      .catch((error) => console.log(error));
+  }
   useEffect(() => {
     if (Token)
       navigate('/dashboard')

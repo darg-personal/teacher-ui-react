@@ -60,7 +60,7 @@ export default function Orginization() {
 
     const getChannels = (data) => {
         setOrgId(data.orgId || -1)
-        setOrgName(data.orgName)
+        setOrgName(data.orgName || -1)
         setShow(!show)
     }
     const updateShow = (data) => {
@@ -82,6 +82,9 @@ export default function Orginization() {
                                 {!show ?
                                     <Container>
                                         <div className='search-bar' >
+                                            <div className="d-flex justify-content-center">
+                                                <h3>Orginization</h3>
+                                            </div>
                                             <p type="click"
                                                 style={{ float: 'right', backgroundColor: 'transparent' }}
                                                 className="button-upload-org" onClick={(data) => {
@@ -103,35 +106,31 @@ export default function Orginization() {
                                                         <div key={i}>
                                                             <div style={{
                                                                 background: 'skyblue', height: '90px',
-                                                                width: '80%', color: "white", padding: '5px',
-                                                                borderRadius: '10px'
-                                                            }}>
+                                                                marginLeft: '25px', width: '80%', color: "white", padding: '5px',
+                                                                borderRadius: '10px', display: 'flex'
+                                                            }} onClick={() =>
+                                                                getChannels(e)
+                                                            }>
                                                                 <ListItemAvatar >
                                                                     <Avatar alt={e.orgName} src={e.owner} style={{
-                                                                        // padding: '5px',
                                                                         alignItems: 'center',
                                                                         height: '35px',
                                                                         width: '35px'
                                                                     }} />
                                                                 </ListItemAvatar>
-                                                                <div style={{
-                                                                    marginTop: "-25px",
-                                                                    paddingLeft: "80px"
-                                                                }} onClick={() =>
-                                                                    getChannels(e)
-                                                                }>
+                                                                <div >
                                                                     <p >ORGINIZATION: {e.orgName}</p>
                                                                     <p >OWNER:  {e.owner}</p>
                                                                 </div>
-
                                                             </div>
                                                             <hr style={{ width: '100%' }}></hr>
                                                         </div>
                                                     ))}
+                                                    <h6 className="d-flex justify-content-center"> No More Orginizations ...</h6>
                                                 </>
-                                                :  
-                                                    <p>Looks like You don't have Orginization</p>                
-                                                    }
+                                                :
+                                                <p style={{color:"red"}}>Looks like You don't have Orginization</p>
+                                            }
                                         </div>
                                     </Container>
                                     :

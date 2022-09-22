@@ -10,8 +10,8 @@ const UserRequest = (props) => {
     const org = props.orgId
     const channel = props.channelId
 
+ 
     
-
     const [reqUsers, setReqUsers] = useState([]);
     let Token = localStorage.getItem("token");
     const [temp, setTemp] = useState({ request: {} })
@@ -75,17 +75,13 @@ const UserRequest = (props) => {
                             },
                         }
                     ).then(() => {
-                        getRequests()
+                        getRequests(org,channel)
                     }).catch(() => {
                         console.log("error");
                     })
-                props.isAddedUser({ userData: data })
-
                 console.log(temp);
                 alert('User is Added or group')
             })
-
-
 
     }
 
