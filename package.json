@@ -32,7 +32,8 @@
     "react-toaster": "^0.0.3",
     "react-toastify": "^9.0.5",
     "sweetalert": "^2.1.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "vmsg": "^0.4.0"
   },
   "scripts": {
     "start": "PORT=3006 react-scripts start",

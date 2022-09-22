@@ -6,6 +6,7 @@ import utils from "../../pages/auth/utils";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
+import { Badge } from "@mui/material";
 
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
@@ -13,6 +14,30 @@ function Contact(props) {
   const [group, setGroup] = useState([]);
   const [isActive, setIsActive] = useState();
   const activeUser = props.activeUser;
+
+  const [notificationCountForClass, setNotificationCountForClass] = useState({});
+  const [notificationCountForUser, setNotificationCountForUser] = useState({});
+  
+  const receiveMessageCountDict = props.receiveMessageCountDict;
+  const userUniqeId = props.userUniqeId;
+  const chatroomId = props.chatroomUniqeId;
+
+  useEffect(() => {
+    console.log(props, "props......");
+    setNotificationCountForClass({
+      ...notificationCountForClass,
+      [chatroomId]: receiveMessageCountDict[chatroomId],
+    });
+  }, [chatroomId, receiveMessageCountDict[chatroomId]]);
+
+  useEffect(() => {
+    console.log(props, "props......");
+    setNotificationCountForUser({
+      ...notificationCountForUser,
+      [userUniqeId]: receiveMessageCountDict[userUniqeId],
+    });
+  }, [userUniqeId, receiveMessageCountDict[userUniqeId]]);
+
 
   useEffect(() => {
     setIsActive(activeUser.chatRoom)
@@ -81,11 +106,11 @@ function Contact(props) {
   };
 
   return (
-    <div >
+    <>
       <div className="sidebar">
         {group.map((e, i) => (
           <div
-            key={i}
+            key={e.id + e.name}
             className={e.name === isActive ? "link active" : "link"}
             onClick={() => handleClick(e)}
           >
@@ -93,12 +118,27 @@ function Contact(props) {
               <Avatar alt={e.name} src={e.image} />
             </ListItemAvatar>
             <ListItemText primary={e.name} secondary="last seen 08:00" />
+            {
+              e.name !== isActive ? (
+              e.type === "Channel" ? (
+                <Badge
+                  badgeContent={notificationCountForClass[e.id + e.name] || 0}
+                  color="success"
+                ></Badge>
+              ) : (
+                <Badge
+                  badgeContent={notificationCountForUser[e.id + e.name] || 0}
+                  color="success"
+                ></Badge>
+              )
+            ) : null
+          }
 
           </div>
 
         ))}
       </div>
-    </div>
+    </  >
   );
 }
 

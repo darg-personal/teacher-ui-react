@@ -85,12 +85,14 @@ input{
   margin-top: 5px;
   padding: 0px 5px;
   margin-left: 23%;
+  bottom: 0;
 
 }
 
 .input_text{
   height: 59px;
   border-radius: 10px;
+  width: 65%;
 }
 
 .btn-outline-success{
@@ -98,7 +100,7 @@ input{
   width: 100px;
   font-size: 200px;
   margin-left: 2%;
-  position: fixed;
+  /* position: fixed; */
   border: 2px solid green;
 }
 

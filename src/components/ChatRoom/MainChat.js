@@ -18,6 +18,7 @@ import CardHeader from "react-bootstrap/esm/CardHeader";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 
 import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
+import Record from "./Recorder";
 
 function MainChat(props) {
 
@@ -31,7 +32,8 @@ function MainChat(props) {
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [messageCount, setMessageCount] = useState(0);
-  const [receiveMessageCount, setReceiveMessageCount] = useState(1);
+  // const [receiveMessageCount, setReceiveMessageCount] = useState(1);
+  const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
   const [load, setLoad] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
@@ -48,6 +50,40 @@ function MainChat(props) {
   const type = props.type;
   const getChatImage = props.getChatImage;
   const isConnected = props.isConnected;
+  const receiveMessageCountDictProp = props.receiveMessageCountDict;
+
+  console.log(receiveMessageCountDictProp, "receiveMessageCountDictProp......");
+
+  const recieveMessages = (value, chatroomId, username) => {
+    console.log("recievemessages function is callled from mainchat");
+    const uniqeId = chatroomId + username;
+    // setReceiveMessageCount(value + 1);
+    console.log(receiveMessageCountDict, "receiveMessageCountDict");
+    var recCount = 1;
+    if (receiveMessageCountDict[uniqeId]) {
+      recCount = receiveMessageCountDict[uniqeId] + 1;
+      console.log("uniq id found");
+    } else {
+      console.log("uniqe id not found");
+      recCount = 1;
+    }
+    // var countDict = {};
+    if (receiveMessageCountDictProp) {
+      // countDict = receiveMessageCountDictProp;
+      value = receiveMessageCountDictProp;
+      value[uniqeId] = recCount;
+      console.log(value, "countDict......----");
+      setReceiveMessageCountDict(value);
+      // console.log(receiveMessageCount,'receiveMessageCount');
+      console.log(receiveMessageCountDict, "setReceiveMessageCountDict");
+      props.receiveMessageCount({
+        receiveMessageCountDict: value,
+        uniqeId,
+      });
+    }
+
+  };
+
   useEffect(() => {
     setPage(1);
     console.log(`web socket connection created for channel ${chatroom}!!`);
@@ -66,35 +102,35 @@ function MainChat(props) {
         setMessageCount(message.count);
         console.log(message.count);
         const prevMsgs = [];
-        if(message.count > 0)
-        for (let i = message.results.length - 1; i >= 0; i--) {
-          const receivedObj = message.results[i];
-          const receivedDate = receivedObj?.created_at || "NA";
-          const messageDate = new Date(receivedDate);
-          const message_type = receivedObj?.message_type;
-          const time = messageDate.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-          const date = messageDate.toLocaleDateString("en-US", {
-            weekday: "short",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          });
+        if (message.count > 0)
+          for (let i = message.results.length - 1; i >= 0; i--) {
+            const receivedObj = message.results[i];
+            const receivedDate = receivedObj?.created_at || "NA";
+            const messageDate = new Date(receivedDate);
+            const message_type = receivedObj?.message_type;
+            const time = messageDate.toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            const date = messageDate.toLocaleDateString("en-US", {
+              weekday: "short",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            });
 
-          const msgObj = {
-            sender: receivedObj?.user.username || "NA",
-            message: receivedObj?.message_text || "NA",
-            time: time || "NA",
-            date: date || "NA",
-            profile: receivedObj?.user_profile.image || null,
-            message_type: message_type || "message/text",
-            media_link: receivedObj?.media_link || null,
-          };
+            const msgObj = {
+              sender: receivedObj?.user.username || "NA",
+              message: receivedObj?.message_text || "NA",
+              time: time || "NA",
+              date: date || "NA",
+              profile: receivedObj?.user_profile.image || null,
+              message_type: message_type || "message/text",
+              media_link: receivedObj?.media_link || null,
+            };
 
-          prevMsgs.push(msgObj);
-        }
+            prevMsgs.push(msgObj);
+          }
         setMessages([...prevMsgs]);
       })
       .catch((error) => {
@@ -138,7 +174,14 @@ function MainChat(props) {
         const prevMsgs = [...messages];
         prevMsgs.push(msgObj);
         setMessages([...prevMsgs]);
+
       }
+      recieveMessages(
+        receiveMessageCountDict,
+        receivedObj?.channel.id,
+        receivedObj?.channel.name
+      );
+
     };
   }, [messages]);
 
@@ -290,6 +333,46 @@ function MainChat(props) {
       </div>
     )
   }
+  const onStopRecording = async (recording) => {
+    let formData = new FormData();
+    formData.append("file", recording,"audio.mp3");
+    await axios
+      .post(`${utils.getHost()}/profile/upload`, formData)
+      .then((resp) => {
+        console.log(resp.data.content_type);
+
+        let file_url = resp.data.file_url;
+        ws.send(
+          JSON.stringify({
+            meta_attributes: "react",
+            message_type: "audio/mpeg",
+            media_link: file_url ? file_url : null,
+            message_text: inputRef.current.value ? inputRef.current.value : "",
+          })
+        );
+
+        let messageDate = new Date();
+        let timeNow = messageDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const date = messageDate.toLocaleDateString("en-US", {
+          weekday: "short",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+        
+        
+        setState({ file: false });
+        document.getElementById("inp").value = "";
+      })
+      .catch((resp) => {
+        // setState({ file: false });
+
+        alert("connection is breaked");
+      });
+  };
 
   return (
     <div className="chatroom">
@@ -310,13 +393,13 @@ function MainChat(props) {
 
       {state.file ? (
         <>
-        <CancelSharpIcon style={{ flex:1,marginLeft:'90%', position: 'relative' }} onClick={() => {
-          setState({
-            file: null,
-            filePreviewUrl: null,
-          });
-        }} color="primary"
-          fontSize="large" />
+          <CancelSharpIcon style={{ flex: 1, marginLeft: '90%', position: 'relative' }} onClick={() => {
+            setState({
+              file: null,
+              filePreviewUrl: null,
+            });
+          }} color="primary"
+            fontSize="large" />
           <ImageShow filePreviewUrl={state.filePreviewUrl} />
         </>
       ) : (
@@ -329,12 +412,13 @@ function MainChat(props) {
         >
           {messages.map((e, i) => {
             return (
-              <div style={{
-                marginTop: '2%',
-                overflow: 'auto'
-              }} >
+              <div key={e?.sender + i}
+                style={{
+                  marginTop: '2%',
+                  overflow: 'auto'
+                }}>
                 {e.message_type === 'group-info-update' ?
-                  <div key={i} id="center">
+                  <div id="center">
                     <div className=" user-add-remove" >
                       <p >{`${e.message}`}</p>
                     </div>
@@ -342,17 +426,17 @@ function MainChat(props) {
                   :
                   <div>
                     {e.sender === loggedUser.username ? (
-                      <div key={i}>
+                      <div >
                         {e.media_link ? (
-                          <ImageView image={e.media_link} profile={e.profile} text={e.message} sender={e.sender} time={e.time} />
+                          <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={e.message} sender={e.sender} time={e.time} />
                         ) : (
                           <TextView sender={'Me'} profile={e.profile} text={e.message} time={e.time} />
                         )}
                       </div>
                     ) : (
-                      <div key={i} >
+                      <div  >
                         {e.media_link ? (
-                          <ImageView image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
+                          <ImageView  type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
                         ) : (
                           <TextView sender={e.sender} profile={e.profile} text={e.message} time={e.time} float={'left'} />
                         )}
@@ -369,7 +453,7 @@ function MainChat(props) {
         </div>
       )
       }
-      { isConnected == 1 ?
+      {isConnected == 1 ?
         <div className="box">
           <form>
             <input
@@ -384,6 +468,7 @@ function MainChat(props) {
             <button onClick={handleClick} className="btn btn-outline-success">
               send
             </button>
+            <Record onStopRecording={onStopRecording}></Record>
           </form>
         </div>
         :

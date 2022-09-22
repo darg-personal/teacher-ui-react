@@ -4,26 +4,58 @@ import { Card } from "react-bootstrap";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
 
-export function ImageView({ image, profile, text, sender, time, float = 'right' }) {
+export function ImageView({
+    type,
+    image,
+    profile,
+    text,
+    sender,
+    time,
+    float = "right",
+}) {
+    console.log(image,type);
     return (
-        <div className="darker" id={float} >
-            <Card style={{
-                width: 'auto',
-                height: '60%',
-                borderColor: "#464444", background: '#464444',
-            }}>{float === 'left' ?
-                <CardHeader style={{ borderColor: 'transparent' }}><span style={{ float: 'right' }}>{sender}</span></CardHeader>
-                : null}
-                <img height='210px' width='auto' style={{
-                    borderRadius: '10px'
-                }} src={image} />
-                <p style={{ marginLeft: '10px' }}>{text !== "NA" ? text : null}</p>
+        <div className="darker" id={float}>
+            <Card
+                style={{
+                    width: "auto",
+                    height: "60%",
+                    borderColor: "#464444",
+                    background: "#464444",
+                }}
+            >
+                {float === "left" ? (
+                    <CardHeader style={{ borderColor: "transparent" }}>
+                        <span style={{ float: "right" }}>{sender}</span>
+                    </CardHeader>
+                ) : null}
+                {/* <img height='210px' width='auto' style={{
+                      borderRadius: '10px'
+                  }} src={image} /> */}
+
+                {type === "audio/mpeg" ? (
+                    <li key={image}>
+                        <audio src={image} controls />
+                    </li>
+                ) : (
+                    <img
+                        height="210px"
+                        width="auto"
+                        style={{
+                            borderRadius: "10px",
+                        }}
+                        src={image}
+                    />
+                )}
+
+                <p style={{ marginLeft: "10px" }}>{text !== "NA" ? text : null}</p>
 
                 <span className="time-right">{time}</span>
             </Card>
         </div>
     );
-};
+}
+
 
 export function TextView({ sender, profile, text, time, float = 'right' }) {
     return (

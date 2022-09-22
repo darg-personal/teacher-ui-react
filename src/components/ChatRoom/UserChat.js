@@ -15,6 +15,7 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
+import Record from "./Recorder";
 
 function UserChat(props) {
   let Token = localStorage.getItem("token");
@@ -39,7 +40,40 @@ function UserChat(props) {
       "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true",
   });
 
+  const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
+  const receiveMessageCountDictProp = props.receiveMessageCountDict;
   var ws = props.websocket
+
+  const recieveMessages = (userId, username) => {
+    console.log('recievemessages function is callled from userChat');
+    const userUniqeId = userId + username;
+    console.log(receiveMessageCountDict, "receiveMessageCountDict");
+    var recCount = 1;
+    console.log(receiveMessageCountDict[userUniqeId],'receiveMessageCountDict[userUniqeId]');
+    if (receiveMessageCountDict[userUniqeId]) {
+      recCount = receiveMessageCountDict[userUniqeId] + 1;
+      console.log("uniq id found");
+    } else {
+      console.log("uniqe id not found");
+      recCount = 1;
+    }
+    console.log(receiveMessageCountDictProp,'receiveMessageCountDictProp');
+    var countDict = {}
+    if (receiveMessageCountDictProp) {
+      // countDict = receiveMessageCountDictProp;
+      countDict = receiveMessageCountDictProp;
+    }
+    countDict[userUniqeId] = recCount;
+    console.log(countDict, "countDict......----");
+    setReceiveMessageCountDict(countDict);
+    // console.log(receiveMessageCount,'receiveMessageCount');
+    console.log(receiveMessageCountDict, "setReceiveMessageCountDict");
+    props.receiveMessageCount({
+      receiveMessageCountDict: countDict,
+      userUniqeId,
+    });
+  };
+
 
   useEffect(() => {
     if (scrollBottom) {
@@ -271,6 +305,14 @@ function UserChat(props) {
         prevMsgs.push(msgObj);
         setMessages([...prevMsgs]);
       }
+      recieveMessages(
+        // receiveMessageCountDict,
+        // receivedObj?.to_user.id,
+        // receivedObj?.to_user.username
+        receivedObj?.from_user.id,
+        receivedObj?.from_user.username
+      );
+
     };
   }, [messages]);
 
@@ -288,6 +330,59 @@ function UserChat(props) {
     };
     reader.readAsDataURL(file);
   };
+
+  const onStopRecording = async (recording) => {
+    let formData = new FormData();
+    formData.append("file", recording,"audio.mp3");
+    await axios
+      .post(`${utils.getHost()}/profile/upload`, formData)
+      .then((resp) => {
+        console.log(resp.data.content_type);
+
+        let file_url = resp.data.file_url;
+        ws.send(
+          JSON.stringify({
+            meta_attributes: "react",
+            message_type: "audio/mpeg",
+            media_link: file_url ? file_url : null,
+            message_text: inputRef.current.value ? inputRef.current.value : "",
+          })
+        );
+
+        let messageDate = new Date();
+        let timeNow = messageDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const date = messageDate.toLocaleDateString("en-US", {
+          weekday: "short",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+        let a = {
+          sender: loggedUser.username,
+          message: inputRef.current.value,
+          time: timeNow,
+          date: date,
+          media_link: file_url ? file_url : null,
+          message_type: "audio/mpeg",
+          profile: getChatImage,
+        };
+        const prevMsgs = [...messages];
+        prevMsgs.push(a);
+        setMessages([...prevMsgs]);
+        setIsSelected(false);
+        setState({ file: false });
+        document.getElementById("inp").value = "";
+      })
+      .catch((resp) => {
+        // setState({ file: false });
+
+        alert("connection is breaked");
+      });
+  };
+
 
   return (
     <>
@@ -351,7 +446,7 @@ function UserChat(props) {
                 {e.sender === loggedUser.username ? (
                   <div >
                     {e.media_link ? (
-                      <ImageView image={e.media_link} profile={e.profile} text={e.message} sender={e.sender} time={e.time} />
+                      <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={e.message} sender={e.sender} time={e.time} />
                     ) : (
                       <TextView sender={'Me'} profile={e.profile} text={e.message} time={e.time} />
                     )}
@@ -359,7 +454,7 @@ function UserChat(props) {
                 ) : (
                   <div  >
                     {e.media_link ? (
-                      <ImageView image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
+                      <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
                     ) : (
                       <TextView sender={e.sender} profile={e.profile} text={e.message} time={e.time} float={'left'} />
                     )}
@@ -386,6 +481,7 @@ function UserChat(props) {
           <button onClick={handleClick} className="btn btn-outline-success">
             send
           </button>
+          <Record onStopRecording={onStopRecording}></Record>
         </form>
       </div>
     </>
