@@ -15,6 +15,7 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
+import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import Record from "./Recorder";
 
 function UserChat(props) {
@@ -49,7 +50,7 @@ function UserChat(props) {
     const userUniqeId = userId + username;
     console.log(receiveMessageCountDict, "receiveMessageCountDict");
     var recCount = 1;
-    console.log(receiveMessageCountDict[userUniqeId],'receiveMessageCountDict[userUniqeId]');
+    console.log(receiveMessageCountDict[userUniqeId], 'receiveMessageCountDict[userUniqeId]');
     if (receiveMessageCountDict[userUniqeId]) {
       recCount = receiveMessageCountDict[userUniqeId] + 1;
       console.log("uniq id found");
@@ -57,7 +58,7 @@ function UserChat(props) {
       console.log("uniqe id not found");
       recCount = 1;
     }
-    console.log(receiveMessageCountDictProp,'receiveMessageCountDictProp');
+    console.log(receiveMessageCountDictProp, 'receiveMessageCountDictProp');
     var countDict = {}
     if (receiveMessageCountDictProp) {
       // countDict = receiveMessageCountDictProp;
@@ -164,9 +165,9 @@ function UserChat(props) {
   useEffect(() => {
     console.log(`web socket connection created for ${userName},${receiverId}!!`);
     fetchData()
-  }, [userName,receiverId]);
+  }, [userName, receiverId]);
 
-  async function fetchData (){
+  async function fetchData() {
     await axios
       .get(
         `${utils.getHost()}/chat/get/user/paginated_messages/?user=${receiverId}&records=10`,
@@ -181,36 +182,36 @@ function UserChat(props) {
         const message = JSON.parse(responseData);
         setMessageCount(message.count);
         const prevMsgs = [];
-        if(message?.results?.length)
-        for (let i = message.results.length - 1; i >= 0; i--) {
-          const receivedObj = message.results[i];
-          const massageTime = receivedObj?.created_at || "NA";
-          const messageDate = new Date(massageTime);
-          const message_type = receivedObj?.message_type;
+        if (message?.results?.length)
+          for (let i = message.results.length - 1; i >= 0; i--) {
+            const receivedObj = message.results[i];
+            const massageTime = receivedObj?.created_at || "NA";
+            const messageDate = new Date(massageTime);
+            const message_type = receivedObj?.message_type;
 
-          const time = messageDate.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-          const date = messageDate.toLocaleDateString("en-US", {
-            weekday: "short",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          });
+            const time = messageDate.toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            const date = messageDate.toLocaleDateString("en-US", {
+              weekday: "short",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            });
 
-          const msgObj = {
-            sender: receivedObj?.from_user.username || "NA",
-            message: receivedObj?.message_text || "NA",
-            time: time || "NA",
-            date: date || "NA",
-            profile: receivedObj?.user_profile?.image || Avatar,
-            message_type: message_type || "message/text",
-            media_link: receivedObj?.media_link || null,
-          };
+            const msgObj = {
+              sender: receivedObj?.from_user.username || "NA",
+              message: receivedObj?.message_text || "NA",
+              time: time || "NA",
+              date: date || "NA",
+              profile: receivedObj?.user_profile?.image || Avatar,
+              message_type: message_type || "message/text",
+              media_link: receivedObj?.media_link || null,
+            };
 
-          prevMsgs.push(msgObj);
-        }
+            prevMsgs.push(msgObj);
+          }
         setMessages([...prevMsgs]);
       })
       .then(() => {
@@ -333,7 +334,7 @@ function UserChat(props) {
 
   const onStopRecording = async (recording) => {
     let formData = new FormData();
-    formData.append("file", recording,"audio.mp3");
+    formData.append("file", recording, "audio.mp3");
     await axios
       .post(`${utils.getHost()}/profile/upload`, formData)
       .then((resp) => {
@@ -387,7 +388,7 @@ function UserChat(props) {
   return (
     <>
       {/* Page content */}
-      <ChatHeader name={userName} props={props} type={type} image={getChatImage}/>
+      <ChatHeader name={userName} props={props} type={type} image={getChatImage} />
       {/* <ul className="profile-header">
         <div className="header-chat">
           <div className="classes">
@@ -431,8 +432,16 @@ function UserChat(props) {
       {load ? <Loader /> : null}
 
       {state.file ? (
-        <ImageShow filePreviewUrl={state.filePreviewUrl} />
-      ) : (
+        <>
+          <CancelSharpIcon style={{ flex: 1, marginLeft: '90%', position: 'relative' }} onClick={() => {
+            setState({
+              file: null,
+              filePreviewUrl: null,
+            });
+          }} color="primary"
+            fontSize="large" />
+          <ImageShow filePreviewUrl={state.filePreviewUrl} />
+        </>) : (
         <div
           className="content"
           id="scroll"
@@ -441,8 +450,10 @@ function UserChat(props) {
         >
           {messages.map((e, i) => {
             return (
-              <div key={i} style={{marginTop:  '2%',
-              overflow: 'auto'}}>
+              <div key={i} style={{
+                marginTop: '2%',
+                overflow: 'auto'
+              }}>
                 {e.sender === loggedUser.username ? (
                   <div >
                     {e.media_link ? (
