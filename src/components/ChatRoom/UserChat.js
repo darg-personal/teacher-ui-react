@@ -21,6 +21,8 @@ import Record from "./Recorder";
 function UserChat(props) {
   let Token = localStorage.getItem("token");
   let loggedUser = JSON.parse(localStorage.getItem("user"));
+  const profileSrc = localStorage.getItem("loginUserImage")
+
   let navigate = useNavigate();
 
   const inputRef = useRef(null);
@@ -458,9 +460,9 @@ function UserChat(props) {
                 {e.sender === loggedUser.username ? (
                   <div >
                     {e.media_link ? (
-                      <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={e.message} sender={e.sender} time={e.time} />
+                      <ImageView type={e.message_type} image={e.media_link} profile={profileSrc} text={e.message} sender={e.sender} time={e.time} />
                     ) : (
-                      <TextView sender={'Me'} profile={e.profile} text={e.message} time={e.time} />
+                      <TextView sender={'Me'} profile={profileSrc} text={e.message} time={e.time} />
                     )}
                   </div>
                 ) : (
