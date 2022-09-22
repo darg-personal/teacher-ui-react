@@ -438,6 +438,7 @@ function UserChat(props) {
               file: null,
               filePreviewUrl: null,
             });
+            setIsSelected(false)
           }} color="primary"
             fontSize="large" />
           <ImageShow filePreviewUrl={state.filePreviewUrl} />

@@ -35,16 +35,17 @@ export default function SearchChannelAndUser() {
                 const data = JSON.parse(responseData);
                 let val = []
                 let tempData = data.results
-                console.log(login_user.id);
                 for (let i = 0; i < tempData.length; i++) {
-                    if (tempData[i]?.org?.user?.username !== login_user.username)
-                        val.push({
-                            "image": tempData[i]?.image,
-                            "orgId": tempData[i]?.org?.id, "orgName": tempData[i]?.org?.meta_attributes, "ChannelId": tempData[i]?.id,
-                            "ChannelName": tempData[i]?.name,
-                            "owner": tempData[i]?.org?.user?.username, "about": tempData[i]?.about
-                        })
-
+                    if (tempData[i]?.org !=1)
+                        if (tempData[i]?.org?.user?.username !== login_user.username) {
+                            console.log(tempData[i].org);
+                            val.push({
+                                "image": tempData[i]?.image,
+                                "orgId": tempData[i]?.org?.id, "orgName": tempData[i]?.org?.meta_attributes, "ChannelId": tempData[i]?.id,
+                                "ChannelName": tempData[i]?.name,
+                                "owner": tempData[i]?.org?.user?.username, "about": tempData[i]?.about
+                            })
+                        }
                 }
 
                 console.log({ val });
@@ -81,12 +82,12 @@ export default function SearchChannelAndUser() {
                             <div className='App'>
                                 <Container>
                                     <div className="d-flex justify-content-center">
-                                    <h3>Groups / Users</h3>
+                                        <h3>Groups / Users</h3>
                                     </div>
-                                    <div className='d-flex' style={{marginLeft:'15px'}} >
+                                    <div className='d-flex' style={{ marginLeft: '15px' }} >
                                         <input onChange={e => console.log("setInput(e.target.value)")}
                                             type="text" placeholder='Search User/Group/...' aria-label="Search "
-                                    />
+                                        />
                                         <p type="click"
                                             style={{ backgroundColor: 'transparent' }}
                                             className=" button-upload-org justify-content-right" onClick={(data) => {
@@ -94,55 +95,55 @@ export default function SearchChannelAndUser() {
                                             }}>Refresh </p>
                                     </div>
                                     <hr style={{ width: '100%' }}></hr>
-                                    {output.length >0 ?
-                                    <div className='output'>
-                                        {output.map((e, i) => (
-                                            <div key={i}>
-                                                <div style={{
-                                                    background: 'skyblue', height: 'auto',
-                                                    width: '80%', color: "white", padding: '5px',
-                                                    borderRadius: '10px'
-                                                }}>
-                                                    <ListItemAvatar >
-                                                        <Avatar alt={e.orgName} src={e.image} style={{
-                                                            // padding: '5px',
-                                                            alignItems: 'center',
-                                                            height: '35px',
-                                                            width: '35px'
-                                                        }} />
-                                                    </ListItemAvatar>
+                                    {output.length > 0 ?
+                                        <div className='output'>
+                                            {output.map((e, i) => (
+                                                <div key={i}>
                                                     <div style={{
-                                                        marginTop: "-25px",
-                                                        paddingLeft: "80px"
-                                                    }} >
-                                                        <span >Channel Name : {e.ChannelName}</span>
-                                                        {requestType.Requested == status ?
-                                                            <span style={{ float: 'right' }} >
-                                                                <Button onClick={() => { senRequest(e) }
-                                                                }>Request</Button>
-                                                            </span> : requestType.Joined == status ?
+                                                        background: 'skyblue', height: 'auto',
+                                                        width: '80%', color: "white", padding: '5px',
+                                                        borderRadius: '10px'
+                                                    }}>
+                                                        <ListItemAvatar >
+                                                            <Avatar alt={e.orgName} src={e.image} style={{
+                                                                // padding: '5px',
+                                                                alignItems: 'center',
+                                                                height: '35px',
+                                                                width: '35px'
+                                                            }} />
+                                                        </ListItemAvatar>
+                                                        <div style={{
+                                                            marginTop: "-25px",
+                                                            paddingLeft: "80px"
+                                                        }} >
+                                                            <span >Channel Name : {e.ChannelName}</span>
+                                                            {requestType.Requested == status ?
                                                                 <span style={{ float: 'right' }} >
                                                                     <Button onClick={() => { senRequest(e) }
-                                                                    }>Joined</Button>
-                                                                </span> : <span style={{ float: 'right' }} >
-                                                                    <Button onClick={() => { senRequest(e) }
-                                                                    }>Cancel</Button>
-                                                                </span>}
-                                                        <p >ORGINIZATION: {e.orgName}</p>
-                                                        <span style={{ float: 'right' }} >About : {e.about}</span>
-                                                        <p >OWNER:  {e.owner}</p>
-                                                    </div>
+                                                                    }>Request</Button>
+                                                                </span> : requestType.Joined == status ?
+                                                                    <span style={{ float: 'right' }} >
+                                                                        <Button onClick={() => { senRequest(e) }
+                                                                        }>Joined</Button>
+                                                                    </span> : <span style={{ float: 'right' }} >
+                                                                        <Button onClick={() => { senRequest(e) }
+                                                                        }>Cancel</Button>
+                                                                    </span>}
+                                                            <p >ORGINIZATION: {e.orgName}</p>
+                                                            <span style={{ float: 'right' }} >About : {e.about}</span>
+                                                            <p >OWNER:  {e.owner}</p>
+                                                        </div>
 
+                                                    </div>
+                                                    <hr style={{ width: '100%' }}></hr>
                                                 </div>
-                                                <hr style={{ width: '100%' }}></hr>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    : 
-                                    <div className="d-flex justify-content-center">
-                                        <h1>No Groups/ User To Show</h1>
-                                    </div>
-}
+                                            ))}
+                                        </div>
+                                        :
+                                        <div className="d-flex justify-content-center">
+                                            <h1>No Groups/ User To Show</h1>
+                                        </div>
+                                    }
                                 </Container>
 
 

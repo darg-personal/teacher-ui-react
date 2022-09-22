@@ -17,7 +17,7 @@ function Contact(props) {
 
   const [notificationCountForClass, setNotificationCountForClass] = useState({});
   const [notificationCountForUser, setNotificationCountForUser] = useState({});
-  
+
   const receiveMessageCountDict = props.receiveMessageCountDict;
   const userUniqeId = props.userUniqeId;
   const chatroomId = props.chatroomUniqeId;
@@ -60,28 +60,30 @@ function Contact(props) {
         const temp = groups.results.length;
         for (let i = 0; i < temp; i++) {
           if (groups.results[i].type === "Channel") {
-            const receivedObj = groups.results[i].Channel;
+            const receivedObj = groups?.results[i].Channel;
             prevGroup.push({
               id: i,
-              name: receivedObj.name,
-              created_at: receivedObj.created_at,
-              typeId: receivedObj.id,
-              image: receivedObj.image || Avatar,
+              name: receivedObj?.name,
+              created_at: receivedObj?.created_at,
+              typeId: receivedObj?.id,
+              image: receivedObj?.image || Avatar,
               type: "Channel",
-              isConnected: groups.results[i].designation
+              isConnected: groups?.results[i].designation,
+              about: receivedObj?.about
             });
           }
           else {
-            const receivedObj = groups.results[i].user;
-            if (login_user.username !== receivedObj.username) {
+            const receivedObj = groups?.results[i]?.user;
+            if (login_user?.username !== receivedObj?.username) {
               prevGroup.push({
                 id: i,
-                name: receivedObj.username,
-                created_at: receivedObj.created_at,
-                typeId: receivedObj.id,
+                name: receivedObj?.username,
+                created_at: receivedObj?.created_at,
+                typeId: receivedObj?.id,
                 image: groups.results[i].user_profile.image || Avatar,
                 type: "user",
-                isConnected: 1
+                isConnected: 1,
+                about: groups.results[i]?.user_profile?.about
               });
             }
           }
@@ -101,7 +103,7 @@ function Contact(props) {
     setIsActive(value.name);
     props.type({
       name: value.name, type: value.type, id: value.typeId, image: value.image,
-      isConnected: value.isConnected
+      isConnected: value.isConnected,about :value.about
     });
   };
 
@@ -120,19 +122,19 @@ function Contact(props) {
             <ListItemText primary={e.name} secondary="last seen 08:00" />
             {
               e.name !== isActive ? (
-              e.type === "Channel" ? (
-                <Badge
-                  badgeContent={notificationCountForClass[e.id + e.name] || 0}
-                  color="success"
-                ></Badge>
-              ) : (
-                <Badge
-                  badgeContent={notificationCountForUser[e.id + e.name] || 0}
-                  color="success"
-                ></Badge>
-              )
-            ) : null
-          }
+                e.type === "Channel" ? (
+                  <Badge
+                    badgeContent={notificationCountForClass[e.id + e.name] || 0}
+                    color="success"
+                  ></Badge>
+                ) : (
+                  <Badge
+                    badgeContent={notificationCountForUser[e.id + e.name] || 0}
+                    color="success"
+                  ></Badge>
+                )
+              ) : null
+            }
 
           </div>
 

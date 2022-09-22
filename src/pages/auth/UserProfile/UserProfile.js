@@ -58,6 +58,7 @@ function UserProfile() {
       }
     )
       .then((data) => {
+        localStorage.setItem("loginUserImage", data?.data?.image);
         navigate("/dashboard");
       })
       .catch((error) => {

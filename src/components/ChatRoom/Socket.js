@@ -25,6 +25,7 @@ export class Socket extends Component {
             receiveMessageCount: 0,
             chatroomUniqeId: 0,
             userUniqeId: 0,
+            about: null
         };
     }
 
@@ -34,7 +35,8 @@ export class Socket extends Component {
         this.setState({ type: data.type });
         this.setState({ show: false });
         this.setState({ image: data.image });
-                this.check(data.name, data.id, data.type, data.isConnected)
+        this.setState({ about: data.about })
+        this.check(data.name, data.id, data.type, data.isConnected)
     };
     pullReceiveMessageCount = (data) => {
         console.log(data, "...............DAttaaaa");
@@ -72,7 +74,7 @@ export class Socket extends Component {
             userst[chatroom] = isConnected;
             this.setState({ ws: wsdict });
             this.setState({ temp: getSocket })
-            this.setState({ userStatus : userst })
+            this.setState({ userStatus: userst })
             this.setState({ isConnected: isConnected })
             //   that.timeout = 250; // reset timer to 250 on open of websocket connection
             //   clearTimeout(connectInterval); // clear Interval on on open of websocket connection
@@ -102,19 +104,19 @@ export class Socket extends Component {
 
     check = (cRoom, id, type, isConnected) => {
         const { ws, userStatus } = this.state;
-        console.log(ws, userStatus, "---0",isConnected);
+        console.log(ws, userStatus, "---0", isConnected);
         if (cRoom in ws) {
             if (!ws[cRoom] || ws[cRoom].readyState == WebSocket.CLOSED) {
                 if (cRoom)
-                 this.connect(cRoom, id, type,isConnected);
+                    this.connect(cRoom, id, type, isConnected);
             }
             this.setState({ temp: ws[cRoom] })
             this.setState({ isConnected: userStatus[cRoom] })
         }
-         else {
+        else {
             console.log(" key not exiest");
-            if (cRoom) 
-            this.connect(cRoom, id, type, isConnected);
+            if (cRoom)
+                this.connect(cRoom, id, type, isConnected);
         }
     };
 
@@ -128,13 +130,13 @@ export class Socket extends Component {
     }
     chatMethod = () => {
         if (this.state.show && this.state.isConnected == 1) {
-            return <UserGroup name={this.state.chatRoom} chatRoomId={this.state.chatRoomId} 
+            return <UserGroup name={this.state.chatRoom} chatRoomId={this.state.chatRoomId}
                 type={this.state.type} show={this.getUserInfo} image={this.state.image}
                 websocket={this.state.temp} updateGrupinfo={this.updateGroupinfo}
-                reDirect={this.reDirect}
+                reDirect={this.reDirect} about={this.state.about}
             />
         }
-         else {
+        else {
             if (this.state.type === "Channel" && this.state.temp !== null) {
                 return (
                     <MainChat
@@ -172,9 +174,9 @@ export class Socket extends Component {
     getUserInfo = (data) => {
         this.setState({ show: data.show });
         if (data.websocket)
-        this.setState({ temp: data.websocket })
-        this.setState({ chatRoomId: data.chatroomId }) 
-       };
+            this.setState({ temp: data.websocket })
+        this.setState({ chatRoomId: data.chatroomId })
+    };
 
     render() {
         return (
@@ -182,7 +184,7 @@ export class Socket extends Component {
                 {Token ? (
                     <div className="chatroom">
                         <Contact type={this.pull_data} activeUser={this.state}
-                        receiveMessageCount={this.state.receiveMessageCount}
+                            receiveMessageCount={this.state.receiveMessageCount}
                             chatroomUniqeId={this.state.chatroomUniqeId}
                             userUniqeId={this.state.userUniqeId}
                             receiveMessageCountDict={this.state.receiveMessageCountDict}

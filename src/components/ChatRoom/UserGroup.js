@@ -17,6 +17,7 @@ function UserGroup(props) {
   const chatRoomId = props.chatRoomId;
   const image = props.image;
   const ws = props.websocket;
+  const about = props.about;
   const [users, setUsers] = useState([]);
   const [isActive, setIsActive] = useState();
 
@@ -134,7 +135,8 @@ function UserGroup(props) {
         style={{ margin: "3px", width: "30rem", left: "35%", height: "5rem" }}
       >
         <Card.Body>
-          <Card.Text>About</Card.Text>
+          <span style={{fontSize:'10px',color:'gray'}}>About</span>
+          <Card.Text style={{color:'black',padding:'3px'}}>{about}</Card.Text>
         </Card.Body>
       </Card>
       {type === 'Channel' ?
