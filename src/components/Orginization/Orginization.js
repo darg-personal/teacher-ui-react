@@ -12,12 +12,12 @@ import "./addorg.css";
 import { Button, Container } from "react-bootstrap";
 import { Avatar, ListItemAvatar } from "@mui/material";
 import { ImageShow } from "../ChatRoom/templates/MainChat/Chat";
+import { AddOrg } from "./OrginizationAdd";
 export default function Orginization() {
     let Token = localStorage.getItem("token");
     let navigate = useNavigate();
     let login_user = JSON.parse(localStorage.getItem("user"));
 
-    const [data, setData] = useState([])
     const [input, setInput] = useState('')
     const [output, setOutput] = useState([])
     const [show, setShow] = useState(false)
@@ -37,10 +37,12 @@ export default function Orginization() {
                 let val = []
                 console.log(data);
                 for (let i = 0; i < data.length; i++) {
-                    if (data[i]?.user.username === login_user.username)
-                        val.push({ "orgId": data[i]?.id, "orgName": data[i]?.meta_attributes, "owner": data[i]?.user.username })
+                        val.push({
+                            "orgId": data[i]?.id,
+                            "orgName": data[i]?.meta_attributes,
+                            "owner": data[i]?.user.username
+                        })
                 }
-                setData(val)
                 setOutput(val)
             })
     }
@@ -49,14 +51,14 @@ export default function Orginization() {
         getOrginizations()
     }, [])
 
-    useEffect(() => {
-        setOutput([])
-        data.filter(val => {
-            if (val.orgName.toLowerCase().includes(input.toLowerCase())) {
-                setOutput(output => [...output, val])
-            }
-        })
-    }, [input])
+    // useEffect(() => {
+    //     setOutput([])
+    //     data.filter(val => {
+    //         if (val.orgName.toLowerCase().includes(input.toLowerCase())) {
+    //             setOutput(output => [...output, val])
+    //         }
+    //     })
+    // }, [input])
 
     const getChannels = (data) => {
         setOrgId(data.orgId || -1)
@@ -69,6 +71,17 @@ export default function Orginization() {
     const goBack = () => {
         setShow(false)
         setAddOrg(false)
+    }
+
+    const updateNewOrginization = (data) => {
+        goBack()
+        let val = []
+        val.push({
+            "orgId": data?.orgId,
+            "orgName": data?.meta_attributes,
+            "owner": login_user.username
+        })
+        setOutput([...val,...output])
     }
     return (
         <>
@@ -92,11 +105,11 @@ export default function Orginization() {
                                                     setShow(true)
                                                     setAddOrg(true)
                                                 }}>ADD New Orginization </p>
-                                            <p type="click"
+                                            {/* <p type="click"
                                                 style={{ float: 'right', backgroundColor: 'transparent' }}
                                                 className="button-upload-org" onClick={(data) => {
                                                     getOrginizations()
-                                                }}>Refresh </p>
+                                                }}>Refresh </p> */}
                                         </div>
                                         <hr style={{ width: '100%' }}></hr>
                                         <div className='output'>
@@ -129,14 +142,14 @@ export default function Orginization() {
                                                     <h6 className="d-flex justify-content-center"> No More Orginizations ...</h6>
                                                 </>
                                                 :
-                                                <p style={{color:"red"}}>Looks like You don't have Orginization</p>
+                                                <p style={{ color: "red" }}>Looks like You don't have Orginization</p>
                                             }
                                         </div>
                                     </Container>
                                     :
                                     <>
                                         {showOrg ?
-                                            <AddOrg goBack={goBack} />
+                                            <AddOrg goBack={goBack} updateNewOrginization={updateNewOrginization} />
                                             :
                                             <OrgChannel orgId={orgId} orgName={orgName} back={updateShow} />
                                         }
@@ -154,122 +167,4 @@ export default function Orginization() {
     )
 }
 
-
-
-
-
-
-export const AddOrg = (props) => {
-    let Token = localStorage.getItem("token");
-    let loginFields = [
-        {
-            placeholder: "Org name",
-            value: "",
-            name: "meta_attributes",
-            type: "text",
-            hasError: false,
-        },
-    ];
-
-
-    const [fields, updateFields] = useState(loginFields);
-
-    const setFieldValue = (value, index) => {
-        let fieldData = [...fields];
-        fieldData[index].value = value;
-        fieldData[index].hasError = value === "";
-        updateFields(fieldData);
-    };
-
-    const handleFormSubmit = (event) => {
-        event.preventDefault();
-        let requestObject = {};
-        fields.forEach((field) => {
-            requestObject[field.name] = field.value;
-        });
-    };
-
-
-    function addorg() {
-        let items = [...fields];
-        let valu = { meta_attributes: items[0].value };
-        axios
-            .post(
-                `${utils.getHost()}/chat/get/org`,
-                valu,
-                {
-                    headers: {
-                        Authorization: `Bearer ${Token}`,
-                    },
-                }
-            )
-            .then((response) => {
-
-                alert('Orginization is Added')
-                props.goBack()
-            })
-            .catch((error) => {
-                let errorFeedback = {
-                    process: "Error",
-                    feedback: "",
-                    closable: true,
-                };
-
-            });
-    }
-    return (
-        <>
-
-            <div
-                className={"login-section page-container"}
-                style={{ display: "flex", padding: "0px" }}
-            >
-                <div className={"auth-container"}>
-                    <Button onClick={() => {
-                        props.goBack()
-                    }}>Back </Button>
-                    <div className={"auth-content"}>
-                        <div className={"auth-header"}>
-                            <h4>Add_Org</h4>
-                        </div>
-
-                        <form
-                            method={"post"}
-                            action={""}
-                            onSubmit={(event) => handleFormSubmit(event)}
-                            style={{ justifyContent: 'center' }}
-                        >
-                            <div className={"input-list centered-data"}>
-                                {fields.map((field, index) => {
-                                    return (
-                                        <div className={`input-control`} key={index}>
-                                            <input
-                                                type={field.type}
-                                                value={field.value}
-                                                name={field.name}
-                                                onChange={(event) =>
-                                                    setFieldValue(event.target.value, index)
-                                                }
-                                                placeholder={field.placeholder}
-                                                className={`${field.hasError ? "input-error" : ""}`}
-                                            />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            <div>
-                                <div className={"button-container "} style={{ marginTop: '100%' }}>
-                                    <button onClick={addorg}>Add</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-
-        </>
-    );
-};
 

@@ -67,7 +67,7 @@ function UserGroup(props) {
   let exitGroup = () => {
     axios
       .patch(`${utils.getHost()}/chat/get/channelmember/${chatRoomId}`,
-        { 'designation': -1 },
+        { 'designation': 2 },
         {
           headers: {
             Authorization: `Bearer ${Token}`,

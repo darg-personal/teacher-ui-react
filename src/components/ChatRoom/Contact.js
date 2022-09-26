@@ -101,6 +101,12 @@ function Contact(props) {
 
   const handleClick = (value) => {
     setIsActive(value.name);
+    setNotificationCountForUser({
+      [userUniqeId]: 0,
+    });
+    setNotificationCountForClass({
+      [chatroomId]: 0,
+    });
     props.type({
       name: value.name, type: value.type, id: value.typeId, image: value.image,
       isConnected: value.isConnected,about :value.about

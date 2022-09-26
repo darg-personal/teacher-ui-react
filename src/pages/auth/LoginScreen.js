@@ -80,10 +80,9 @@ const LoginScreen = () => {
         console.log("________token_______", response.data);
         if (response.status === 200) {
           console.log("======if=======", token);
-          getUserImage(token)
           localStorage.setItem("token", token);
           localStorage.setItem("user", JSON.stringify(response.data.user));
-          window.location.href = "/dashboard";
+          getUserImage(token, response.data.user.id)
         } else {
           swal("Failed", response, "error");
         }
@@ -117,13 +116,15 @@ const LoginScreen = () => {
       });
   };
 
-  const getUserImage = (token) => {
-  let api = `${utils.getHost()}/profile/user/profile_update/`;
-    axios
+  const getUserImage = async (token, resp) => {
+    let api = `${utils.getHost()}/profile/user/profile_update/${resp}`;
+    await axios
       .get(api, { headers: { Authorization: `Bearer ${token}` } })
       .then((data) => {
-        const value = data.data;
+        const value = data?.data;
         localStorage.setItem("loginUserImage", value?.image);
+      }).then(() => {
+        window.location.href = "/dashboard";
       })
       .catch((error) => console.log(error));
   }

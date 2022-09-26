@@ -43,7 +43,7 @@ const CreatePassword = () => {
         let items = [...fields]
         let valu = { "password": items[0].value, "token": current_token }
         if (items[0].value === items[1].value) {
-            axios.post(`${utils.getHost()}/s3_uploader/user/password_reset/confirm/`, valu).then(resp => {
+            axios.post(`${utils.getHost()}/profile/user/password_reset/confirm/`, valu).then(resp => {
                 navigate("/login");
             }).then(() => {
                 navigate("/login")

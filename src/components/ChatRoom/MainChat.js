@@ -34,7 +34,7 @@ function MainChat(props) {
   const [page, setPage] = useState(1);
   const [messageCount, setMessageCount] = useState(0);
   // const [receiveMessageCount, setReceiveMessageCount] = useState(1);
-  const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
+  // const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
   const [load, setLoad] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
@@ -55,34 +55,31 @@ function MainChat(props) {
 
   console.log(receiveMessageCountDictProp, "receiveMessageCountDictProp......");
 
-  const recieveMessages = (value, chatroomId, username) => {
+  var tempDict = {};
+  const recieveMessages = (chatroomId, username) => {
     console.log("recievemessages function is callled from mainchat");
     const uniqeId = chatroomId + username;
-    // setReceiveMessageCount(value + 1);
-    console.log(receiveMessageCountDict, "receiveMessageCountDict");
-    var recCount = 1;
-    if (receiveMessageCountDict[uniqeId]) {
-      recCount = receiveMessageCountDict[uniqeId] + 1;
+    console.log(tempDict, "receiveMessageCountDict");
+    var recCount = 0;
+    if (tempDict[uniqeId]) {
+      recCount = tempDict[uniqeId] + 1;
       console.log("uniq id found");
     } else {
       console.log("uniqe id not found");
       recCount = 1;
     }
-    // var countDict = {};
+
+    var countDict = {};
     if (receiveMessageCountDictProp) {
-      // countDict = receiveMessageCountDictProp;
-      value = receiveMessageCountDictProp;
-      value[uniqeId] = recCount;
-      console.log(value, "countDict......----");
-      setReceiveMessageCountDict(value);
-      // console.log(receiveMessageCount,'receiveMessageCount');
-      console.log(receiveMessageCountDict, "setReceiveMessageCountDict");
+      countDict[uniqeId] = recCount;
+      tempDict = countDict
+      console.log(tempDict, "setReceiveMessageCountDict");
       props.receiveMessageCount({
-        receiveMessageCountDict: value,
+        receiveMessageCountDict: countDict,
         uniqeId,
       });
     }
-
+      
   };
 
   useEffect(() => {
@@ -178,7 +175,7 @@ function MainChat(props) {
 
       }
       recieveMessages(
-        receiveMessageCountDict,
+        // receiveMessageCountDict,
         receivedObj?.channel.id,
         receivedObj?.channel.name
       );
@@ -455,7 +452,7 @@ function MainChat(props) {
         </div>
       )
       }
-      {isConnected == 1 ?
+      {isConnected == 0 ?
         <div className="box">
           <form>
             <input

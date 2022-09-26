@@ -46,21 +46,21 @@ function UserChat(props) {
   const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
   const receiveMessageCountDictProp = props.receiveMessageCountDict;
   var ws = props.websocket
-
+  var tempDict = {}
   const recieveMessages = (userId, username) => {
     console.log('recievemessages function is callled from userChat');
     const userUniqeId = userId + username;
-    console.log(receiveMessageCountDict, "receiveMessageCountDict");
+    console.log(tempDict, "receiveMessageCountDict");  
     var recCount = 1;
-    console.log(receiveMessageCountDict[userUniqeId], 'receiveMessageCountDict[userUniqeId]');
-    if (receiveMessageCountDict[userUniqeId]) {
-      recCount = receiveMessageCountDict[userUniqeId] + 1;
+    console.log(tempDict[userUniqeId],'receiveMessageCountDict[userUniqeId]');
+    if (tempDict[userUniqeId]) {
+      recCount = tempDict[userUniqeId] + 1;
       console.log("uniq id found");
     } else {
       console.log("uniqe id not found");
       recCount = 1;
     }
-    console.log(receiveMessageCountDictProp, 'receiveMessageCountDictProp');
+    console.log(receiveMessageCountDictProp,'receiveMessageCountDictProp');
     var countDict = {}
     if (receiveMessageCountDictProp) {
       // countDict = receiveMessageCountDictProp;
@@ -68,9 +68,10 @@ function UserChat(props) {
     }
     countDict[userUniqeId] = recCount;
     console.log(countDict, "countDict......----");
-    setReceiveMessageCountDict(countDict);
+    tempDict = countDict
+    // setReceiveMessageCountDict(countDict);
     // console.log(receiveMessageCount,'receiveMessageCount');
-    console.log(receiveMessageCountDict, "setReceiveMessageCountDict");
+    console.log(tempDict, "setReceiveMessageCountDict");
     props.receiveMessageCount({
       receiveMessageCountDict: countDict,
       userUniqeId,

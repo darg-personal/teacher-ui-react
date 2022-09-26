@@ -5,21 +5,22 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import './userProfile.css'
 import utils from '../utils';
 let Token = localStorage.getItem("token");
+let loggedUser = JSON.parse(localStorage.getItem("user"));
 
 function UserProfile() {
-  let api = `${utils.getHost()}/profile/user/profile_update/`;
+  let api = `${utils.getHost()}/profile/user/profile_update/${loggedUser.id}`;
 
   const navigate = useNavigate();
-
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('+91');
-  const [userName, setUserName] = useState('');
-
+  const [userName, setUserName] = useState(loggedUser.username);
+  const [aboutUser, setAboutUser] = useState(null)
   const [state, setState] = useState({
-    image: '',
-    imagePreviewUrl: 'https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true',
+    file: '',
+    imagePreviewUrl: null,
   })
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
 
   useEffect(() => {
     axios
@@ -33,23 +34,46 @@ function UserProfile() {
       )
       .then((data) => {
         console.log(data.data);
+        setImagePreviewUrl(data?.data?.image)
+        setPhoneNumber(data?.data?.phone_number)
+        setAboutUser(data?.data.about)
         setState({
-          imagePreviewUrl: data.data?.image
+          imagePreviewUrl: data?.data?.image
         });
-        setPhoneNumber(data.data?.phone_number)
       }).catch((data) => {
-        console.log(data, "----");
+        console.log(data);
       })
   }, [])
 
-  const handleSubmission = () => {
+  const handleSubmission = async () => {
     let formData = new FormData();
-
-    if (isSelected)
-      formData.append('image', selectedFile);
+    if (isSelected) {
+      let imageData = new FormData();
+      imageData.append("file", selectedFile);
+      await axios
+        .post(`${utils.getHost()}/profile/upload`, imageData)
+        .then((resp) => {
+          console.log(resp);
+          const file_url = resp?.data.file_url;
+          formData.append('image', file_url);
+          localStorage.setItem("loginUserImage", file_url);
+        })
+        .then(() => {
+          alert('pic update')
+          setState({ file: false });
+        })
+        .catch((resp) => {
+          setState({ file: false });
+          alert("connection is breaked");
+        });
+    }
     if (phoneNumber)
       formData.append('phone_number', phoneNumber);
+    if (aboutUser) {
+      formData.append('about', aboutUser);
+    }
 
+    console.log(formData.getAll);
     axios.patch(
       api,
       formData,
@@ -58,7 +82,6 @@ function UserProfile() {
       }
     )
       .then((data) => {
-        localStorage.setItem("loginUserImage", data?.data?.image);
         navigate("/dashboard");
       })
       .catch((error) => {
@@ -69,11 +92,11 @@ function UserProfile() {
 
   const ImgUpload = ({ onChange, src }) =>
     <div>
-      <label className="custom-file-upload">
+      <label className="custom-file-upload  justify-content-center">
         <div className="img-wrap" >
           <img className="img-upload" src={src} />
         </div>
-        <input id="photo-upload" type="file" onChange={onChange} />
+        <input id="photo-upload" accept="image/*" type="file" onChange={onChange} />
       </label>
     </div>
 
@@ -96,26 +119,30 @@ function UserProfile() {
     <>
       {
         Token ? (
-          <div className='upload-body-centered'>
+          <div className='upload-body-centered' >
             <div className="card-upload">
               <form >
                 <h1 >Profile Card</h1>
                 <ImgUpload onChange={photoUpload} src={state.imagePreviewUrl} />
-                <p>Name :</p>
-                <input className="input-text"
-                  id="name"
-                  type="text"
-                  value={userName}
-                  onChange={(e) => { setUserName(e.target.value) }}
-                />
-                <p style={{ marginTop: '5%' }}>Number :</p>
-                {/* <input className="input-text"
-                id="number"
-                type="text"
-                value={phoneNumber}
-                onChange={(e) => { setPhoneNumber(e.target.value) }}
-              /> */}
-                <p>{phoneNumber}</p>
+                <div>
+                  <span>Name :</span>
+                  {false ?
+                    <input className="input-text"
+                      id="name"
+                      type="text"
+                      value={userName}
+                      onChange={(e) => { setUserName(e.target.value) }}
+                    /> :
+                    <span> {userName}</span>
+                  }
+                </div>
+                <div style={{ marginTop: '5%' }}>
+                  <span >Number :</span>
+                  <span>{phoneNumber}</span>
+                </div>
+                <div style={{ marginTop: '5%' }}>
+                  <p style={{ marginTop: '5%' }}>About : {aboutUser}</p>
+                </div>
                 {isSelected ?
                   <p type="click" className="button-upload" onClick={(data) => {
                     handleSubmission()

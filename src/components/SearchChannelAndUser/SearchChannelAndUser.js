@@ -10,10 +10,16 @@ import "../../css/auth/auth.scss";
 import { Button, Container } from "react-bootstrap";
 import { Avatar, ListItemAvatar } from "@mui/material";
 
+// ("0","joined"),   
+//     ("1","cancel"),
+//     ("2","leave"),
+//     ("3", "requested"),
+//     ("-1","terminated")
 const requestType = {
-    cancel: "0",
-    Joined: '1',
-    Requested: "2"
+    Leave: 0,
+    Request: 1,
+    cancel: 3,
+    terminated: -1
 }
 
 export default function SearchChannelAndUser() {
@@ -22,6 +28,7 @@ export default function SearchChannelAndUser() {
 
     const [output, setOutput] = useState([])
     const [status, setStatus] = useState(2)
+    const [request, setRequest] = useState({})
 
     async function getOrginizations() {
         axios
@@ -36,19 +43,30 @@ export default function SearchChannelAndUser() {
                 let val = []
                 let tempData = data.results
                 for (let i = 0; i < tempData.length; i++) {
-                    if (tempData[i]?.org !=1)
+                    if (tempData[i]?.org != 1)
                         if (tempData[i]?.org?.user?.username !== login_user.username) {
-                            console.log(tempData[i].org);
+                            console.log(tempData[i]?.requested);
                             val.push({
                                 "image": tempData[i]?.image,
-                                "orgId": tempData[i]?.org?.id, "orgName": tempData[i]?.org?.meta_attributes, "ChannelId": tempData[i]?.id,
+                                "orgId": tempData[i]?.org?.id,
+                                "orgName": tempData[i]?.org?.meta_attributes, "ChannelId": tempData[i]?.id,
                                 "ChannelName": tempData[i]?.name,
-                                "owner": tempData[i]?.org?.user?.username, "about": tempData[i]?.about
+                                "owner": tempData[i]?.org?.user?.username, "about": tempData[i]?.about,
+                                "type": "Channel"
                             })
+                            const uniqueId = tempData[i].type + tempData[i]?.org?.id + tempData[i]?.id
+                            console.log(uniqueId, tempData[i]?.requested, " =-= ");
+                            var req = request;
+
+                            req[uniqueId] = tempData[i]?.requested;
+                            setRequest({
+                                ...request,
+                                req
+                            });
+
                         }
                 }
-
-                console.log({ val });
+                console.log({ request });
                 setOutput(val)
             })
     }
@@ -57,7 +75,7 @@ export default function SearchChannelAndUser() {
         getOrginizations()
     }, [])
 
-    const senRequest = async (data) => {
+    const sendRequest = async (data) => {
         let value = { org: data.orgId, Channel: data.ChannelId, user: login_user.id }
         const res = await axios.post(
             `${utils.getHost()}/chat/userRequest/${login_user.id}`,
@@ -66,11 +84,38 @@ export default function SearchChannelAndUser() {
                 headers: { Authorization: ` Bearer ${Token}` },
             }
         );
-        setStatus(res?.data?.request_type)
-        console.log('request data', res?.data?.request_type)
+        setRequest({
+            ...request,
+            [data.type + data.orgId + data.ChannelId]: 3,
+        });
+        // console.log('request data', res?.data?.request_type)
 
     }
 
+    const sendCancleRequest = async (data) => {
+        let value = { org: data.orgId, Channel: data.ChannelId, user: login_user.id }
+        const res = await axios.delete
+            (`${utils.getHost()}/chat/userRequest/${data.orgId}/${data.ChannelId}`,
+                {
+                    headers: { Authorization: ` Bearer ${Token}` },
+                }
+            ).then(() => {
+                setRequest({
+                    ...request,
+                    [data.type + data.orgId + data.ChannelId]: 1,
+                });
+            })
+        // console.log('request data', res?.data?.request_type)
+    }
+
+
+    const leaveRequest = async (data) => {
+        console.log(data);
+        setRequest({
+            ...request,
+            [data.type + data.orgId + data.ChannelId]: 1,
+        });
+    }
     return (
         <>
             {
@@ -104,6 +149,7 @@ export default function SearchChannelAndUser() {
                                                         width: '80%', color: "white", padding: '5px',
                                                         borderRadius: '10px'
                                                     }}>
+                                                        {'' + e.orgId + e.ChannelId}
                                                         <ListItemAvatar >
                                                             <Avatar alt={e.orgName} src={e.image} style={{
                                                                 // padding: '5px',
@@ -117,18 +163,24 @@ export default function SearchChannelAndUser() {
                                                             paddingLeft: "80px"
                                                         }} >
                                                             <span >Channel Name : {e.ChannelName}</span>
-                                                            {requestType.Requested == status ?
+
+                                                            {requestType.Request == request[e.type + e.orgId + e.ChannelId] &&
                                                                 <span style={{ float: 'right' }} >
-                                                                    <Button onClick={() => { senRequest(e) }
+                                                                    <Button onClick={() => { sendRequest(e) }
                                                                     }>Request</Button>
-                                                                </span> : requestType.Joined == status ?
-                                                                    <span style={{ float: 'right' }} >
-                                                                        <Button onClick={() => { senRequest(e) }
-                                                                        }>Joined</Button>
-                                                                    </span> : <span style={{ float: 'right' }} >
-                                                                        <Button onClick={() => { senRequest(e) }
-                                                                        }>Cancel</Button>
-                                                                    </span>}
+
+                                                                </span>}
+                                                            {requestType.Leave == request[e.type + e.orgId + e.ChannelId] &&
+                                                                <span style={{ float: 'right' }} >
+                                                                    <Button onClick={() => { leaveRequest(e) }
+                                                                    }>Leave</Button>
+                                                                </span>}
+
+                                                            {requestType.cancel == request[e.type + e.orgId + e.ChannelId]
+                                                                && <span style={{ float: 'right' }} >
+                                                                    <Button onClick={() => { sendCancleRequest(e) }
+                                                                    }>Cancel</Button>
+                                                                </span>}
                                                             <p >ORGINIZATION: {e.orgName}</p>
                                                             <span style={{ float: 'right' }} >About : {e.about}</span>
                                                             <p >OWNER:  {e.owner}</p>

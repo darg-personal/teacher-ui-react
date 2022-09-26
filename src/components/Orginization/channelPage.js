@@ -5,18 +5,24 @@ import utils from "../../pages/auth/utils";
 import Avatar from "@mui/material/Avatar";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import { Button, Card } from "react-bootstrap";
+
+const requestType = {
+    Leave: 0,
+    Request: 1,
+    cancel: 3,
+    terminated: -1
+}
+
 const UserRequest = (props) => {
+    let Token = localStorage.getItem("token");
 
     const org = props.orgId
     const channel = props.channelId
 
- 
-    
     const [reqUsers, setReqUsers] = useState([]);
-    let Token = localStorage.getItem("token");
     const [temp, setTemp] = useState({ request: {} })
 
-    const getRequests = (org,channel) => {
+    const getRequests = (org, channel) => {
         axios
             .get(`${utils.getHost()}/chat/userRequest/${org}/${channel}`,
                 {
@@ -29,7 +35,7 @@ const UserRequest = (props) => {
                 const tempResponse = JSON.parse(responseData);
                 let reqTempUsers = [];
                 for (var i = 0; i < tempResponse.length; i++) {
-                    if (tempResponse[i]?.request_type == 2) {
+                    if (tempResponse[i]?.request_type == 3) {
                         console.log(tempResponse[i]);
                         reqTempUsers.push({
                             requestId: tempResponse[i]?.id,
@@ -38,9 +44,6 @@ const UserRequest = (props) => {
                             request: tempResponse[i]?.request_type,
                             channel: tempResponse[i]?.Channel,
                         });
-                        // var tempUser = temp.request
-                        // tempUser[tempResponse[i]?.user.username + tempResponse[i]?.user.id] = tempResponse[i].request_type
-                        // setTemp({ request: tempUser })
                     }
                 }
                 setReqUsers(reqTempUsers);
@@ -48,13 +51,13 @@ const UserRequest = (props) => {
     }
 
     useEffect(() => {
-        getRequests(org,channel)
-        console.log(org,channel);
-    }, [org,channel]);
+        getRequests(org, channel)
+        console.log(org, channel);
+    }, [org, channel]);
 
     function addChannelMember(data) {
         console.log(data);
-        let valu = { Channel: data.channel, designation: 1, user: data.id, org: org };
+        let valu = { Channel: data.channel, designation: 0, user: data.id, org: org };
         axios
             .post(
                 `${utils.getHost()}/chat/get/channelmember`,
@@ -75,29 +78,33 @@ const UserRequest = (props) => {
                             },
                         }
                     ).then(() => {
-                        getRequests(org,channel)
+                        getRequests(org, channel)
                     }).catch(() => {
                         console.log("error");
                     })
                 console.log(temp);
                 alert('User is Added or group')
+            }).catch((error) => {
+                console.log("Post Channel Member Error ", error);
             })
 
     }
 
     function rejectChannelMember(data) {
-        let value = { request_type: 1 }
         axios
-            .patch(
+            .delete(
                 `${utils.getHost()}/chat/userRequest/${data.requestId}`,
-                value,
                 {
                     headers: {
                         Authorization: `Bearer ${Token}`,
                     },
                 }
             ).then(() => {
-
+                getRequests(org, channel)
+            }).catch(() => {
+                console.log("error");
+            })
+            .then(() => {
                 alert('User is Removed or group')
             })
             .catch(() => {
@@ -110,52 +117,41 @@ const UserRequest = (props) => {
             {
                 Token ? (
                     <>
-                            <Card style={{ height: '100%', width: '70%', marginLeft: '10px', padding: '10px', borderWidth: 1 }}>
-                                <Card style={{ margin: '10px', padding: '10px', borderWidth: 1, display: 'flex' }}>
-                                    Group : {props.channelName}
-                                    {/* {props.orgName} */}
-                                </Card>
-                                {reqUsers.length > 0 ?
-                                    <>
-                                        {
-                                            reqUsers.map((e, i) => (
-                                                <div key={e + i} >
-                                                    <Card  >
-                                                        <div>
-                                                            <ListItemAvatar>
-                                                                <Avatar src={e.user} alt={e.user} />
-                                                            </ListItemAvatar>
-                                                            {e.user}
-                                                            {/* <li>{e.request}</li> */}
-                                                            {e.request == 2 ?
-                                                                <>
-                                                                    <Button style={{ float: 'right', margin: '2px' }}
-                                                                        onClick={() => {
-                                                                            addChannelMember(e)
-                                                                        }}>accept</Button>
-                                                                    <Button style={{ float: 'right', margin: '2px' }}
-                                                                        onClick={() => {
-                                                                            rejectChannelMember(e)
-                                                                        }}>reject</Button>
-                                                                </> :
-
-                                                                <>  {temp.request[e.user + e.id] == 1 ?
-                                                                    <p>Accepted</p> :
-                                                                    <p>Rejected</p>
-                                                                }
-                                                                </>
-                                                            }
-                                                        </div>
-                                                    </Card>
-                                                    <hr />
-                                                </div>
-                                            ))
-                                        }
-                                    </>
-                                    : <p style={{ alignSelf: 'center' }} >No New Requests</p>}
+                        <Card style={{ height: '100%', width: '70%', marginLeft: '10px', padding: '10px', borderWidth: 1 }}>
+                            <Card style={{ margin: '10px', padding: '10px', borderWidth: 1, display: 'flex' }}>
+                                Group : {props.channelName}
+                                {/* {props.orgName} */}
                             </Card>
-                            
-                            
+                            {reqUsers.length > 0 ?
+                                <>
+                                    {
+                                        reqUsers.map((e, i) => (
+                                            <div key={e + i} >
+                                                <Card  >
+                                                    <div>
+                                                        <ListItemAvatar>
+                                                            <Avatar src={e.user} alt={e.user} />
+                                                        </ListItemAvatar>
+                                                        {e.user}
+                                                        <Button style={{ float: 'right', margin: '2px' }}
+                                                            onClick={() => {
+                                                                addChannelMember(e)
+                                                            }}>accept</Button>
+                                                        <Button style={{ float: 'right', margin: '2px' }}
+                                                            onClick={() => {
+                                                                rejectChannelMember(e)
+                                                            }}>reject</Button>
+                                                    </div>
+                                                </Card>
+                                                <hr />
+                                            </div>
+                                        ))
+                                    }
+                                </>
+                                : <p style={{ alignSelf: 'center' }} >No New Requests</p>}
+                        </Card>
+
+
                     </>)
                     : (
                         <Navigate replace to="/login" />
