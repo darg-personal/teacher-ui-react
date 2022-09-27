@@ -129,7 +129,7 @@ export class Socket extends Component {
         this.pull_data(data)
     }
     chatMethod = () => {
-        if (this.state.show && this.state.isConnected == 1) {
+        if (this.state.show && this.state.isConnected == 0) {
             return <UserGroup name={this.state.chatRoom} chatRoomId={this.state.chatRoomId}
                 type={this.state.type} show={this.getUserInfo} image={this.state.image}
                 websocket={this.state.temp} updateGrupinfo={this.updateGroupinfo}

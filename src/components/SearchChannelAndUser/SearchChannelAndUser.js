@@ -18,6 +18,7 @@ import { Avatar, ListItemAvatar } from "@mui/material";
 const requestType = {
     Leave: 0,
     Request: 1,
+    reRequest: 2,
     cancel: 3,
     terminated: -1
 }
@@ -108,9 +109,41 @@ export default function SearchChannelAndUser() {
         // console.log('request data', res?.data?.request_type)
     }
 
+    const callWebSocket = (data) => {
+        var ws = new WebSocket(
+            `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${data.ChannelName}`)
+        ws.onopen = () => {
+            console.log("Web Socket is connected");
+        }
 
+        return ws;
+    }
     const leaveRequest = async (data) => {
         console.log(data);
+        let webSocket = callWebSocket(data)
+        axios
+            .patch(`${utils.getHost()}/chat/get/channelmember/${data.ChannelId}`,
+                { 'designation': 2 },
+                {
+                    headers: {
+                        Authorization: `Bearer ${Token}`,
+                    },
+                })
+            .then((res) => {
+                const responseData = JSON.stringify(res.data);
+                const message = JSON.parse(responseData);
+                webSocket.send(
+                    JSON.stringify({
+                        meta_attributes: "react",
+                        message_type: "group-info-update",
+                        media_link: null,
+                        message_text: `${login_user.username} leave group`,
+                    })
+                );
+            }).then(() => {
+                webSocket.close()
+            })
+
         setRequest({
             ...request,
             [data.type + data.orgId + data.ChannelId]: 1,
@@ -129,15 +162,15 @@ export default function SearchChannelAndUser() {
                                     <div className="d-flex justify-content-center">
                                         <h3>Groups / Users</h3>
                                     </div>
-                                    <div className='d-flex' style={{ marginLeft: '15px' }} >
+                                    <div className='d-flex justify-content-center' style={{ marginLeft: '15px' }} >
                                         <input onChange={e => console.log("setInput(e.target.value)")}
                                             type="text" placeholder='Search User/Group/...' aria-label="Search "
                                         />
-                                        <p type="click"
+                                        {/* <p type="click"
                                             style={{ backgroundColor: 'transparent' }}
                                             className=" button-upload-org justify-content-right" onClick={(data) => {
                                                 getOrginizations()
-                                            }}>Refresh </p>
+                                            }}>Refresh </p> */}
                                     </div>
                                     <hr style={{ width: '100%' }}></hr>
                                     {output.length > 0 ?
@@ -164,7 +197,10 @@ export default function SearchChannelAndUser() {
                                                         }} >
                                                             <span >Channel Name : {e.ChannelName}</span>
 
-                                                            {requestType.Request == request[e.type + e.orgId + e.ChannelId] &&
+                                                            {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
+                                                                ||
+                                                                requestType.reRequest == request[e.type + e.orgId + e.ChannelId])
+                                                                &&
                                                                 <span style={{ float: 'right' }} >
                                                                     <Button onClick={() => { sendRequest(e) }
                                                                     }>Request</Button>

@@ -23,10 +23,11 @@ function OrgChannel(props) {
 
     const [showAddChannelPage, setShowAddChannelPage] = useState(false);
     const [requestPageVisible, setRequestPageVisible] = useState(false);
+    const [websocket, setWebSocket] = useState(false);
 
     async function getChannels() {
         await axios
-            .get(`${utils.getHost()}/chat/get/channel`, {
+            .get(`${utils.getHost()}/chat/get/channel/${orgId}`, {
                 headers: {
                     Authorization: `Bearer ${Token}`,
                 },
@@ -53,9 +54,17 @@ function OrgChannel(props) {
     const navigateToRequestPage = (data) => {
         setChannelId(data.channelId);
         setChannelName(data.name)
+        var ws = new WebSocket(
+            `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${data.name}`)
+        ws.onopen = () =>
+        {
+            console.log("Web Socket is connected");
+        }
+        setWebSocket(ws)
 
         setRequestPageVisible(true)
     }
+
 
     function Channels() {
         return <>
@@ -151,7 +160,9 @@ function OrgChannel(props) {
                                 <UserRequest channelId={channelId}
                                     channelName={channelName}
                                     orgId={orgId}
-                                    orgName={orgName} />
+                                    orgName={orgName} 
+                                    ws  = {websocket}
+                                    />
                                 : null}
                         </div>
                     </>
@@ -164,6 +175,3 @@ function OrgChannel(props) {
     )
 }
 export default OrgChannel;
-
-
-

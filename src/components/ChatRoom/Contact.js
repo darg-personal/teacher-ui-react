@@ -43,10 +43,13 @@ function Contact(props) {
     setIsActive(activeUser.chatRoom)
   }, [activeUser])
 
+  // useEffect(() => {
+  //   getGroupData();
+  // }, [activeUser]);
+
   useEffect(() => {
     getGroupData();
-  }, [activeUser]);
-
+  }, []);
   const getGroupData = () => {
     axios
       .get(`${utils.getHost()}/chat/get/user_connected_list/`, {

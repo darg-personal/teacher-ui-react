@@ -1,17 +1,10 @@
 import { React, useState } from "react";
 import axios from "axios";
-import { AiOutlineArrowLeft } from "react-icons/ai";
-import { Link, Navigate, Outlet } from "react-router-dom";
 import utils from "../../pages/auth/utils";
 import { useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
 import { Avatar, Button, ListItemAvatar } from "@mui/material";
-import { Card, Container } from "react-bootstrap";
-import Sidebar from "../../pages/auth/Sidebar";
-import Header from "../../pages/auth/Header";
 import { ImageShow, ImgUpload } from "../ChatRoom/templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
-import UserRequest from "./channelPage";
 
 export const CreateChannelPage = (props) => {
     let Token = localStorage.getItem("token");
@@ -51,7 +44,6 @@ export const CreateChannelPage = (props) => {
                             `Bearer ${Token}`,
                     }
                 }).then(data => {
-                    // alert("!!! Channel Created");
                     let value = data?.data?.msg
                     let valu = { Channel: value.id, designation: 0, user: value.created_by, org: value.org };
                     axios

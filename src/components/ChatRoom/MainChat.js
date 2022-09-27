@@ -53,19 +53,14 @@ function MainChat(props) {
   const isConnected = props.isConnected;
   const receiveMessageCountDictProp = props.receiveMessageCountDict;
 
-  console.log(receiveMessageCountDictProp, "receiveMessageCountDictProp......");
-
   var tempDict = {};
   const recieveMessages = (chatroomId, username) => {
-    console.log("recievemessages function is callled from mainchat");
     const uniqeId = chatroomId + username;
     console.log(tempDict, "receiveMessageCountDict");
     var recCount = 0;
     if (tempDict[uniqeId]) {
       recCount = tempDict[uniqeId] + 1;
-      console.log("uniq id found");
     } else {
-      console.log("uniqe id not found");
       recCount = 1;
     }
 
@@ -73,7 +68,6 @@ function MainChat(props) {
     if (receiveMessageCountDictProp) {
       countDict[uniqeId] = recCount;
       tempDict = countDict
-      console.log(tempDict, "setReceiveMessageCountDict");
       props.receiveMessageCount({
         receiveMessageCountDict: countDict,
         uniqeId,
@@ -98,7 +92,6 @@ function MainChat(props) {
         const responseData = JSON.stringify(res.data);
         const message = JSON.parse(responseData);
         setMessageCount(message.count);
-        console.log(message.count);
         const prevMsgs = [];
         if (message.count > 0)
           for (let i = message.results.length - 1; i >= 0; i--) {
@@ -140,12 +133,11 @@ function MainChat(props) {
 
   useEffect(() => {
     ws.onmessage = (evt) => {
-      console.log("=========on message========");
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
       console.log(receivedObj.channel, "=========on message========");
 
-      if (chatroomId === receivedObj.channel.id && isConnected == 1) {
+      if (chatroomId === receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const message_type = receivedObj?.message_type;
@@ -337,8 +329,6 @@ function MainChat(props) {
     await axios
       .post(`${utils.getHost()}/profile/upload`, formData)
       .then((resp) => {
-        console.log(resp.data.content_type);
-
         let file_url = resp.data.file_url;
         ws.send(
           JSON.stringify({

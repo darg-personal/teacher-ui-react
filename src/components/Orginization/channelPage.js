@@ -18,7 +18,7 @@ const UserRequest = (props) => {
 
     const org = props.orgId
     const channel = props.channelId
-
+    const ws = props.ws
     const [reqUsers, setReqUsers] = useState([]);
     const [temp, setTemp] = useState({ request: {} })
 
@@ -67,7 +67,17 @@ const UserRequest = (props) => {
                         Authorization: `Bearer ${Token}`,
                     },
                 }
-            )
+            ).then(()=>
+            {
+                ws.send(
+                    JSON.stringify({
+                      meta_attributes: "react",
+                      message_type: "group-info-update",
+                      media_link: null,
+                      message_text: `${data.user} joined group`,
+                    })
+                  );
+            })
             .then((response) => {
                 axios
                     .delete(
@@ -102,12 +112,6 @@ const UserRequest = (props) => {
             ).then(() => {
                 getRequests(org, channel)
             }).catch(() => {
-                console.log("error");
-            })
-            .then(() => {
-                alert('User is Removed or group')
-            })
-            .catch(() => {
                 console.log("error");
             })
     }
