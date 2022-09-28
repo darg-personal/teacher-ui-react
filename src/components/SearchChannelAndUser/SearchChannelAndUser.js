@@ -121,33 +121,35 @@ export default function SearchChannelAndUser() {
     const leaveRequest = async (data) => {
         console.log(data);
         let webSocket = callWebSocket(data)
-        axios
-            .patch(`${utils.getHost()}/chat/get/channelmember/${data.ChannelId}`,
-                { 'designation': 2 },
-                {
-                    headers: {
-                        Authorization: `Bearer ${Token}`,
-                    },
-                })
-            .then((res) => {
-                const responseData = JSON.stringify(res.data);
-                const message = JSON.parse(responseData);
-                webSocket.send(
-                    JSON.stringify({
-                        meta_attributes: "react",
-                        message_type: "group-info-update",
-                        media_link: null,
-                        message_text: `${login_user.username} leave group`,
+        setTimeout(() => {
+            axios
+                .patch(`${utils.getHost()}/chat/get/channelmember/${data.ChannelId}`,
+                    { 'designation': 2 },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${Token}`,
+                        },
                     })
-                );
-            }).then(() => {
-                webSocket.close()
-            })
+                .then((res) => {
+                    const responseData = JSON.stringify(res.data);
+                    const message = JSON.parse(responseData);
+                    webSocket.send(
+                        JSON.stringify({
+                            meta_attributes: "react",
+                            message_type: "group-info-update",
+                            media_link: null,
+                            message_text: `${login_user.username} leave group`,
+                        })
+                    );
+                }).then(() => {
+                    webSocket.close()
+                })
 
-        setRequest({
-            ...request,
-            [data.type + data.orgId + data.ChannelId]: 1,
-        });
+            setRequest({
+                ...request,
+                [data.type + data.orgId + data.ChannelId]: 1,
+            });
+        }, 5000);
     }
     return (
         <>
@@ -182,9 +184,9 @@ export default function SearchChannelAndUser() {
                                                         width: '80%', color: "white", padding: '5px',
                                                         borderRadius: '10px'
                                                     }}>
-                                                        {'' + e.orgId + e.ChannelId}
+                                                        {/* {'' + e.orgId + e.ChannelId} */}
                                                         <ListItemAvatar >
-                                                            <Avatar alt={e.orgName} src={e.image} style={{
+                                                            <Avatar alt={e.ChannelName} src={e.image} style={{
                                                                 // padding: '5px',
                                                                 alignItems: 'center',
                                                                 height: '35px',
@@ -196,7 +198,10 @@ export default function SearchChannelAndUser() {
                                                             paddingLeft: "80px"
                                                         }} >
                                                             <span >Channel Name : {e.ChannelName}</span>
-
+                                                            {requestType.terminated == request[e.type + e.orgId + e.ChannelId] &&
+                                                                <span style={{ float: 'right' }} >
+                                                                    <Button disabled class="btn btn-secondary">request</Button>
+                                                                </span>}
                                                             {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
                                                                 ||
                                                                 requestType.reRequest == request[e.type + e.orgId + e.ChannelId])

@@ -19,11 +19,10 @@ function OrgChannel(props) {
     const [channelId, setChannelId] = useState(null);
     const [channelName, setChannelName] = useState(null);
     const [orgData, setOrgData] = useState({ orgId: null, channelId: null, orgName: null, channelName: null });
-
-
     const [showAddChannelPage, setShowAddChannelPage] = useState(false);
     const [requestPageVisible, setRequestPageVisible] = useState(false);
     const [websocket, setWebSocket] = useState(false);
+    const [groupIsExist, setgroupIsExist] = useState(true);
 
     async function getChannels() {
         await axios
@@ -35,9 +34,17 @@ function OrgChannel(props) {
             .then((response) => {
                 const responseData = JSON.stringify(response.data);
                 const value = JSON.parse(responseData);
+                console.log({ value });
                 let data = []
                 for (let i = 0; i < value.length; i++) {
-                    data.push({ 'orgId': value[i].org, 'name': value[i].name, 'profile': value[i].image, requested: false, 'channelId': value[i].id })
+                    // if(value.isExist != 5)
+                    data.push({
+                        'orgId': value[i]?.org,
+                        'name': value[i]?.name,
+                        'profile': value[i]?.image,
+                        'isExist': value[i]?.isExist,
+                        'channelId': value[i]?.id
+                    })
                 }
                 setUsers(data);
             });
@@ -52,19 +59,54 @@ function OrgChannel(props) {
     }
 
     const navigateToRequestPage = (data) => {
-        setChannelId(data.channelId);
-        setChannelName(data.name)
-        var ws = new WebSocket(
-            `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${data.name}`)
-        ws.onopen = () =>
-        {
-            console.log("Web Socket is connected");
+        if (data.isExist != 5) {
+            setChannelId(data.channelId);
+            setChannelName(data.name)
+            var ws = new WebSocket(
+                `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${data.name}`)
+            ws.onopen = () => {
+                console.log("Web Socket is connected");
+            }
+            setWebSocket(ws)
         }
-        setWebSocket(ws)
-
+        else
+            setgroupIsExist(false)
         setRequestPageVisible(true)
     }
 
+    const deleteChannel = (data) => {
+        var ws = new WebSocket(
+            `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${data.name}`)
+        ws.onopen = () => {
+            console.log("Web Socket is connected");
+        }
+        setTimeout(() => {
+            let value = { "isExist": "5" }
+            axios.patch(`${utils.getHost()}/chat/get/channel/${data?.channelId}`,
+                value,
+                {
+                    headers: { Authorization: ` Bearer ${Token}` },
+                }
+            )
+                .then((data) => {
+
+                    ws.send(
+                        JSON.stringify({
+                            meta_attributes: "react",
+                            message_type: "group-info-update",
+                            media_link: null,
+                            message_text: `The Owner Delete This Channel`,
+                        })
+                    );
+
+                }).then(() => {
+                    ws.close()
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }, 5000);
+    }
 
     function Channels() {
         return <>
@@ -77,7 +119,7 @@ function OrgChannel(props) {
 
                 {users.length > 0 ?
                     <>
-                        {users.map((e, i) => (
+                        {users.map((user, i) => (
                             <div key={i}>
                                 <div style={{
                                     background: 'darkblue', height: 'auto',
@@ -86,32 +128,33 @@ function OrgChannel(props) {
                                 }}
                                 >
                                     <ListItemAvatar style={{ display: 'flex' }}>
-                                        <Avatar alt={e.name} src={e.profile} style={{
+                                        <Avatar alt={user.name} src={user.profile} style={{
                                             alignItems: 'center',
                                             margin: '5px',
                                             height: '35px',
                                             width: '35px'
                                         }} />
-                                        <p style={{ float: 'right', justifyContent: 'center', margin: '10px 10px' }}>{e.name}</p>
+                                        <p style={{ float: 'right', justifyContent: 'center', margin: '10px 10px' }}>{user.name}</p>
                                     </ListItemAvatar>
                                     <p style={{ justifyContent: 'center', margin: '10px 55px' }}>About Section</p>
-                                    {!e.requested ?
+                                    {!false ?
                                         <>
-                                            <Delete style={{
-                                                float: 'right', justifyContent: 'center',
-                                                margin: '-80px 0px'
-                                            }}
-                                                onClick={() => {
-                                                   alert("In Progress...")
+                                            {user.isExist != 5 &&
+                                                <Delete style={{
+                                                    float: 'right', justifyContent: 'center',
+                                                    margin: '-80px 0px'
                                                 }}
-                                            > </Delete>
-
+                                                    onClick={() => {
+                                                        deleteChannel(user)
+                                                    }}
+                                                />
+                                            }
                                             <Button style={{
                                                 float: 'right', justifyContent: 'center',
                                                 margin: '-60px 10px'
                                             }}
                                                 onClick={() => {
-                                                    navigateToRequestPage(e)
+                                                    navigateToRequestPage(user)
                                                 }}
                                             > {'show >'} </Button>
                                         </>
@@ -153,17 +196,21 @@ function OrgChannel(props) {
                             <hr style={{ width: '100%' }}></hr>
 
                         </Container>
-                        <div style={{ display: 'flex' }}>
+                        <div className="d-flex">
                             <Channels />
 
-                            {requestPageVisible ?
+                            {requestPageVisible && groupIsExist &&
                                 <UserRequest channelId={channelId}
                                     channelName={channelName}
                                     orgId={orgId}
-                                    orgName={orgName} 
-                                    ws  = {websocket}
-                                    />
-                                : null}
+                                    orgName={orgName}
+                                    ws={websocket}
+                                />
+                                }
+                            {requestPageVisible && !groupIsExist && 
+                            <div className="d-flex justify-content-center color:red">
+                            alert("Group Is Deleted")
+                            </div>}
                         </div>
                     </>
 

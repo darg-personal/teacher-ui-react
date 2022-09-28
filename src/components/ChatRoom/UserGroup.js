@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./UserGroup.css";
-import Avatar from "../../assets/Images/avatar.svg";
 import utils from "../../pages/auth/utils";
 import Card from "react-bootstrap/Card";
 import { ImCross } from "react-icons/im";
+import { Avatar } from "@mui/material";
 
 let Token = localStorage.getItem("token");
 let loggedUser = JSON.parse(localStorage.getItem("user"));
@@ -19,6 +19,8 @@ function UserGroup(props) {
   const ws = props.websocket;
   const about = props.about;
   const [users, setUsers] = useState([]);
+  let loggedUser = JSON.parse(localStorage.getItem("user"));
+
   const [isActive, setIsActive] = useState();
 
   const ImgUpload = ({ src }) => (
@@ -58,10 +60,11 @@ function UserGroup(props) {
 
   useEffect(() => {
     getUsers();
-  }, [name,chatRoomId,image]);
+  }, [name, chatRoomId, image]);
 
   function userinfo(value) {
-    props.reDirect({ name: value.user, image: value.image, id: value.id, type: 'user', websocket:ws });
+    if (loggedUser.username !== value.user)
+      props.reDirect({ name: value.user, image: value.image, id: value.id, type: 'user', websocket: ws });
   }
 
   let exitGroup = () => {
@@ -85,7 +88,7 @@ function UserGroup(props) {
           })
         );
       }).then(() => {
-        props.updateGrupinfo({ show: false, isConnected: -1, user:name });
+        props.updateGrupinfo({ show: false, isConnected: -1, user: name });
       })
   }
   return (
@@ -135,8 +138,8 @@ function UserGroup(props) {
         style={{ margin: "3px", width: "30rem", left: "35%", height: "5rem" }}
       >
         <Card.Body>
-          <span style={{fontSize:'10px',color:'gray'}}>About</span>
-          <Card.Text style={{color:'black',padding:'3px'}}>{about}</Card.Text>
+          <span style={{ fontSize: '10px', color: 'gray' }}>About</span>
+          <Card.Text style={{ color: 'black', padding: '3px' }}>{about}</Card.Text>
         </Card.Body>
       </Card>
       {type === 'Channel' ?
@@ -149,10 +152,19 @@ function UserGroup(props) {
             {users.map((user, i) => {
               return (
                 <>
-                  <div key={i+user} onClick={() => { userinfo(user) }}>
-                    <Card.Text onClick={getUsers}>
-                      <img src={user.image} height={20} width={20} />
-                      {user.user}
+                  <div key={i + user} onClick={() => { userinfo(user) }}>
+                    <Card.Text className="d-flex justify-content-start" >
+                      <Avatar alt={user.user} src={user.image} style={{ height: '30px', width: '30px' }} />
+                      {
+                        (loggedUser.username === user.user) ?
+                          <snap style={{color : 'blue'}}>
+                            {user.user} 
+                          </snap>
+                          :
+                          <>
+                            {user.user}
+                          </>
+                      }
                     </Card.Text>
                     <hr></hr>
                   </div>

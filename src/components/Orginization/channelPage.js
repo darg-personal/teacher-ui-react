@@ -67,16 +67,15 @@ const UserRequest = (props) => {
                         Authorization: `Bearer ${Token}`,
                     },
                 }
-            ).then(()=>
-            {
+            ).then(() => {
                 ws.send(
                     JSON.stringify({
-                      meta_attributes: "react",
-                      message_type: "group-info-update",
-                      media_link: null,
-                      message_text: `${data.user} joined group`,
+                        meta_attributes: "react",
+                        message_type: "group-info-update",
+                        media_link: null,
+                        message_text: `${data.user} joined group`,
                     })
-                  );
+                );
             })
             .then((response) => {
                 axios
@@ -127,31 +126,27 @@ const UserRequest = (props) => {
                                 {/* {props.orgName} */}
                             </Card>
                             {reqUsers.length > 0 ?
-                                <>
-                                    {
-                                        reqUsers.map((e, i) => (
-                                            <div key={e + i} >
-                                                <Card  >
-                                                    <div>
-                                                        <ListItemAvatar>
-                                                            <Avatar src={e.user} alt={e.user} />
-                                                        </ListItemAvatar>
-                                                        {e.user}
-                                                        <Button style={{ float: 'right', margin: '2px' }}
-                                                            onClick={() => {
-                                                                addChannelMember(e)
-                                                            }}>accept</Button>
-                                                        <Button style={{ float: 'right', margin: '2px' }}
-                                                            onClick={() => {
-                                                                rejectChannelMember(e)
-                                                            }}>reject</Button>
-                                                    </div>
-                                                </Card>
-                                                <hr />
+                                reqUsers.map((e, i) => (
+                                    <div key={e + i} >
+                                        <Card  >
+                                            <div>
+                                                <ListItemAvatar>
+                                                    <Avatar src={e.user} alt={e.user} />
+                                                </ListItemAvatar>
+                                                {e.user}
+                                                <Button style={{ float: 'right', margin: '2px' }}
+                                                    onClick={() => {
+                                                        addChannelMember(e)
+                                                    }}>accept</Button>
+                                                <Button style={{ float: 'right', margin: '2px' }}
+                                                    onClick={() => {
+                                                        rejectChannelMember(e)
+                                                    }}>reject</Button>
                                             </div>
-                                        ))
-                                    }
-                                </>
+                                        </Card>
+                                        <hr />
+                                    </div>
+                                ))
                                 : <p style={{ alignSelf: 'center' }} >No New Requests</p>}
                         </Card>
 

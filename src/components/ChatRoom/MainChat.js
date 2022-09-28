@@ -73,7 +73,7 @@ function MainChat(props) {
         uniqeId,
       });
     }
-      
+
   };
 
   useEffect(() => {
@@ -325,7 +325,7 @@ function MainChat(props) {
   }
   const onStopRecording = async (recording) => {
     let formData = new FormData();
-    formData.append("file", recording,"audio.mp3");
+    formData.append("file", recording, "audio.mp3");
     await axios
       .post(`${utils.getHost()}/profile/upload`, formData)
       .then((resp) => {
@@ -350,8 +350,8 @@ function MainChat(props) {
           month: "2-digit",
           day: "2-digit",
         });
-        
-        
+
+
         setState({ file: false });
         document.getElementById("inp").value = "";
       })
@@ -425,7 +425,7 @@ function MainChat(props) {
                     ) : (
                       <div  >
                         {e.media_link ? (
-                          <ImageView  type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
+                          <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
                         ) : (
                           <TextView sender={e.sender} profile={e.profile} text={e.message} time={e.time} float={'left'} />
                         )}
@@ -461,11 +461,19 @@ function MainChat(props) {
           </form>
         </div>
         :
-        <Card style={{ marginLeft: '25%', alignSelf: 'center' }}>
-          <p style={{ alignSelf: 'center' }}>
-            Please Join The Group to chat
-          </p>
-        </Card>
+        <>
+          <Card style={{ marginLeft: '25%', alignSelf: 'center' }}>
+            {isConnected == 5 ?
+              <p style={{ alignSelf: 'center' }}>
+                This Group Is no Longer Exist...
+              </p>
+              :
+              <p style={{ alignSelf: 'center' }}>
+                Please Join The Group to chat
+              </p>
+            }
+          </Card>
+        </>
       }
     </div >
   );

@@ -2,7 +2,7 @@ import { React, useState } from "react";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 import { useEffect } from "react";
-import { Avatar, Button, ListItemAvatar } from "@mui/material";
+import { Button } from "@mui/material";
 import { ImageShow, ImgUpload } from "../ChatRoom/templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 
@@ -61,7 +61,7 @@ export const CreateChannelPage = (props) => {
                     }, 5000);
                 }).catch(resp => {
                     alert("NetWork Error....", resp)
-                })
+            })
         }
         else {
             alert('Please Upload custom Profile')
@@ -86,7 +86,7 @@ export const CreateChannelPage = (props) => {
             setOrginizations(tempstore)
             setOrg(tempstore[0].orgId)
         }).catch(resp => {
-            alert("Indeed no Org")
+            alert("Indeed No Org")
         })
     }
 
