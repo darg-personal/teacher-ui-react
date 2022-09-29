@@ -1,8 +1,19 @@
 import React from "react";
 import { Avatar, IconButton, ListItemAvatar } from "@mui/material";
-import { Card } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
+
+
+function answer(data) {
+    console.log({ data });
+    function popupWindow(url, windowName, win, w, h, username) {
+        const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
+        const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+        return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+    }
+    popupWindow(data, 'test', window, 800, 600);
+}
 
 export function ImageView({
     type,
@@ -32,11 +43,13 @@ export function ImageView({
                       borderRadius: '10px'
                   }} src={image} /> */}
 
-                {type === "audio/mpeg" ? (
+                {type === "audio/mpeg" && (
                     <li key={image}>
                         <audio src={image} controls />
                     </li>
-                ) : (
+                )}
+                t
+                {type === "image/jpeg" && (
                     <img
                         height="210px"
                         width="auto"
@@ -45,6 +58,11 @@ export function ImageView({
                         }}
                         src={image}
                     />
+                )}
+                {type === "message/videocall" && (
+                    <div>
+                        <Button onClick={() => answer(image)}>Answer</Button>
+                    </div>
                 )}
 
                 <p style={{ marginLeft: "10px" }}>{text !== "NA" ? text : null}</p>

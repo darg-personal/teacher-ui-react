@@ -16,6 +16,7 @@ import Avatar from "@mui/material/Avatar";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
+import VideocamIcon from "@mui/icons-material/Videocam";
 
 import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
 import Record from "./Recorder";
@@ -50,7 +51,7 @@ function MainChat(props) {
   const chatroomId = props.chatRoomId;
   const type = props.type;
   const getChatImage = props.getChatImage;
-  const isConnected = props.isConnected;
+  const [isConnected, setIsConnected] = useState(props.isConnected);
   const receiveMessageCountDictProp = props.receiveMessageCountDict;
 
   var tempDict = {};
@@ -163,6 +164,8 @@ function MainChat(props) {
         };
         const prevMsgs = [...messages];
         prevMsgs.push(msgObj);
+
+        // setIsConnected()
         setMessages([...prevMsgs]);
 
       }
@@ -362,6 +365,24 @@ function MainChat(props) {
       });
   };
 
+  function handelclickpopupcall(event) {
+    event.preventDefault();
+    let id =require("uuid").v4();
+    function popupWindow(url, windowName, win, w, h) {
+      const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
+      const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          message_type: "message/videocall",
+          media_link: `https://18.117.227.68:9011/${chatroom}${id}`,
+          message_text: "",
+        }))
+      return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+    }
+    popupWindow(`https://18.117.227.68:9011/${chatroom}${id}`, 'test', window, 800, 600);
+  }
+
   return (
     <div className="chatroom">
       <div className="profile-header">
@@ -373,7 +394,20 @@ function MainChat(props) {
 
         </div>
       </div>
-
+      <div className="position-fixed  end-0">
+        <VideocamIcon
+          style={{
+            color: "white",
+            position: "absolute",
+            right: "100",
+            top: "15",
+            fontSize: "40",
+            cursor: "pointer",
+          }}
+          onClick={handelclickpopupcall}
+        >
+        </VideocamIcon>
+      </div>
       <div className="position-fixed  end-0">
         <ChatOptions />
       </div>

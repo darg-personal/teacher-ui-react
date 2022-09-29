@@ -10,20 +10,24 @@ const requestType = {
     Leave: 0,
     Request: 1,
     cancel: 3,
-    terminated: -1
+    terminated: 4
 }
 
 const UserRequest = (props) => {
     let Token = localStorage.getItem("token");
+    let loggedUser = JSON.parse(localStorage.getItem("user"));
 
     const org = props.orgId
     const channel = props.channelId
     const ws = props.ws
     const [reqUsers, setReqUsers] = useState([]);
-    const [temp, setTemp] = useState({ request: {} })
+    const [removeBtn, setRemoveBtn] = useState({ user: {} })
 
-    const getRequests = (org, channel) => {
-        axios
+    const [isClicked, setIsClicked] = useState(true);
+    const [users, setUsers] = useState([]);
+
+    const getRequests = async (org, channel) => {
+        await axios
             .get(`${utils.getHost()}/chat/userRequest/${org}/${channel}`,
                 {
                     headers: {
@@ -33,6 +37,7 @@ const UserRequest = (props) => {
             .then((res) => {
                 const responseData = JSON.stringify(res.data);
                 const tempResponse = JSON.parse(responseData);
+                console.log({ tempResponse });
                 let reqTempUsers = [];
                 for (var i = 0; i < tempResponse.length; i++) {
                     if (tempResponse[i]?.request_type == 3) {
@@ -50,9 +55,41 @@ const UserRequest = (props) => {
             });
     }
 
+    async function getUsers() {
+        console.log({ channel });
+        await axios
+            .get(`${utils.getHost()}/chat/get/channel/user_list/${channel}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Token}`,
+                    },
+                })
+            .then((res) => {
+                const responseData = JSON.stringify(res.data);
+                const tempUsers = JSON.parse(responseData);
+                console.log(tempUsers, "09t7374j");
+                let localUserUpdate = [];
+                for (var i = 0; i < tempUsers?.length; i++) {
+                    localUserUpdate.push({
+                        'user': tempUsers[i]?.user.username,
+                        'image': tempUsers[i]?.image,
+                        'id': tempUsers[i]?.user.id,
+                    });
+                    var remove = removeBtn;
+                    const uniqueId = tempUsers[i]?.user.id + tempUsers[i]?.user.username
+                    remove[uniqueId] = true;
+                    setRemoveBtn({
+                                ...removeBtn,
+                                remove
+                            });
+                }
+                setUsers(localUserUpdate);
+            });
+    }
+
     useEffect(() => {
-        getRequests(org, channel)
-        console.log(org, channel);
+        getRequests(org, channel);
+        getUsers();
     }, [org, channel]);
 
     function addChannelMember(data) {
@@ -67,8 +104,8 @@ const UserRequest = (props) => {
                         Authorization: `Bearer ${Token}`,
                     },
                 }
-            ).then(() => {
-                ws.send(
+            ).then(async() => {
+                await ws.send(
                     JSON.stringify({
                         meta_attributes: "react",
                         message_type: "group-info-update",
@@ -91,7 +128,6 @@ const UserRequest = (props) => {
                     }).catch(() => {
                         console.log("error");
                     })
-                console.log(temp);
                 alert('User is Added or group')
             }).catch((error) => {
                 console.log("Post Channel Member Error ", error);
@@ -115,42 +151,127 @@ const UserRequest = (props) => {
             })
     }
 
+    function removeUser(data) {
+
+        let valu = { Channel: data.channel, designation: 4, user: data.id, org: org };
+
+        axios
+            .patch(
+                `${utils.getHost()}/chat/get/channelmember/${channel}`,
+                valu,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Token}`,
+                    },
+                }
+            ).then((resp) => {
+                console.log({ resp },{removeBtn});
+
+                    setRemoveBtn({
+                                ...removeBtn,
+                                [data.id + data.user]:false
+                            });
+                ws.send(
+                    JSON.stringify({
+                        meta_attributes: "react",
+                        message_type: "group-info-update",
+                        media_link: null,
+                        message_text: `${data.user} is removed by Admin`,
+                    })
+                );
+            })
+    }
     return (
         <>
             {
                 Token ? (
                     <>
-                        <Card style={{ height: '100%', width: '70%', marginLeft: '10px', padding: '10px', borderWidth: 1 }}>
+                        <Card style={{ height: '100vh', width: '70%', marginLeft: '10px', padding: '10px', borderWidth: 1, display: 'flex' }}>
                             <Card style={{ margin: '10px', padding: '10px', borderWidth: 1, display: 'flex' }}>
                                 Group : {props.channelName}
                                 {/* {props.orgName} */}
                             </Card>
-                            {reqUsers.length > 0 ?
-                                reqUsers.map((e, i) => (
-                                    <div key={e + i} >
-                                        <Card  >
-                                            <div>
-                                                <ListItemAvatar>
-                                                    <Avatar src={e.user} alt={e.user} />
-                                                </ListItemAvatar>
-                                                {e.user}
-                                                <Button style={{ float: 'right', margin: '2px' }}
-                                                    onClick={() => {
-                                                        addChannelMember(e)
-                                                    }}>accept</Button>
-                                                <Button style={{ float: 'right', margin: '2px' }}
-                                                    onClick={() => {
-                                                        rejectChannelMember(e)
-                                                    }}>reject</Button>
+                            <Card style={{ margin: '10px', padding: '10px', borderWidth: 1, display: 'flex' }}>
+                                <div className="d-flex justify-content-between">
+
+                                    <Button style={{ margin: '10px', padding: '10px', background: isClicked ? 'blue' : 'white', color: isClicked ? '#fff' : "#aaa" }}
+                                        onClick={() => setIsClicked(true)}
+                                    >
+                                        Request's
+                                    </Button>
+                                    <Button style={{ margin: '10px', padding: '10px', background: !isClicked ? 'blue' : 'white', color: !isClicked ? '#fff' : '#aaa' }}
+                                        onClick={() => setIsClicked(false)}
+                                    >
+                                        Connected User's
+                                    </Button>
+                                </div>
+                            </Card>
+
+                            {isClicked &&
+                                <>
+                                    {reqUsers.length > 0 ?
+                                        reqUsers.map((e, i) => (
+                                            <div key={e + i} >
+                                                <Card  >
+                                                    <div>
+                                                        <ListItemAvatar>
+                                                            <Avatar src={e.user} alt={e.user} />
+                                                        </ListItemAvatar>
+                                                        {e.user}
+                                                        <Button style={{ float: 'right', margin: '2px' }}
+                                                            onClick={() => {
+                                                                addChannelMember(e)
+                                                            }}>accept</Button>
+                                                        <Button style={{ float: 'right', margin: '2px' }}
+                                                            onClick={() => {
+                                                                rejectChannelMember(e)
+                                                            }}>reject</Button>
+                                                    </div>
+                                                </Card>
+                                                <hr />
                                             </div>
-                                        </Card>
-                                        <hr />
-                                    </div>
-                                ))
-                                : <p style={{ alignSelf: 'center' }} >No New Requests</p>}
+                                        ))
+                                        :
+                                        <div>
+                                            <p style={{ alignSelf: 'center' }} >No New Requests</p>
+                                        </div>
+                                    }
+                                </>
+                            }
+
+                            {!isClicked &&
+                                <>
+                                    {users.map((user, i) => {
+                                        return (
+                                            <div key={i + user} >
+                                                <Card.Text className="d-flex justify-content-start" >
+                                                    <Avatar alt={user.user} src={user.image} style={{ height: '30px', width: '30px' }} />
+                                                    {
+                                                        (loggedUser.username === user.user) ?
+                                                            <>
+                                                                <span style={{ color: 'blue' }}>
+                                                                    {user.user}
+                                                                </span>
+                                                                <span style={{ marginLeft: '10px', float: 'right' }}>Owner</span>
+                                                            </>
+                                                            :
+                                                            <span>
+                                                                {user.user}
+                                                            </span>
+                                                    }
+
+                                                </Card.Text>
+                                                {loggedUser.username !== user.user && removeBtn[user.id +user.user] &&
+                                                    <Button style={{ position: 'relative', float: 'right', margin: '2px' }}
+                                                        onClick={() => removeUser(user)}>remove</Button>
+                                                }
+                                                <hr></hr>
+                                            </div>
+                                        );
+                                    })}
+                                </>
+                            }
                         </Card>
-
-
                     </>)
                     : (
                         <Navigate replace to="/login" />

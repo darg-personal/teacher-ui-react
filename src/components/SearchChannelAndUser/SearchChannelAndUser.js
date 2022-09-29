@@ -20,7 +20,7 @@ const requestType = {
     Request: 1,
     reRequest: 2,
     cancel: 3,
-    terminated: -1
+    terminated: 4
 }
 
 export default function SearchChannelAndUser() {

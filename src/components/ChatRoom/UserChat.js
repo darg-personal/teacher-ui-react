@@ -14,6 +14,7 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import VideocamIcon from "@mui/icons-material/Videocam";
 import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import Record from "./Recorder";
@@ -50,9 +51,9 @@ function UserChat(props) {
   const recieveMessages = (userId, username) => {
     console.log('recievemessages function is callled from userChat');
     const userUniqeId = userId + username;
-    console.log(tempDict, "receiveMessageCountDict");  
+    console.log(tempDict, "receiveMessageCountDict");
     var recCount = 1;
-    console.log(tempDict[userUniqeId],'receiveMessageCountDict[userUniqeId]');
+    console.log(tempDict[userUniqeId], 'receiveMessageCountDict[userUniqeId]');
     if (tempDict[userUniqeId]) {
       recCount = tempDict[userUniqeId] + 1;
       console.log("uniq id found");
@@ -60,7 +61,7 @@ function UserChat(props) {
       console.log("uniqe id not found");
       recCount = 1;
     }
-    console.log(receiveMessageCountDictProp,'receiveMessageCountDictProp');
+    console.log(receiveMessageCountDictProp, 'receiveMessageCountDictProp');
     var countDict = {}
     if (receiveMessageCountDictProp) {
       // countDict = receiveMessageCountDictProp;
@@ -388,10 +389,67 @@ function UserChat(props) {
   };
 
 
+  function handelclickpopupcall(event) {
+    event.preventDefault();
+    function popupWindow(url, windowName, win, w, h,) {
+      const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
+      const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          message_type: "message/videocall",
+          media_link: `https://18.117.227.68:9011/${userName}`,
+          message_text: null,
+        }))
+
+        let messageDate = new Date();
+        let timeNow = messageDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const date = messageDate.toLocaleDateString("en-US", {
+          weekday: "short",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+        let a = {
+          sender: loggedUser.username,
+          time: timeNow,
+          date: date,
+          meta_attributes: "react",
+          message_type: "message/videocall",
+          media_link: `https://18.117.227.68:9011/${userName}`,
+          message_text: null,
+          profile: getChatImage,
+        };
+        const prevMsgs = [...messages];
+        prevMsgs.push(a);
+        setMessages([...prevMsgs]);
+        
+      return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+    }
+    popupWindow(`https://18.117.227.68:9011/${userName}`, 'test', window, 800, 600);
+  }
+
   return (
     <>
       {/* Page content */}
       <ChatHeader name={userName} props={props} type={type} image={getChatImage} />
+      <div className="position-fixed  end-0">
+        <VideocamIcon
+          style={{
+            color: "white",
+            position: "absolute",
+            right: "100",
+            top: "15",
+            fontSize: "40",
+            cursor: "pointer",
+          }}
+          onClick={handelclickpopupcall}
+        >
+        </VideocamIcon>
+        </div>
       {/* <ul className="profile-header">
         <div className="header-chat">
           <div className="classes">

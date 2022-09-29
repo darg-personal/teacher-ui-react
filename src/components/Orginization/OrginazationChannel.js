@@ -59,18 +59,15 @@ function OrgChannel(props) {
     }
 
     const navigateToRequestPage = (data) => {
-        if (data.isExist != 5) {
-            setChannelId(data.channelId);
-            setChannelName(data.name)
-            var ws = new WebSocket(
-                `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${data.name}`)
-            ws.onopen = () => {
-                console.log("Web Socket is connected");
-            }
-            setWebSocket(ws)
+        setChannelId(data.channelId);
+        setChannelName(data.name)
+        var ws = new WebSocket(
+            `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${data.name}`)
+        ws.onopen = () => {
+            console.log("Web Socket is connected");
         }
-        else
-            setgroupIsExist(false)
+        setWebSocket(ws)
+        setgroupIsExist(data.isExist != 5)
         setRequestPageVisible(true)
     }
 
@@ -196,7 +193,7 @@ function OrgChannel(props) {
                             <hr style={{ width: '100%' }}></hr>
 
                         </Container>
-                        <div className="d-flex">
+                        <div style={{ display: 'flex' }}>
                             <Channels />
 
                             {requestPageVisible && groupIsExist &&
@@ -206,11 +203,11 @@ function OrgChannel(props) {
                                     orgName={orgName}
                                     ws={websocket}
                                 />
-                                }
-                            {requestPageVisible && !groupIsExist && 
-                            <div className="d-flex justify-content-center color:red">
-                            alert("Group Is Deleted")
-                            </div>}
+                            }
+                            {!groupIsExist &&
+                                <div className="d-flex justify-content-center">
+                                    alert("Group Is Deleted")
+                                </div>}
                         </div>
                     </>
 
