@@ -9,17 +9,24 @@ import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { Dropdown } from "react-bootstrap";
+import { Card, Dropdown } from "react-bootstrap";
 import IconButton from "@mui/material/IconButton";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import CardHeader from "react-bootstrap/esm/CardHeader";
+import CancelSharpIcon from "@mui/icons-material/CancelSharp";
+import VideocamIcon from "@mui/icons-material/Videocam";
+
+import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
+import Record from "./Recorder";
 
 function MainChat(props) {
 
   let Token = localStorage.getItem("token");
   let navigate = useNavigate();
   let loggedUser = JSON.parse(localStorage.getItem("user"));
+  const profileSrc = localStorage.getItem("loginUserImage")
 
   // Variables
   const inputRef = useRef(null);
@@ -27,7 +34,8 @@ function MainChat(props) {
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [messageCount, setMessageCount] = useState(0);
-  const [receiveMessageCount, setReceiveMessageCount] = useState(1);
+  // const [receiveMessageCount, setReceiveMessageCount] = useState(1);
+  // const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
   const [load, setLoad] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
@@ -43,6 +51,31 @@ function MainChat(props) {
   const chatroomId = props.chatRoomId;
   const type = props.type;
   const getChatImage = props.getChatImage;
+  const [isConnected, setIsConnected] = useState(props.isConnected);
+  const receiveMessageCountDictProp = props.receiveMessageCountDict;
+
+  var tempDict = {};
+  const recieveMessages = (chatroomId, username) => {
+    const uniqeId = chatroomId + username;
+    console.log(tempDict, "receiveMessageCountDict");
+    var recCount = 0;
+    if (tempDict[uniqeId]) {
+      recCount = tempDict[uniqeId] + 1;
+    } else {
+      recCount = 1;
+    }
+
+    var countDict = {};
+    if (receiveMessageCountDictProp) {
+      countDict[uniqeId] = recCount;
+      tempDict = countDict
+      props.receiveMessageCount({
+        receiveMessageCountDict: countDict,
+        uniqeId,
+      });
+    }
+
+  };
 
   useEffect(() => {
     setPage(1);
@@ -61,34 +94,35 @@ function MainChat(props) {
         const message = JSON.parse(responseData);
         setMessageCount(message.count);
         const prevMsgs = [];
-        for (let i = message.results.length - 1; i >= 0; i--) {
-          const receivedObj = message.results[i];
-          const receivedDate = receivedObj?.created_at || "NA";
-          const messageDate = new Date(receivedDate);
-          const message_type = receivedObj?.message_type;
-          const time = messageDate.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-          const date = messageDate.toLocaleDateString("en-US", {
-            weekday: "short",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          });
+        if (message.count > 0)
+          for (let i = message.results.length - 1; i >= 0; i--) {
+            const receivedObj = message.results[i];
+            const receivedDate = receivedObj?.created_at || "NA";
+            const messageDate = new Date(receivedDate);
+            const message_type = receivedObj?.message_type;
+            const time = messageDate.toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            const date = messageDate.toLocaleDateString("en-US", {
+              weekday: "short",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            });
 
-          const msgObj = {
-            sender: receivedObj?.user.username || "NA",
-            message: receivedObj?.message_text || "NA",
-            time: time || "NA",
-            date: date || "NA",
-            profile: receivedObj?.user_profile.image || null,
-            message_type: message_type || "message/text",
-            media_link: receivedObj?.media_link || null,
-          };
+            const msgObj = {
+              sender: receivedObj?.user.username || "NA",
+              message: receivedObj?.message_text || "NA",
+              time: time || "NA",
+              date: date || "NA",
+              profile: receivedObj?.user_profile.image || null,
+              message_type: message_type || "message/text",
+              media_link: receivedObj?.media_link || null,
+            };
 
-          prevMsgs.push(msgObj);
-        }
+            prevMsgs.push(msgObj);
+          }
         setMessages([...prevMsgs]);
       })
       .catch((error) => {
@@ -100,12 +134,11 @@ function MainChat(props) {
 
   useEffect(() => {
     ws.onmessage = (evt) => {
-      console.log("=========on message========");
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
       console.log(receivedObj.channel, "=========on message========");
 
-      if (chatroomId === receivedObj.channel.id) {
+      if (chatroomId === receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const message_type = receivedObj?.message_type;
@@ -131,8 +164,17 @@ function MainChat(props) {
         };
         const prevMsgs = [...messages];
         prevMsgs.push(msgObj);
+
+        // setIsConnected()
         setMessages([...prevMsgs]);
+
       }
+      recieveMessages(
+        // receiveMessageCountDict,
+        receivedObj?.channel.id,
+        receivedObj?.channel.name
+      );
+
     };
   }, [messages]);
 
@@ -144,9 +186,8 @@ function MainChat(props) {
       let formData = new FormData();
       formData.append("file", selectedFile);
       await axios
-        .post(`${utils.getHost()}/s3_uploader/upload`, formData)
+        .post(`${utils.getHost()}/profile/upload`, formData)
         .then((resp) => {
-          console.log(resp.data.content_type);
           context_type = resp.data.content_type;
           file_url = resp.data.file_url;
         })
@@ -249,43 +290,6 @@ function MainChat(props) {
     }
   }, []);
 
-  const ImageView = ({ image, text }) => {
-    console.log(image, text, "-=-");
-    return (
-      <div class="share-pic">
-        <img
-          className="share-pic-text"
-          src={image}
-        // alt="Geeks Image"
-        />
-        <p>{text !== "NA" ? text : null}</p>
-      </div>
-    );
-  };
-
-  const ImgUpload = ({ onChange, src }) => {
-    return (
-      <IconButton color="primary" aria-label="upload picture" component="label">
-        <input hidden accept="image/*" type="file" onChange={onChange} />
-        <AttachFileIcon />
-      </IconButton>
-    );
-  };
-
-  const ImageShow = () => {
-    console.log("iisiisiii");
-    return (
-      <div className="image-show-view">
-        <label className="centered-view">
-          <img  
-            src={state.filePreviewUrl}
-            style={{ height: "80%", width: "80%" }}
-          />
-        </label>
-      </div>
-    );
-  };
-
   const photoUpload = (event) => {
     event.preventDefault();
     const reader = new FileReader();
@@ -301,53 +305,126 @@ function MainChat(props) {
     reader.readAsDataURL(file);
   };
 
+
+  const ChatOptions = () => {
+    return (
+      <div className="three-dots">
+        <i className="bi bi-three-dots-vertical"></i>
+        <Dropdown>
+          <Dropdown.Toggle variant="white" id="dropdown-basic">
+            <BiDotsVerticalRounded
+              id="dropdown-basic"
+              style={{ color: "#FFF" }}
+            ></BiDotsVerticalRounded>
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu className="drop">
+            <Dropdown.Item>Settings</Dropdown.Item>
+            <Dropdown.Item>Details</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+    )
+  }
+  const onStopRecording = async (recording) => {
+    let formData = new FormData();
+    formData.append("file", recording, "audio.mp3");
+    await axios
+      .post(`${utils.getHost()}/profile/upload`, formData)
+      .then((resp) => {
+        let file_url = resp.data.file_url;
+        ws.send(
+          JSON.stringify({
+            meta_attributes: "react",
+            message_type: "audio/mpeg",
+            media_link: file_url ? file_url : null,
+            message_text: inputRef.current.value ? inputRef.current.value : "",
+          })
+        );
+
+        let messageDate = new Date();
+        let timeNow = messageDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const date = messageDate.toLocaleDateString("en-US", {
+          weekday: "short",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+
+
+        setState({ file: false });
+        document.getElementById("inp").value = "";
+      })
+      .catch((resp) => {
+        // setState({ file: false });
+
+        alert("connection is breaked");
+      });
+  };
+
+  function handelclickpopupcall(event) {
+    event.preventDefault();
+    let id =require("uuid").v4();
+    function popupWindow(url, windowName, win, w, h) {
+      const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
+      const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          message_type: "message/videocall",
+          media_link: `https://18.117.227.68:9011/${chatroom}${id}`,
+          message_text: "",
+        }))
+      return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+    }
+    popupWindow(`https://18.117.227.68:9011/${chatroom}${id}`, 'test', window, 800, 600);
+  }
+
   return (
-    <>
-      {/* Page content */}
-      <ul className="profile-header">
+    <div className="chatroom">
+      <div className="profile-header">
         <div className="header-chat">
-          <div className="classes">
-            <div>
-              <AiOutlineArrowLeft
-                style={{ color: "#fff", height: "30" }}
-                onClick={() => {
-                  navigate("/dashboard");
-                }}
-              />
-            </div>
-            <li onClick={() => props.show({ show: true, type: type })}>
-              <ListItemAvatar>
-                <Avatar alt={chatroom} src={getChatImage} />
-              </ListItemAvatar>
-            </li>
+          <ListItemAvatar onClick={() => props.show({ show: true, type: type, chatroomId: chatroomId, websocket: ws })}>
+            <Avatar alt={chatroom} src={getChatImage} />
+          </ListItemAvatar>
+          <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{chatroom}</li>
 
-            <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{chatroom}</li>
-          </div>
         </div>
-      </ul>
+      </div>
       <div className="position-fixed  end-0">
-        <div className="three-dots">
-          <i className="bi bi-three-dots-vertical"></i>
-
-          <Dropdown>
-            <Dropdown.Toggle variant="white" id="dropdown-basic">
-              <BiDotsVerticalRounded
-                id="dropdown-basic"
-                style={{ color: "#FFF" }}
-              ></BiDotsVerticalRounded>
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu className="drop">
-              <Dropdown.Item>Settings</Dropdown.Item>
-              <Dropdown.Item>Details</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
+        <VideocamIcon
+          style={{
+            color: "white",
+            position: "absolute",
+            right: "100",
+            top: "15",
+            fontSize: "40",
+            cursor: "pointer",
+          }}
+          onClick={handelclickpopupcall}
+        >
+        </VideocamIcon>
+      </div>
+      <div className="position-fixed  end-0">
+        <ChatOptions />
       </div>
       {load ? <Loader /> : null}
 
       {state.file ? (
-        <ImageShow />
+        <>
+          <CancelSharpIcon style={{ flex: 1, marginLeft: '90%', position: 'relative' }} onClick={() => {
+            setState({
+              file: null,
+              filePreviewUrl: null,
+            });
+            setIsSelected(false)
+          }} color="primary"
+            fontSize="large" />
+          <ImageShow filePreviewUrl={state.filePreviewUrl} />
+        </>
       ) : (
 
         <div
@@ -358,73 +435,81 @@ function MainChat(props) {
         >
           {messages.map((e, i) => {
             return (
-              <div>
-                {e.sender === loggedUser.username ? (
-                  <div>
-                    <div key={i} className="container darker" id="right">
-                      <ListItemAvatar style={{ float: 'right' }}>
-                        <Avatar alt={e.sender} src={e.profile} style={{
-                          marginLeft: '10px',
-                          height: '35px',
-                          width: '35px'
-                        }} />
-                      </ListItemAvatar>
-                      <span className="name right">Me</span>
-                      {e.media_link ? (
-                        <ImageView image={e.media_link} text={`${e.message}`} />
-                      ) : (
-                        <p>{`${e.message}`}</p>
-                      )}
-
-                      <span className="time-right">{e.time}</span>
+              <div key={e?.sender + i}
+                style={{
+                  marginTop: '2%',
+                  overflow: 'auto'
+                }}>
+                {e.message_type === 'group-info-update' ?
+                  <div id="center">
+                    <div className=" user-add-remove" >
+                      <p >{`${e.message}`}</p>
                     </div>
                   </div>
-                ) : (
-                  <>
-                    <div key={i} className="container" id="left">
-                      <span className="name right">{e.sender}</span>
-                      <ListItemAvatar>
-                        <Avatar alt={e.sender} src={e.profile} style={{
-                          marginLeft: '10px',
-                          height: '35px',
-                          width: '35px'
-                        }} />
-                      </ListItemAvatar>
-                      {e.media_link ? (
-                        <ImageView image={e.media_link} text={`${e.message}`} />
-                      ) : (
-                        <p>{`${e.message}`}</p>
-                      )}
-                      <span className="time-left">{e.time}</span>
-                    </div>
-
-                  </>
-                )}
+                  :
+                  <div>
+                    {e.sender === loggedUser.username ? (
+                      <div >
+                        {e.media_link ? (
+                          <ImageView type={e.message_type} image={e.media_link} profile={profileSrc} text={e.message} sender={e.sender} time={e.time} />
+                        ) : (
+                          <TextView sender={'Me'} profile={profileSrc} text={e.message} time={e.time} />
+                        )}
+                      </div>
+                    ) : (
+                      <div  >
+                        {e.media_link ? (
+                          <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
+                        ) : (
+                          <TextView sender={e.sender} profile={e.profile} text={e.message} time={e.time} float={'left'} />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                }
+                {/* <hr/> */}
               </div>
             );
           })}
 
           <Outlet />
         </div>
-      )}
-
-      <div className="box">
-        <form>
-          <ImgUpload onChange={photoUpload} src={state.filePreviewUrl} />
-          <input
-            ref={inputRef}
-            className="input_text"
-            id="inp"
-            type="text"
-            placeholder="Enter Text Here..."
-            onKeyDown={(e) => e.key === "Enter" && handleClick}
-          />
-          <button onClick={handleClick} className="btn btn-outline-success">
-            send
-          </button>
-        </form>
-      </div>
-    </>
+      )
+      }
+      {isConnected == 0 ?
+        <div className="box">
+          <form>
+            <input
+              ref={inputRef}
+              className="input_text"
+              id="inp"
+              type="text"
+              placeholder="Enter Text Here..."
+              onKeyDown={(e) => e.key === "Enter" && handleClick}
+            />
+            <ImgUpload onChange={photoUpload} />
+            <button onClick={handleClick} className="btn btn-outline-success">
+              send
+            </button>
+            <Record onStopRecording={onStopRecording}></Record>
+          </form>
+        </div>
+        :
+        <>
+          <Card style={{ marginLeft: '25%', alignSelf: 'center' }}>
+            {isConnected == 5 ?
+              <p style={{ alignSelf: 'center' }}>
+                This Group Is no Longer Exist...
+              </p>
+              :
+              <p style={{ alignSelf: 'center' }}>
+                Please Join The Group to chat
+              </p>
+            }
+          </Card>
+        </>
+      }
+    </div >
   );
 }
 

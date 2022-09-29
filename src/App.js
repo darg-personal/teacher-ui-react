@@ -29,6 +29,11 @@ import UserProfile from "./pages/auth/UserProfile/UserProfile";
 import ChangePassword from "./pages/auth/ChangePassword";
 import ForgetPassword from './pages/auth/ForgetPassword';
 import { Socket } from "./components/ChatRoom/Socket";
+import Orginization from "./components/Orginization/Orginization";
+import OrgChannel from "./components/Orginization/OrginazationChannel";
+import UserRequest from "./components/Orginization/channelPage";
+import SearchChannelAndUser from "./components/SearchChannelAndUser/SearchChannelAndUser";
+import CreatePassword from "./pages/auth/CreatePassword";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 function App() {
@@ -60,6 +65,12 @@ function App() {
             <Route path={"usefetch"} element={<UserFetchApp />}/>
             <Route path={"sms"} element={<Sms />} />
             <Route path={"userprofile"} element={<UserProfile />} />
+            <Route path={"orginization"} element={<Orginization />} />
+            <Route path={"orginization_channel"} element={<OrgChannel />} />
+            <Route path={"user_request"} element={<UserRequest />} />
+            <Route path={"channels"} element={<SearchChannelAndUser />} />
+            <Route path={"CreatePassword"} element={<CreatePassword />} />
+            
           </Route>
         </Routes>
       </Router>
