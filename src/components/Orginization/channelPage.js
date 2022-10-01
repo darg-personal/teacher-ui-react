@@ -55,7 +55,7 @@ const UserRequest = (props) => {
             });
     }
 
-    async function getUsers() {
+    const getUsers = async () => {
         console.log({ channel });
         await axios
             .get(`${utils.getHost()}/chat/get/channel/user_list/${channel}`,
@@ -79,9 +79,9 @@ const UserRequest = (props) => {
                     const uniqueId = tempUsers[i]?.user.id + tempUsers[i]?.user.username
                     remove[uniqueId] = true;
                     setRemoveBtn({
-                                ...removeBtn,
-                                remove
-                            });
+                        ...removeBtn,
+                        remove
+                    });
                 }
                 setUsers(localUserUpdate);
             });
@@ -89,8 +89,11 @@ const UserRequest = (props) => {
 
     useEffect(() => {
         getRequests(org, channel);
-        getUsers();
     }, [org, channel]);
+
+    useEffect(() => {
+        getUsers();
+    }, [])
 
     function addChannelMember(data) {
         console.log(data);
@@ -104,7 +107,7 @@ const UserRequest = (props) => {
                         Authorization: `Bearer ${Token}`,
                     },
                 }
-            ).then(async() => {
+            ).then(async () => {
                 await ws.send(
                     JSON.stringify({
                         meta_attributes: "react",
@@ -165,12 +168,11 @@ const UserRequest = (props) => {
                     },
                 }
             ).then((resp) => {
-                console.log({ resp },{removeBtn});
 
-                    setRemoveBtn({
-                                ...removeBtn,
-                                [data.id + data.user]:false
-                            });
+                setRemoveBtn({
+                    ...removeBtn,
+                    [data.id + data.user]: false
+                });
                 ws.send(
                     JSON.stringify({
                         meta_attributes: "react",

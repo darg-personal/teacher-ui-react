@@ -200,7 +200,7 @@ export default function SearchChannelAndUser() {
                                                             <span >Channel Name : {e.ChannelName}</span>
                                                             {requestType.terminated == request[e.type + e.orgId + e.ChannelId] &&
                                                                 <span style={{ float: 'right' }} >
-                                                                    <Button disabled class="btn btn-secondary">request</Button>
+                                                                    <Button disabled class="btn btn-secondary">Request</Button>
                                                                 </span>}
                                                             {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
                                                                 ||

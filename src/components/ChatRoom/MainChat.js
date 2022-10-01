@@ -142,6 +142,12 @@ function MainChat(props) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const message_type = receivedObj?.message_type;
+        const message = receivedObj?.message_text
+
+        if (message_type.includes("info")) {
+          if (message.includes("remove"))
+          setIsConnected(4)
+        }
 
         const time = messageDate.toLocaleTimeString("en-US", {
           hour: "2-digit",
@@ -155,7 +161,7 @@ function MainChat(props) {
         });
         const msgObj = {
           sender: receivedObj?.user.username || "NA",
-          message: receivedObj?.message_text || "NA",
+          message: message || "NA",
           time: time || "NA",
           date: date || "NA",
           profile: receivedObj?.user_profile.image || Avatar,
@@ -367,7 +373,7 @@ function MainChat(props) {
 
   function handelclickpopupcall(event) {
     event.preventDefault();
-    let id =require("uuid").v4();
+    let id = require("uuid").v4();
     function popupWindow(url, windowName, win, w, h) {
       const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
       const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
