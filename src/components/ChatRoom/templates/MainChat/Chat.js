@@ -48,7 +48,7 @@ export function ImageView({
                         <audio src={image} controls />
                     </li>
                 )}
-                t
+
                 {type === "image/jpeg" && (
                     <img
                         height="210px"

@@ -1,4 +1,5 @@
 import React, { createRef, useState } from "react";
+import ReactDOM from "react-dom";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { Link, Outlet, useParams } from "react-router-dom";
@@ -9,20 +10,28 @@ import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { Dropdown } from "react-bootstrap";
+import { Button, Dropdown } from "react-bootstrap";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
-import AttachFileIcon from '@mui/icons-material/AttachFile';
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import VideocamIcon from "@mui/icons-material/Videocam";
-import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
+import {
+  ChatHeader,
+  ImageShow,
+  ImageView,
+  ImgUpload,
+  TextView,
+} from "./templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import Record from "./Recorder";
+import { JitsiMeeting } from "@jitsi/react-sdk";
+import { createPortal } from "react-dom";
 
 function UserChat(props) {
   let Token = localStorage.getItem("token");
   let loggedUser = JSON.parse(localStorage.getItem("user"));
-  const profileSrc = localStorage.getItem("loginUserImage")
+  const profileSrc = localStorage.getItem("loginUserImage");
 
   let navigate = useNavigate();
 
@@ -46,14 +55,14 @@ function UserChat(props) {
 
   const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
   const receiveMessageCountDictProp = props.receiveMessageCountDict;
-  var ws = props.websocket
-  var tempDict = {}
+  var ws = props.websocket;
+  var tempDict = {};
   const recieveMessages = (userId, username) => {
-    console.log('recievemessages function is callled from userChat');
+    console.log("recievemessages function is callled from userChat");
     const userUniqeId = userId + username;
     console.log(tempDict, "receiveMessageCountDict");
     var recCount = 1;
-    console.log(tempDict[userUniqeId], 'receiveMessageCountDict[userUniqeId]');
+    console.log(tempDict[userUniqeId], "receiveMessageCountDict[userUniqeId]");
     if (tempDict[userUniqeId]) {
       recCount = tempDict[userUniqeId] + 1;
       console.log("uniq id found");
@@ -61,15 +70,15 @@ function UserChat(props) {
       console.log("uniqe id not found");
       recCount = 1;
     }
-    console.log(receiveMessageCountDictProp, 'receiveMessageCountDictProp');
-    var countDict = {}
+    console.log(receiveMessageCountDictProp, "receiveMessageCountDictProp");
+    var countDict = {};
     if (receiveMessageCountDictProp) {
       // countDict = receiveMessageCountDictProp;
       countDict = receiveMessageCountDictProp;
     }
     countDict[userUniqeId] = recCount;
     console.log(countDict, "countDict......----");
-    tempDict = countDict
+    tempDict = countDict;
     // setReceiveMessageCountDict(countDict);
     // console.log(receiveMessageCount,'receiveMessageCount');
     console.log(tempDict, "setReceiveMessageCountDict");
@@ -78,7 +87,6 @@ function UserChat(props) {
       userUniqeId,
     });
   };
-
 
   useEffect(() => {
     if (scrollBottom) {
@@ -161,14 +169,17 @@ function UserChat(props) {
       prevMsgs.push(a);
       setMessages([...prevMsgs]);
       setIsSelected(false);
+      setOpen(false);
       setState({ file: false });
       document.getElementById("inp").value = "";
     }
   }
 
   useEffect(() => {
-    console.log(`web socket connection created for ${userName},${receiverId}!!`);
-    fetchData()
+    console.log(
+      `web socket connection created for ${userName},${receiverId}!!`
+    );
+    fetchData();
   }, [userName, receiverId]);
 
   async function fetchData() {
@@ -271,9 +282,10 @@ function UserChat(props) {
         }
         setLoad(false);
         setMessages([...prevMsgs, ...messages]);
-      }).finally(() => {
-        setLoad(false);
       })
+      .finally(() => {
+        setLoad(false);
+      });
   }
 
   useEffect(() => {
@@ -317,7 +329,6 @@ function UserChat(props) {
         receivedObj?.from_user.id,
         receivedObj?.from_user.username
       );
-
     };
   }, [messages]);
 
@@ -388,54 +399,162 @@ function UserChat(props) {
       });
   };
 
+  const node = document.createElement("div");
+  // async function handleClickCall(event) {
+  //   event.preventDefault();
+  //   console.log("hello");
+  //   document.body.appendChild(node);
+  //   node.style.height = "300px";
+  //   node.style.width = "600px";
+  //   node.style.position = "relative";
+  //   const PopupContent = () => {
+  //     ws.send(
+  //       JSON.stringify({
+  //         meta_attributes: "react",
+  //         message_type: "message/videocall",
+  //         media_link: "https://192.168.29.147:8443/nayanroom",
+  //         message_text: "https://192.168.29.147:8443/nayanroom",
+  //       })
+  //     );
+  //     return (
+  //       <div>
+  //         <JitsiMeeting
+  //           domain={"192.168.29.147:8443"}
+  //           roomName="PleaseUseAGoodRoomName"
+  //           configOverwrite={{
+  //             startWithAudioMuted: true,
+  //             disableModeratorIndicator: true,
+  //             startScreenSharing: true,
+  //             enableEmailInStats: false,
+  //           }}
+  //           interfaceConfigOverwrite={{
+  //             DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+  //           }}
+  //           userInfo={{
+  //             displayName: "YOUR_USER",
+  //           }}
+  //           onApiReady={(externalApi) => {
+  //             // here you can attach custom event listeners to the Jitsi Meet External API
+  //             // you can also store it locally to execute commands
+  //           }}
+  //           getIFrameRef={(iframeRef) => {
+  //             iframeRef.style.height = "400px";
+  //           }}
+  //         />
+  //         <button
+  //           style={{
+  //             position: "absolute",
+  //             top: "5%",
+  //             // left: "80%",
+  //           }}
+  //           onClick={clear}
+  //         >
+  //           C-Call
+  //         </button>
+  //       </div>
+  //     );
+  //   };
+  //   const clear = () => {
+  //     ReactDOM.unmountComponentAtNode(node);
+  //     node.remove();
+  //   };
+  //   ReactDOM.render(<PopupContent />, node);
+  // }
+
+  const clear = () => {
+    // ReactDOM.unmountComponentAtNode(node);
+    // node.remove();
+    setOpen(false)
+  };
 
   function handelclickpopupcall(event) {
     event.preventDefault();
-    function popupWindow(url, windowName, win, w, h,) {
-      const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
-      const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+    setOpen(true)
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
           message_type: "message/videocall",
           media_link: `https://18.117.227.68:9011/${userName}`,
           message_text: null,
-        }))
+        })
+      );
 
-        let messageDate = new Date();
-        let timeNow = messageDate.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        const date = messageDate.toLocaleDateString("en-US", {
-          weekday: "short",
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        });
-        let a = {
-          sender: loggedUser.username,
-          time: timeNow,
-          date: date,
-          meta_attributes: "react",
-          message_type: "message/videocall",
-          media_link: `https://18.117.227.68:9011/${userName}`,
-          message_text: null,
-          profile: getChatImage,
-        };
-        const prevMsgs = [...messages];
-        prevMsgs.push(a);
-        setMessages([...prevMsgs]);
-        
-      return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
-    }
-    popupWindow(`https://18.117.227.68:9011/${userName}`, 'test', window, 800, 600);
+      let messageDate = new Date();
+      let timeNow = messageDate.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const date = messageDate.toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+      let a = {
+        sender: loggedUser.username,
+        time: timeNow,
+        date: date,
+        meta_attributes: "react",
+        message_type: "message/videocall",
+        media_link: `https://18.117.227.68:9011/${userName}`,
+        message_text: null,
+        profile: getChatImage,
+      };
+      const prevMsgs = [...messages];
+      prevMsgs.push(a);
+      setMessages([...prevMsgs]);
   }
 
+  const RenderInWindow = (props) => {
+    const [container, setContainer] = useState(null);
+    const newWindow = useRef(window);
+    useEffect(() => {
+      const div = document.createElement("div");
+      setContainer(div);
+    }, []);
+
+    useEffect(() => {
+      if (container) {
+        newWindow.current = window.open(
+          "",
+          "",
+          "width=600,height=400,left=200,top=200"
+        );
+        newWindow.current.document.body.appendChild(container);
+        const curWindow = newWindow.current;
+        return () => curWindow.close();
+      }
+    }, [container]);
+
+    return container && createPortal(props.children, container);
+  };
+
+  function answer(data) {
+    console.log({ data });
+    function popupWindow(url, windowName, win, w, h, username) {
+        const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
+        const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+        return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+    }
+    popupWindow(data, 'test', window, 800, 600);
+}
+
+
+  const [open, setOpen] = useState();
   return (
     <>
       {/* Page content */}
-      <ChatHeader name={userName} props={props} type={type} image={getChatImage} />
+      <ChatHeader
+        name={userName}
+        props={props}
+        type={type}
+        image={getChatImage}
+      />
+      {open && (
+        <div className="position-fixed  end-0">
+            <Button onClick={() => answer('https://18.117.227.68:9011')}>Answer</Button>
+        </div>
+    )}
       <div className="position-fixed  end-0">
         <VideocamIcon
           style={{
@@ -446,31 +565,11 @@ function UserChat(props) {
             fontSize: "40",
             cursor: "pointer",
           }}
+          // onClick={() => setOpen(true)}
           onClick={handelclickpopupcall}
-        >
-        </VideocamIcon>
-        </div>
-      {/* <ul className="profile-header">
-        <div className="header-chat">
-          <div className="classes">
-            <div>
-              <AiOutlineArrowLeft
-                style={{ color: "#fff", height: "30" }}
-                onClick={() => {
-                  navigate("/dashboard");
-                }}
-              />
-            </div>
-            <li onClick={() => props.show({ show: true, type: type })}>
-              <ListItemAvatar>
-                <Avatar alt={userName} src={getChatImage} />
-              </ListItemAvatar>
-            </li>
-
-            <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{userName}</li>
-          </div>
-        </div>
-      </ul> */}
+          // onClick={handleClickCall}
+        ></VideocamIcon>
+      </div>
       <div className="position-fixed  end-0">
         <div className="three-dots">
           <i className="bi bi-three-dots-vertical"></i>
@@ -491,19 +590,67 @@ function UserChat(props) {
         </div>
       </div>
       {load ? <Loader /> : null}
+      {
+        open && (
+        <RenderInWindow>
+          <div>
+            <JitsiMeeting
+              domain={"192.168.29.147:8443"}
+              roomName="PleaseUseAGoodRoomName"
+              configOverwrite={{
+                toolbarButtons:['microphone','chat','fullscreen', 'hangup','settings','toggle-camera'],
+                buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
+                hiddenPremeetingButtons: ['camera'],
+                startWithAudioMuted: true,
+                disableModeratorIndicator: true,
+                startScreenSharing: true,
+                enableEmailInStats: false,
+              }}
+              interfaceConfigOverwrite={{
+                DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+              }}
+              userInfo={{
+                displayName: "YOUR_USER",
+              }}
+              onApiReady={(externalApi) => {
+                // here you can attach custom event listeners to the Jitsi Meet External API
+                // you can also store it locally to execute commands
+              }}
+              getIFrameRef={(iframeRef) => {
+                iframeRef.style.height = "400px";
+              }}
+            />
+            <button
+            style={{
+              position: "absolute",
+              top: "5%",
+              // left: "80%",
+            }}
+            onClick={clear}
+          >
+            C-Call
+          </button>
+          </div>
+        </RenderInWindow>
+      )}
 
       {state.file ? (
         <>
-          <CancelSharpIcon style={{ flex: 1, marginLeft: '90%', position: 'relative' }} onClick={() => {
-            setState({
-              file: null,
-              filePreviewUrl: null,
-            });
-            setIsSelected(false)
-          }} color="primary"
-            fontSize="large" />
+          <CancelSharpIcon
+            style={{ flex: 1, marginLeft: "90%", position: "relative" }}
+            onClick={() => {
+              setState({
+                file: null,
+                filePreviewUrl: null,
+              });
+              setIsSelected(false);
+            }}
+            color="primary"
+            fontSize="large"
+          />
           <ImageShow filePreviewUrl={state.filePreviewUrl} />
-        </>) : (
+        </>
+      ) : (
         <div
           className="content"
           id="scroll"
@@ -512,31 +659,59 @@ function UserChat(props) {
         >
           {messages.map((e, i) => {
             return (
-              <div key={i} style={{
-                marginTop: '2%',
-                overflow: 'auto'
-              }}>
+              <div
+                key={i}
+                style={{
+                  marginTop: "2%",
+                  overflow: "auto",
+                }}
+              >
                 {e.sender === loggedUser.username ? (
-                  <div >
+                  <div>
                     {e.media_link ? (
-                      <ImageView type={e.message_type} image={e.media_link} profile={profileSrc} text={e.message} sender={e.sender} time={e.time} />
+                      <ImageView
+                        type={e.message_type}
+                        image={e.media_link}
+                        profile={profileSrc}
+                        text={e.message}
+                        sender={e.sender}
+                        time={e.time}
+                      />
                     ) : (
-                      <TextView sender={'Me'} profile={profileSrc} text={e.message} time={e.time} />
+                      <TextView
+                        sender={"Me"}
+                        profile={profileSrc}
+                        text={e.message}
+                        time={e.time}
+                      />
                     )}
                   </div>
                 ) : (
-                  <div  >
+                  <div>
                     {e.media_link ? (
-                      <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
+                      <ImageView
+                        type={e.message_type}
+                        image={e.media_link}
+                        profile={e.profile}
+                        text={`${e.message}`}
+                        sender={e.sender}
+                        time={e.time}
+                        float={"left"}
+                      />
                     ) : (
-                      <TextView sender={e.sender} profile={e.profile} text={e.message} time={e.time} float={'left'} />
+                      <TextView
+                        sender={e.sender}
+                        profile={e.profile}
+                        text={e.message}
+                        time={e.time}
+                        float={"left"}
+                      />
                     )}
                   </div>
                 )}
               </div>
-            )
-          })
-          }
+            );
+          })}
           <Outlet />
         </div>
       )}
