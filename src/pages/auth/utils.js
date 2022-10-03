@@ -2,22 +2,22 @@ let localStorageGroup ={'group':{}, 'user': {}}
 localStorage.setItem("localStorageGroup", JSON.stringify(localStorageGroup));
 function getHost() {
 
-    var HOST = '';  
-    if (window.location.origin.includes("localhost")) { 
+    var HOST = '';
+    if (window.location.origin.includes("localhost")) {
         HOST = 'http://localhost:8000';
-        // HOST = 'http://192.168.29.187:8000';
-        // HOST = 'http://192.168.1.30:8000';
         console.log(HOST);
       }
-      else {
-      // HOST = 'http://192.168.29.147:8000';
-      // HOST = 'http://192.168.1.30:8000';
-      HOST = 'https://api.dreampotential.org'; 
+
+    else if (window.location.origin.includes("teacher-v2.alt-r.world")) {
+        HOST = 'https://python-base-api.alt-r.world';
+        console.log(HOST);
+    }
+    else {
+      HOST = 'https://api.dreampotential.org';
     }
     return HOST
-    
   }
-  
+
   function getServer()
   {
     var SERVER = '';
