@@ -53,40 +53,41 @@ function UserChat(props) {
       "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true",
   });
 
-  const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
-  const receiveMessageCountDictProp = props.receiveMessageCountDict;
+  // const [unreadMessageCountDict, setUnreadMessageCountDict] = useState(0);
+  // const receiveMessageCountDictProp = props.receiveMessageCountDict;
   var ws = props.websocket;
   var tempDict = {};
-  const recieveMessages = (userId, username) => {
-    console.log("recievemessages function is callled from userChat");
-    const userUniqeId = userId + username;
-    console.log(tempDict, "receiveMessageCountDict");
-    var recCount = 1;
-    console.log(tempDict[userUniqeId], "receiveMessageCountDict[userUniqeId]");
-    if (tempDict[userUniqeId]) {
-      recCount = tempDict[userUniqeId] + 1;
-      console.log("uniq id found");
-    } else {
-      console.log("uniqe id not found");
-      recCount = 1;
-    }
-    console.log(receiveMessageCountDictProp, "receiveMessageCountDictProp");
-    var countDict = {};
-    if (receiveMessageCountDictProp) {
-      // countDict = receiveMessageCountDictProp;
-      countDict = receiveMessageCountDictProp;
-    }
-    countDict[userUniqeId] = recCount;
-    console.log(countDict, "countDict......----");
-    tempDict = countDict;
-    // setReceiveMessageCountDict(countDict);
-    // console.log(receiveMessageCount,'receiveMessageCount');
-    console.log(tempDict, "setReceiveMessageCountDict");
-    props.receiveMessageCount({
-      receiveMessageCountDict: countDict,
-      userUniqeId,
-    });
-  };
+  console.log(receiverId,'==============================');
+  // const recieveMessages = (userId, username) => {
+  //   console.log("recievemessages function is callled from userChat");
+  //   const userUniqeId = userId + username;
+  //   console.log(tempDict, "receiveMessageCountDict");
+  //   var recCount = 1;
+  //   console.log(tempDict[userUniqeId], "receiveMessageCountDict[userUniqeId]");
+  //   if (tempDict[userUniqeId]) {
+  //     recCount = tempDict[userUniqeId] + 1;
+  //     console.log("uniq id found");
+  //   } else {
+  //     console.log("uniqe id not found");
+  //     recCount = 1;
+  //   }
+  //   console.log(receiveMessageCountDictProp, "receiveMessageCountDictProp");
+  //   var countDict = {};
+  //   if (receiveMessageCountDictProp) {
+  //     // countDict = receiveMessageCountDictProp;
+  //     countDict = receiveMessageCountDictProp;
+  //   }
+  //   countDict[userUniqeId] = recCount;
+  //   console.log(countDict, "countDict......----");
+  //   tempDict = countDict;
+  //   // setReceiveMessageCountDict(countDict);
+  //   // console.log(receiveMessageCount,'receiveMessageCount');
+  //   console.log(tempDict, "setReceiveMessageCountDict");
+  //   props.receiveMessageCount({
+  //     receiveMessageCountDict: countDict,
+  //     userUniqeId,
+  //   });
+  // };
 
   useEffect(() => {
     if (scrollBottom) {
@@ -293,7 +294,19 @@ function UserChat(props) {
       // listen to data sent from the websocket server
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
+      console.log(receivedObj,'receivedObj...............>>!');
+      tempDict[receivedObj.from_user.id + receivedObj.from_user.username] = receivedObj.unread_message_count
+          props.receiveMessageCount({
+          unreadMessageCountDict: tempDict,
+          unreadMessageCount: receivedObj.unread_message_count,
+          userUniqeId: receivedObj.from_user.id + receivedObj.from_user.username,
+          
+    });
+    console.log(tempDict,'tempdict from userchat.........>>>!');
+    
+    console.log(receiverId,receivedObj.from_user.id,'receiverId,receivedObj.from_user.id');
       if (receiverId === receivedObj.from_user.id) {
+        console.log(receiverId,receivedObj.from_user.id,'$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
         const massageTime = receivedObj?.created_at || "NA";
         const messageDate = new Date(massageTime);
         const message_type = receivedObj?.message_type;
@@ -322,13 +335,14 @@ function UserChat(props) {
         prevMsgs.push(msgObj);
         setMessages([...prevMsgs]);
       }
-      recieveMessages(
-        // receiveMessageCountDict,
-        // receivedObj?.to_user.id,
-        // receivedObj?.to_user.username
-        receivedObj?.from_user.id,
-        receivedObj?.from_user.username
-      );
+      // console.log(messages,'messages...........>!');
+      // recieveMessages(
+      //   // receiveMessageCountDict,
+      //   // receivedObj?.to_user.id,
+      //   // receivedObj?.to_user.username
+      //   receivedObj?.from_user.id,
+      //   receivedObj?.from_user.username
+      // );
     };
   }, [messages]);
 
@@ -635,7 +649,7 @@ function UserChat(props) {
       )}
 
       {state.file ? (
-        <>
+        <div>
           <CancelSharpIcon
             style={{ flex: 1, marginLeft: "90%", position: "relative" }}
             onClick={() => {
@@ -649,7 +663,7 @@ function UserChat(props) {
             fontSize="large"
           />
           <ImageShow filePreviewUrl={state.filePreviewUrl} />
-        </>
+        </div>
       ) : (
         <div
           className="content"

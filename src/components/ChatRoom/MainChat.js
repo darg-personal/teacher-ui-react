@@ -288,7 +288,8 @@ function MainChat(props) {
   };
   //useEffect
   useEffect(() => {
-    if (scrollBottom) {
+    const { scrollTop } = scrollBottom.current;
+    if (scrollBottom && scrollTop !== 0) {
       scrollBottom.current.addEventListener("DOMNodeInserted", (event) => {
         const { currentTarget: target } = event;
         target.scroll({ top: target.scrollHeight, behavior: "smooth" });

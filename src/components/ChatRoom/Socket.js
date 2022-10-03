@@ -21,7 +21,7 @@ export class Socket extends Component {
             show: false,
             isConnected: true,
             userStatus: {},
-            receiveMessageCountDict: {},
+            unreadMessageCountDict: {},
             receiveMessageCount: 0,
             chatroomUniqeId: 0,
             userUniqeId: 0,
@@ -30,6 +30,7 @@ export class Socket extends Component {
     }
 
     pull_data = (data) => {
+        console.log(data,'dataaaaaa.................>>>>>>!');
         this.setState({ chatRoom: data.name });
         this.setState({ chatRoomId: data.id });
         this.setState({ type: data.type });
@@ -40,8 +41,8 @@ export class Socket extends Component {
     };
     pullReceiveMessageCount = (data) => {
         console.log(data, "...............DAttaaaa");
-        console.log(data.receiveMessageCountDict, "data.receiveMessageCountDict");
-        this.setState({ receiveMessageCountDict: data.receiveMessageCountDict });
+        console.log(data.unreadMessageCountDict, "data.unreadMessageCountDict");
+        this.setState({ unreadMessageCountDict: data.unreadMessageCountDict });
         this.setState({ chatroomUniqeId: data.uniqeId });
         this.setState({ userUniqeId: data.userUniqeId });
 
@@ -104,7 +105,6 @@ export class Socket extends Component {
 
     check = (cRoom, id, type, isConnected) => {
         const { ws, userStatus } = this.state;
-        console.log(ws, userStatus, "---0", isConnected);
         if (cRoom in ws) {
             if (!ws[cRoom] || ws[cRoom].readyState == WebSocket.CLOSED) {
                 if (cRoom)
@@ -114,7 +114,6 @@ export class Socket extends Component {
             this.setState({ isConnected: userStatus[cRoom] })
         }
         else {
-            console.log(" key not exiest");
             if (cRoom)
                 this.connect(cRoom, id, type, isConnected);
         }
@@ -148,7 +147,7 @@ export class Socket extends Component {
                         isConnected={this.state.isConnected}
                         show={this.getUserInfo}
                         receiveMessageCount={this.pullReceiveMessageCount}
-                        receiveMessageCountDict={this.state.receiveMessageCountDict}
+                        // receiveMessageCountDict={this.state.receiveMessageCountDict}
                     />
                 );
             }
@@ -163,7 +162,7 @@ export class Socket extends Component {
                         isConnected={this.state.isConnected}
                         show={this.getUserInfo}
                         receiveMessageCount={this.pullReceiveMessageCount}
-                        receiveMessageCountDict={this.state.receiveMessageCountDict}
+                        // receiveMessageCountDict={this.state.receiveMessageCountDict}
 
                     />
                 );
@@ -187,7 +186,7 @@ export class Socket extends Component {
                             receiveMessageCount={this.state.receiveMessageCount}
                             chatroomUniqeId={this.state.chatroomUniqeId}
                             userUniqeId={this.state.userUniqeId}
-                            receiveMessageCountDict={this.state.receiveMessageCountDict}
+                            unreadMessageCountDict={this.state.unreadMessageCountDict}
                         />
                         {this.chatMethod()}
                     </div>

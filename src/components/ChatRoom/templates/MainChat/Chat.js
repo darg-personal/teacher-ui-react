@@ -24,6 +24,7 @@ export function ImageView({
     time,
     float = "right",
 }) {
+    console.log(image,'image...................!');
     return (
         <div className="darker" id={float}>
             <Card

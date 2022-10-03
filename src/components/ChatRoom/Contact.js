@@ -15,57 +15,87 @@ function Contact(props) {
   const [isActive, setIsActive] = useState();
   const activeUser = props.activeUser;
 
-  const [notificationCountForClass, setNotificationCountForClass] = useState({});
+  // const [notificationCountForClass, setNotificationCountForClass] = useState({});
   const [notificationCountForUser, setNotificationCountForUser] = useState({});
+  const [wsState, setWsState] = useState({});
+  const [tempState, setTempState] = useState(null);
 
-  const receiveMessageCountDict = props.receiveMessageCountDict;
+  const unreadMessageCountDict = props.unreadMessageCountDict;
   const userUniqeId = props.userUniqeId;
-  const chatroomId = props.chatroomUniqeId;
+  // const unreadMessageCount = props.unreadMessageCount;
+  // const chatroomId = props.chatroomUniqeId;
+
+  // useEffect(() => {
+  //   setNotificationCountForClass({
+  //     ...notificationCountForClass,
+  //     [chatroomId]: receiveMessageCountDict[chatroomId],
+  //   });
+  // }, [chatroomId, receiveMessageCountDict[chatroomId]]);
 
   useEffect(() => {
-    console.log(props, "props......");
-    setNotificationCountForClass({
-      ...notificationCountForClass,
-      [chatroomId]: receiveMessageCountDict[chatroomId],
-    });
-  }, [chatroomId, receiveMessageCountDict[chatroomId]]);
-
-  useEffect(() => {
-    console.log(props, "props......");
     setNotificationCountForUser({
       ...notificationCountForUser,
-      [userUniqeId]: receiveMessageCountDict[userUniqeId],
+      [userUniqeId]: unreadMessageCountDict[userUniqeId],
     });
-  }, [userUniqeId, receiveMessageCountDict[userUniqeId]]);
+  }, [userUniqeId, unreadMessageCountDict[userUniqeId]]);
 
 
   useEffect(() => {
     setIsActive(activeUser.chatRoom)
   }, [activeUser])
 
-  // useEffect(() => {
-  //   getGroupData();
-  // }, [activeUser]);
-
   useEffect(() => {
     getGroupData();
-  }, []);
-  const getGroupData = () => {
-    axios
-      .get(`${utils.getHost()}/chat/get/user_connected_list/`, {
-        headers: {
-          Authorization: `Bearer ${Token}`,
-        },
-      })
-      .then((response) => {
-        const groups = response.data;
-        const prevGroup = [];
-        const temp = groups.results.length;
-        for (let i = 0; i < temp; i++) {
-          if (groups.results[i].type === "Channel") {
-            const receivedObj = groups?.results[i].Channel;
+  }, [activeUser]);
+  
+  // const connect = (cRoom, userId, type, isConnected) => {
+  //   console.log(`Connnnect calll for ${cRoom}`);
+  //   setTempState(null);
+  //   const ws = [];
+  //   if (type == "Channel")
+  //       ws.push(
+  //           new WebSocket(
+  //               `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${cRoom}`
+  //           )
+  //       );
+  //   else
+  //       ws.push(
+  //           new WebSocket(
+  //               `${utils.getWebsocketHost()}/msg/user/?token=${Token}&receiver_id=${userId}`
+  //           )
+  //       );
+  //   const getSocket = ws[0];
+  //   getSocket.onopen = () => {
+  //       var chatroom = cRoom;
+  //       var wsdict = wsState;
+  //       wsdict[chatroom] = getSocket;
+  //       setTempState(getSocket);
+  //       setWsState(wsdict)
+  //     };
+  //   };
+  //   console.log(wsState,'wsState.................>>>>>!');
+
+useEffect(() => {
+  getGroupData();
+}, []);
+const getGroupData = () => {
+  axios
+  .get(`${utils.getHost()}/chat/get/user_connected_list/`, {
+    headers: {
+      Authorization: `Bearer ${Token}`,
+    },
+  })
+  .then((response) => {
+    const groups = response.data;
+    const prevGroup = [];
+    const temp = groups.results.length;
+    for (let i = 0; i < temp; i++) {
+      if (groups.results[i].type === "Channel") {
+        const receivedObj = groups?.results[i].Channel;
+        // connect(receivedObj?.name,receivedObj?.id,'Channel')
             prevGroup.push({
-              id: i,
+              // id: i,
+              id: receivedObj?.id,
               name: receivedObj?.name,
               created_at: receivedObj?.created_at,
               typeId: receivedObj?.id,
@@ -77,9 +107,11 @@ function Contact(props) {
           }
           else {
             const receivedObj = groups?.results[i]?.user;
+            // connect(receivedObj?.username,receivedObj?.id,'user')
             if (login_user?.username !== receivedObj?.username) {
               prevGroup.push({
-                id: i,
+                // id: i,
+                id: receivedObj?.id,
                 name: receivedObj?.username,
                 created_at: receivedObj?.created_at,
                 typeId: receivedObj?.id,
@@ -107,12 +139,13 @@ function Contact(props) {
     setNotificationCountForUser({
       [userUniqeId]: 0,
     });
-    setNotificationCountForClass({
-      [chatroomId]: 0,
-    });
+    // setNotificationCountForClass({
+    //   [chatroomId]: 0,
+    // });
+    console.log(value,'value............>!');
     props.type({
-      name: value.name, type: value.type, id: value.typeId, image: value.image,
-      isConnected: value.isConnected,about :value.about
+      name: value.name, type: value.type, id: value.id, image: value.image,
+      isConnected: value.isConnected,about: value.about
     });
   };
 
@@ -133,11 +166,13 @@ function Contact(props) {
               e.name !== isActive ? (
                 e.type === "Channel" ? (
                   <Badge
-                    badgeContent={notificationCountForClass[e.id + e.name] || 0}
+                    badgeContent={2}
+                    // badgeContent={notificationCountForClass[e.id + e.name] || 0}
                     color="success"
                   ></Badge>
                 ) : (
                   <Badge
+                    // badgeContent={5}
                     badgeContent={notificationCountForUser[e.id + e.name] || 0}
                     color="success"
                   ></Badge>
