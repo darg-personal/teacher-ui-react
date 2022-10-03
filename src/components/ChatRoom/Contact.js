@@ -136,9 +136,11 @@ const getGroupData = () => {
 
   const handleClick = (value) => {
     setIsActive(value.name);
+    if(value.id + value.name == userUniqeId){
     setNotificationCountForUser({
       [userUniqeId]: 0,
     });
+  }
     // setNotificationCountForClass({
     //   [chatroomId]: 0,
     // });
