@@ -17,13 +17,9 @@ function Contact(props) {
 
   // const [notificationCountForClass, setNotificationCountForClass] = useState({});
   const [notificationCountForUser, setNotificationCountForUser] = useState({});
-  const [wsState, setWsState] = useState({});
-  const [tempState, setTempState] = useState(null);
 
   const unreadMessageCountDict = props.unreadMessageCountDict;
   const userUniqeId = props.userUniqeId;
-  // const unreadMessageCount = props.unreadMessageCount;
-  // const chatroomId = props.chatroomUniqeId;
 
   // useEffect(() => {
   //   setNotificationCountForClass({
@@ -39,60 +35,27 @@ function Contact(props) {
     });
   }, [userUniqeId, unreadMessageCountDict[userUniqeId]]);
 
-
   useEffect(() => {
-    setIsActive(activeUser.chatRoom)
-  }, [activeUser])
+    setIsActive(activeUser.chatRoom);
+  }, [activeUser]);
 
   useEffect(() => {
     getGroupData();
-  }, [activeUser]);
-  
-  // const connect = (cRoom, userId, type, isConnected) => {
-  //   console.log(`Connnnect calll for ${cRoom}`);
-  //   setTempState(null);
-  //   const ws = [];
-  //   if (type == "Channel")
-  //       ws.push(
-  //           new WebSocket(
-  //               `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${cRoom}`
-  //           )
-  //       );
-  //   else
-  //       ws.push(
-  //           new WebSocket(
-  //               `${utils.getWebsocketHost()}/msg/user/?token=${Token}&receiver_id=${userId}`
-  //           )
-  //       );
-  //   const getSocket = ws[0];
-  //   getSocket.onopen = () => {
-  //       var chatroom = cRoom;
-  //       var wsdict = wsState;
-  //       wsdict[chatroom] = getSocket;
-  //       setTempState(getSocket);
-  //       setWsState(wsdict)
-  //     };
-  //   };
-  //   console.log(wsState,'wsState.................>>>>>!');
-
-useEffect(() => {
-  getGroupData();
-}, []);
-const getGroupData = () => {
-  axios
-  .get(`${utils.getHost()}/chat/get/user_connected_list/`, {
-    headers: {
-      Authorization: `Bearer ${Token}`,
-    },
-  })
-  .then((response) => {
-    const groups = response.data;
-    const prevGroup = [];
-    const temp = groups.results.length;
-    for (let i = 0; i < temp; i++) {
-      if (groups.results[i].type === "Channel") {
-        const receivedObj = groups?.results[i].Channel;
-        // connect(receivedObj?.name,receivedObj?.id,'Channel')
+  }, []);
+  const getGroupData = () => {
+    axios
+      .get(`${utils.getHost()}/chat/get/user_connected_list/`, {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+        },
+      })
+      .then((response) => {
+        const groups = response.data;
+        const prevGroup = [];
+        const temp = groups.results.length;
+        for (let i = 0; i < temp; i++) {
+          if (groups.results[i].type === "Channel") {
+            const receivedObj = groups?.results[i].Channel;
             prevGroup.push({
               // id: i,
               id: receivedObj?.id,
@@ -102,12 +65,10 @@ const getGroupData = () => {
               image: receivedObj?.image || Avatar,
               type: "Channel",
               isConnected: groups?.results[i].designation,
-              about: receivedObj?.about
+              about: receivedObj?.about,
             });
-          }
-          else {
+          } else {
             const receivedObj = groups?.results[i]?.user;
-            // connect(receivedObj?.username,receivedObj?.id,'user')
             if (login_user?.username !== receivedObj?.username) {
               prevGroup.push({
                 // id: i,
@@ -118,7 +79,7 @@ const getGroupData = () => {
                 image: groups.results[i].user_profile.image || Avatar,
                 type: "user",
                 isConnected: 1,
-                about: groups.results[i]?.user_profile?.about
+                about: groups.results[i]?.user_profile?.about,
               });
             }
           }
@@ -136,18 +97,21 @@ const getGroupData = () => {
 
   const handleClick = (value) => {
     setIsActive(value.name);
-    if(value.id + value.name == userUniqeId){
-    setNotificationCountForUser({
-      [userUniqeId]: 0,
-    });
-  }
+    if (value.id + value.name == userUniqeId) {
+      setNotificationCountForUser({
+        [userUniqeId]: 0,
+      });
+    }
     // setNotificationCountForClass({
     //   [chatroomId]: 0,
     // });
-    console.log(value,'value............>!');
     props.type({
-      name: value.name, type: value.type, id: value.id, image: value.image,
-      isConnected: value.isConnected,about: value.about
+      name: value.name,
+      type: value.type,
+      id: value.id,
+      image: value.image,
+      isConnected: value.isConnected,
+      about: value.about,
     });
   };
 
@@ -164,29 +128,25 @@ const getGroupData = () => {
               <Avatar alt={e.name} src={e.image} />
             </ListItemAvatar>
             <ListItemText primary={e.name} secondary="last seen 08:00" />
-            {
-              e.name !== isActive ? (
-                e.type === "Channel" ? (
-                  <Badge
-                    badgeContent={2}
-                    // badgeContent={notificationCountForClass[e.id + e.name] || 0}
-                    color="success"
-                  ></Badge>
-                ) : (
-                  <Badge
-                    // badgeContent={5}
-                    badgeContent={notificationCountForUser[e.id + e.name] || 0}
-                    color="success"
-                  ></Badge>
-                )
-              ) : null
+            {e.name !== isActive ? (
+              e.type === "Channel" ? (
+                <Badge
+                  badgeContent={0}
+                  // badgeContent={notificationCountForClass[e.id + e.name] || 0}
+                  color="success"
+                ></Badge>
+              ) : (
+                <Badge
+                  badgeContent={notificationCountForUser[e.id + e.name] || 0}
+                  color="success"
+                ></Badge>
+              )
+            ) : null
             }
-
           </div>
-
         ))}
       </div>
-    </  >
+    </>
   );
 }
 
