@@ -496,7 +496,7 @@ function UserChat(props) {
         <RenderInWindow>
           <div>
             <JitsiMeeting
-              domain={"192.168.29.147:8443"}
+              domain={"18.117.227.68:9011"}
               roomName="PleaseUseAGoodRoomName"
               configOverwrite={{
                 toolbarButtons: [

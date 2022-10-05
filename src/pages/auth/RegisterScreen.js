@@ -48,10 +48,9 @@ const RegisterScreen = () => {
         fieldItems[index].value = value;
         fieldItems[index].hasError = value === ''
         updateFields(fieldItems)
-        console.log("input value", fieldItems)
-    }
 
-    console.log(fields, "===============");
+    }
+    
     return <div className={'login-section page-container'}>
         <div className={'auth-container'}>
             <div className={'auth-logo'}>
