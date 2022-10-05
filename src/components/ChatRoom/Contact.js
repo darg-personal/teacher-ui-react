@@ -15,37 +15,29 @@ function Contact(props) {
   const [isActive, setIsActive] = useState();
   const activeUser = props.activeUser;
 
-  const [notificationCountForClass, setNotificationCountForClass] = useState({});
+  // const [notificationCountForClass, setNotificationCountForClass] = useState({});
   const [notificationCountForUser, setNotificationCountForUser] = useState({});
 
-  const receiveMessageCountDict = props.receiveMessageCountDict;
+  const unreadMessageCountDict = props.unreadMessageCountDict;
   const userUniqeId = props.userUniqeId;
-  const chatroomId = props.chatroomUniqeId;
-
-  useEffect(() => {
-    console.log(props, "props......");
-    setNotificationCountForClass({
-      ...notificationCountForClass,
-      [chatroomId]: receiveMessageCountDict[chatroomId],
-    });
-  }, [chatroomId, receiveMessageCountDict[chatroomId]]);
-
-  useEffect(() => {
-    console.log(props, "props......");
-    setNotificationCountForUser({
-      ...notificationCountForUser,
-      [userUniqeId]: receiveMessageCountDict[userUniqeId],
-    });
-  }, [userUniqeId, receiveMessageCountDict[userUniqeId]]);
-
-
-  useEffect(() => {
-    setIsActive(activeUser.chatRoom)
-  }, [activeUser])
 
   // useEffect(() => {
-  //   getGroupData();
-  // }, [activeUser]);
+  //   setNotificationCountForClass({
+  //     ...notificationCountForClass,
+  //     [chatroomId]: receiveMessageCountDict[chatroomId],
+  //   });
+  // }, [chatroomId, receiveMessageCountDict[chatroomId]]);
+
+  useEffect(() => {
+    setNotificationCountForUser({
+      ...notificationCountForUser,
+      [userUniqeId]: unreadMessageCountDict[userUniqeId],
+    });
+  }, [userUniqeId, unreadMessageCountDict[userUniqeId]]);
+
+  useEffect(() => {
+    setIsActive(activeUser.chatRoom);
+  }, [activeUser]);
 
   useEffect(() => {
     getGroupData();
@@ -65,28 +57,29 @@ function Contact(props) {
           if (groups.results[i].type === "Channel") {
             const receivedObj = groups?.results[i].Channel;
             prevGroup.push({
-              id: i,
+              // id: i,
+              id: receivedObj?.id,
               name: receivedObj?.name,
               created_at: receivedObj?.created_at,
               typeId: receivedObj?.id,
               image: receivedObj?.image || Avatar,
               type: "Channel",
               isConnected: groups?.results[i].designation,
-              about: receivedObj?.about
+              about: receivedObj?.about,
             });
-          }
-          else {
+          } else {
             const receivedObj = groups?.results[i]?.user;
             if (login_user?.username !== receivedObj?.username) {
               prevGroup.push({
-                id: i,
+                // id: i,
+                id: receivedObj?.id,
                 name: receivedObj?.username,
                 created_at: receivedObj?.created_at,
                 typeId: receivedObj?.id,
                 image: groups.results[i].user_profile.image || Avatar,
                 type: "user",
                 isConnected: 1,
-                about: groups.results[i]?.user_profile?.about
+                about: groups.results[i]?.user_profile?.about,
               });
             }
           }
@@ -104,15 +97,21 @@ function Contact(props) {
 
   const handleClick = (value) => {
     setIsActive(value.name);
-    setNotificationCountForUser({
-      [userUniqeId]: 0,
-    });
-    setNotificationCountForClass({
-      [chatroomId]: 0,
-    });
+    if (value.id + value.name == userUniqeId) {
+      setNotificationCountForUser({
+        [userUniqeId]: 0,
+      });
+    }
+    // setNotificationCountForClass({
+    //   [chatroomId]: 0,
+    // });
     props.type({
-      name: value.name, type: value.type, id: value.typeId, image: value.image,
-      isConnected: value.isConnected,about :value.about
+      name: value.name,
+      type: value.type,
+      id: value.id,
+      image: value.image,
+      isConnected: value.isConnected,
+      about: value.about,
     });
   };
 
@@ -129,27 +128,25 @@ function Contact(props) {
               <Avatar alt={e.name} src={e.image} />
             </ListItemAvatar>
             <ListItemText primary={e.name} secondary="last seen 08:00" />
-            {
-              e.name !== isActive ? (
-                e.type === "Channel" ? (
-                  <Badge
-                    badgeContent={notificationCountForClass[e.id + e.name] || 0}
-                    color="success"
-                  ></Badge>
-                ) : (
-                  <Badge
-                    badgeContent={notificationCountForUser[e.id + e.name] || 0}
-                    color="success"
-                  ></Badge>
-                )
-              ) : null
+            {e.name !== isActive ? (
+              e.type === "Channel" ? (
+                <Badge
+                  badgeContent={0}
+                  // badgeContent={notificationCountForClass[e.id + e.name] || 0}
+                  color="success"
+                ></Badge>
+              ) : (
+                <Badge
+                  badgeContent={notificationCountForUser[e.id + e.name] || 0}
+                  color="success"
+                ></Badge>
+              )
+            ) : null
             }
-
           </div>
-
         ))}
       </div>
-    </  >
+    </>
   );
 }
 
