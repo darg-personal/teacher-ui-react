@@ -17,9 +17,12 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import VideocamIcon from "@mui/icons-material/Videocam";
-
 import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
 import Record from "./Recorder";
+import ReactDOM from "react-dom";
+import { JitsiMeeting } from '@jitsi/react-sdk';
+import CallIcon from '@mui/icons-material/Call';
+
 
 function MainChat(props) {
 
@@ -223,6 +226,136 @@ function MainChat(props) {
       document.getElementById("inp").value = "";
     }
   }
+  const videoNode = document.createElement("div");
+  function videoCall(event) {
+    event.preventDefault();
+    console.log("Video call");
+    document.body.appendChild(videoNode);
+    videoNode.style.height = "300px";
+    videoNode.style.width = "600px";
+    videoNode.style.position = "relative"
+    const PopupContent = () => {
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          message_type: "message/text",
+          media_link: "",
+          message_text: "https://18.117.227.68:9011/videocall",
+        })
+      );
+      return (
+        <div>
+<JitsiMeeting
+    domain = { "18.117.227.68:9011" }
+    roomName = "videocall"
+    configOverwrite = {{
+      toolbarButtons:['microphone', 'hangup','settings','camera',],
+      buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
+      hiddenPremeetingButtons: ['invite'],
+      // filmstrip:
+      notifications: [],
+        startWithAudioMuted: true,
+        disableModeratorIndicator: true,
+        startScreenSharing: true,
+        enableEmailInStats: false
+    }}
+    interfaceConfigOverwrite = {{
+        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+    }}
+    userInfo = {{
+        displayName: 'YOUR_USERNAME'
+    }}
+    onApiReady = { (externalApi) => {
+        // here you can attach custom event listeners to the Jitsi Meet External API
+        // you can also store it locally to execute commands
+    } }
+    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '600px'; } }
+/>
+          <button
+            style={{
+              position: "relative",
+              top: "5%",
+              // left: "80%",
+            }}
+            onClick={clear}
+          >
+            C-Call
+          </button>
+        </div>
+      );
+    };
+    const clear = () => {
+      ReactDOM.unmountComponentAtNode(videoNode);
+      videoNode.remove();
+    };
+    ReactDOM.render(<PopupContent />, videoNode);
+  }
+
+// const uniqueString = require("uuid").uuid.v4();
+  const voiceNode = document.createElement("div");
+  async function voiceCall(event) {
+    event.preventDefault();
+    console.log("voiceCall");
+    document.body.appendChild(voiceNode);
+    voiceNode.style.height = "300px";
+    voiceNode.style.width = "600px";
+    voiceNode.style.position = "relative"
+    const PopupContent = () => {
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          message_type: "message/text",
+          media_link: "",
+          message_text: "https://18.117.227.68:9011/voicecall",
+        })
+      );
+      return (
+        <div>
+<JitsiMeeting
+    domain = { "18.117.227.68:9011" }
+    roomName = "voicecall"
+    configOverwrite = {{
+      toolbarButtons:['microphone', 'hangup','settings'],
+      buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
+      hiddenPremeetingButtons: ['camera','invite','select-background'],
+      
+      notifications: [],
+        startWithAudioMuted: true,
+        disableModeratorIndicator: true,
+        startScreenSharing: true,
+        enableEmailInStats: false
+    }}
+    interfaceConfigOverwrite = {{
+        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+    }}
+    userInfo = {{
+        displayName: 'YOUR_USERNAME'
+    }}
+    onApiReady = { (externalApi) => {
+        // here you can attach custom event listeners to the Jitsi Meet External API
+        // you can also store it locally to execute commands
+    } }
+    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '600px'; } }
+/>
+          <button
+            style={{
+              position: "absolute",
+              top: "5%",
+              // left: "80%",
+            }}
+            onClick={clear}
+          >
+            C-Call
+          </button>
+        </div>
+      );
+    };
+    const clear = () => {
+      ReactDOM.unmountComponentAtNode(voiceNode);
+      voiceNode.remove();
+    };
+    ReactDOM.render(<PopupContent />, voiceNode);
+  }
   //OnScroll fetch more data from pagination api
   function updateData(value) {
     axios
@@ -402,16 +535,30 @@ function MainChat(props) {
         </div>
       </div>
       <div className="position-fixed  end-0">
+      <CallIcon
+         style={{
+          color: "white",
+          position: "relative",
+          right: "200",
+          top: "15",
+          fontSize: "40",
+          cursor: "pointer",}}
+          onClick={voiceCall}
+          >
+          
+          </CallIcon> 
+  
+
         <VideocamIcon
           style={{
             color: "white",
-            position: "absolute",
+            position: "relative",
             right: "100",
             top: "15",
             fontSize: "40",
             cursor: "pointer",
           }}
-          onClick={handelclickpopupcall}
+           onClick={videoCall}
         >
         </VideocamIcon>
       </div>

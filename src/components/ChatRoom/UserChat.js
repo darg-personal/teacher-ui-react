@@ -27,6 +27,8 @@ import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import Record from "./Recorder";
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { createPortal } from "react-dom";
+import { VideoCall } from "@mui/icons-material";
+import CallIcon from '@mui/icons-material/Call';
 
 function UserChat(props) {
   let Token = localStorage.getItem("token");
@@ -141,6 +143,144 @@ function UserChat(props) {
       document.getElementById("inp").value = "";
     }
   }
+
+  const videoNode = document.createElement("div");
+  function videoCall(event) {
+    event.preventDefault();
+    console.log("Video call");
+    document.body.appendChild(videoNode);
+    videoNode.style.height = "300px";
+    videoNode.style.width = "600px";
+    videoNode.style.position = "relative"
+    const PopupContent = () => {
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          message_type: "message/videocall",
+          media_link: "",
+          message_text: "https://18.117.227.68:9011/videocall",
+        })
+      );
+      return (
+        <div>
+<JitsiMeeting
+    domain = { "18.117.227.68:9011" }
+    roomName = "videocall"
+    configOverwrite = {{
+      toolbarButtons:['microphone', 'hangup','settings','camera',],
+      buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
+      hiddenPremeetingButtons: ['invite'],
+      // filmstrip:
+      notifications: [],
+        startWithAudioMuted: true,
+        disableModeratorIndicator: true,
+        startScreenSharing: true,
+        enableEmailInStats: false
+    }}
+    interfaceConfigOverwrite = {{
+        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+    }}
+    userInfo = {{
+        displayName: 'YOUR_USERNAME'
+    }}
+    onApiReady = { (externalApi) => {
+        // here you can attach custom event listeners to the Jitsi Meet External API
+        // you can also store it locally to execute commands
+    } }
+    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '600px'; } }
+/>
+          <button
+            style={{
+              position: "relative",
+              top: "5%",
+              // left: "80%",
+            }}
+            onClick={clear}
+          >
+            C-Call
+          </button>
+        </div>
+      );
+    };
+    const clear = () => {
+      ReactDOM.unmountComponentAtNode(videoNode);
+      videoNode.remove();
+    };
+    ReactDOM.render(<PopupContent />, videoNode);
+  }
+
+// const uniqueString = require("uuid").uuid.v4();
+  const voiceNode = document.createElement("div");
+  async function voiceCall(event) {
+    event.preventDefault();
+    console.log("voiceCall");
+    document.body.appendChild(voiceNode);
+    voiceNode.style.height = "300px";
+    voiceNode.style.width = "600px";
+    voiceNode.style.position = "relative"
+    const PopupContent = () => {
+      ws.send(
+        JSON.stringify({
+          meta_attributes: "react",
+          message_type: "message/videocall",
+          media_link: "",
+          message_text: "https://18.117.227.68:9011/voicecall",
+        })
+      );
+      return (
+        <div>
+<JitsiMeeting
+    domain = { "18.117.227.68:9011" }
+    roomName = "voicecall"
+    configOverwrite = {{
+      toolbarButtons:['microphone', 'hangup','settings'],
+      buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
+      hiddenPremeetingButtons: ['camera','invite','select-background'],
+      
+      notifications: [],
+        startWithAudioMuted: true,
+        disableModeratorIndicator: true,
+        startScreenSharing: true,
+        enableEmailInStats: false
+    }}
+    interfaceConfigOverwrite = {{
+        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+    }}
+    userInfo = {{
+        displayName: 'YOUR_USERNAME'
+    }}
+    onApiReady = { (externalApi) => {
+        // here you can attach custom event listeners to the Jitsi Meet External API
+        // you can also store it locally to execute commands
+    } }
+    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '600px'; } }
+/>
+          <button
+            style={{
+              position: "absolute",
+              top: "5%",
+              // left: "80%",
+            }}
+            onClick={clear}
+          >
+            C-Call
+          </button>
+        </div>
+      );
+    };
+    const clear = () => {
+      ReactDOM.unmountComponentAtNode(voiceNode);
+      voiceNode.remove();
+    };
+    ReactDOM.render(<PopupContent />, voiceNode);
+  }
+
+
+
+
+
+
+
   useEffect(() => {
     console.log(
       `web socket connection created for ${userName},${receiverId}!!`
@@ -365,43 +505,7 @@ function UserChat(props) {
     setOpen(false);
   };
 
-  function handelclickpopupcall(event) {
-    event.preventDefault();
-    setOpen(true);
-    ws.send(
-      JSON.stringify({
-        meta_attributes: "react",
-        message_type: "message/videocall",
-        media_link: `https://18.117.227.68:9011/${userName}`,
-        message_text: null,
-      })
-    );
-
-    let messageDate = new Date();
-    let timeNow = messageDate.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    const date = messageDate.toLocaleDateString("en-US", {
-      weekday: "short",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    let a = {
-      sender: loggedUser.username,
-      time: timeNow,
-      date: date,
-      meta_attributes: "react",
-      message_type: "message/videocall",
-      media_link: `https://18.117.227.68:9011/${userName}`,
-      message_text: null,
-      profile: getChatImage,
-    };
-    const prevMsgs = [...messages];
-    prevMsgs.push(a);
-    setMessages([...prevMsgs]);
-  }
+ 
 
   const RenderInWindow = (props) => {
     const [container, setContainer] = useState(null);
@@ -427,18 +531,7 @@ function UserChat(props) {
     return container && createPortal(props.children, container);
   };
 
-  function answer(data) {
-    function popupWindow(url, windowName, win, w, h, username) {
-      const y = win.top.outerHeight / 2 + win.top.screenY - h / 2;
-      const x = win.top.outerWidth / 2 + win.top.screenX - w / 2;
-      return win.open(
-        url,
-        windowName,
-        `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`
-      );
-    }
-    popupWindow(data, "test", window, 800, 600);
-  }
+
 
   const [open, setOpen] = useState();
   return (
@@ -452,12 +545,25 @@ function UserChat(props) {
       />
       {open && (
         <div className="position-fixed  end-0">
-          <Button onClick={() => answer("https://18.117.227.68:9011")}>
+          {/* <Button onClick={() => answer("https://18.117.227.68:9011")}>
             Answer
-          </Button>
+          </Button> */}
         </div>
       )}
       <div className="position-fixed  end-0">
+      <CallIcon
+         style={{
+          color: "white",
+          position: "absolute",
+          right: "200",
+          top: "15",
+          fontSize: "40",
+          cursor: "pointer",}}
+          onClick={voiceCall}
+          >
+          
+          </CallIcon> 
+
         <VideocamIcon
           style={{
             color: "white",
@@ -467,9 +573,8 @@ function UserChat(props) {
             fontSize: "40",
             cursor: "pointer",
           }}
-          // onClick={() => setOpen(true)}
-          onClick={handelclickpopupcall}
-          // onClick={handleClickCall}
+        onClick={videoCall}
+        
         ></VideocamIcon>
       </div>
       <div className="position-fixed  end-0">
