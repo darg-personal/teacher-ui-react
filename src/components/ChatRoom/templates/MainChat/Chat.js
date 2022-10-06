@@ -24,6 +24,7 @@ export function ImageView({
     time,
     float = "right",
 }) {
+    console.log(image,'image...................!');
     return (
         <div className="darker" id={float}>
             <Card
@@ -48,7 +49,7 @@ export function ImageView({
                         <audio src={image} controls />
                     </li>
                 )}
-                t
+
                 {type === "image/jpeg" && (
                     <img
                         height="210px"
