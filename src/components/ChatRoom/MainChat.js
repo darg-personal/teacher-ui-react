@@ -139,7 +139,7 @@ function MainChat(props) {
     ws.onmessage = (evt) => {
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
-      console.log(receivedObj.channel, "=========on message========");
+      console.log(receivedObj, "=========on message========");
 
       if (chatroomId === receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
@@ -235,6 +235,7 @@ function MainChat(props) {
     videoNode.style.width = "600px";
     videoNode.style.position = "relative"
     const PopupContent = () => {
+      console.log("inside videoCall");
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
@@ -242,7 +243,8 @@ function MainChat(props) {
           media_link: "",
           message_text: "https://18.117.227.68:9011/videocall",
         })
-      );
+        );
+        console.log("inside videoCall");
       return (
         <div>
 <JitsiMeeting
@@ -301,6 +303,8 @@ function MainChat(props) {
     voiceNode.style.width = "600px";
     voiceNode.style.position = "relative"
     const PopupContent = () => {
+      console.log("inside voiceCall");
+
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
@@ -309,6 +313,8 @@ function MainChat(props) {
           message_text: "https://18.117.227.68:9011/voicecall",
         })
       );
+      console.log("inside voiceCall");
+
       return (
         <div>
 <JitsiMeeting
@@ -630,7 +636,7 @@ function MainChat(props) {
         </div>
       )
       }
-      {isConnected == 0 ?
+    
         <div className="box">
           <form>
             <input
@@ -648,21 +654,8 @@ function MainChat(props) {
             <Record onStopRecording={onStopRecording}></Record>
           </form>
         </div>
-        :
-        <>
-          <Card style={{ marginLeft: '25%', alignSelf: 'center' }}>
-            {isConnected == 5 ?
-              <p style={{ alignSelf: 'center' }}>
-                This Group Is no Longer Exist...
-              </p>
-              :
-              <p style={{ alignSelf: 'center' }}>
-                Please Join The Group to chat
-              </p>
-            }
-          </Card>
-        </>
-      }
+       
+    
     </div >
   );
 }

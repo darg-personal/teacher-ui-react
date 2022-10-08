@@ -156,7 +156,7 @@ function UserChat(props) {
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
-          message_type: "message/videocall",
+          message_type: "message/text",
           media_link: "",
           message_text: "https://18.117.227.68:9011/videocall",
         })
@@ -222,7 +222,7 @@ function UserChat(props) {
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
-          message_type: "message/videocall",
+          message_type: "message/text",
           media_link: "",
           message_text: "https://18.117.227.68:9011/voicecall",
         })
@@ -395,6 +395,7 @@ function UserChat(props) {
       // listen to data sent from the websocket server
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
+      console.log("receivedObj  ",receivedObj);
       tempDict[receivedObj.from_user.id + receivedObj.from_user.username] =
         receivedObj.unread_message_count;
       props.receiveMessageCount({
