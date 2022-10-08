@@ -17,7 +17,7 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import VideocamIcon from "@mui/icons-material/Videocam";
-import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView } from "./templates/MainChat/Chat";
+import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView, Answer } from "./templates/MainChat/Chat";
 import Record from "./Recorder";
 import ReactDOM from "react-dom";
 import { JitsiMeeting } from '@jitsi/react-sdk';
@@ -134,12 +134,21 @@ function MainChat(props) {
         setLoad(false);
       })
   }, [chatroom]);
+const [call, setCall] = useState(false);
+const [videoLink, setVideoLink] = useState(null);
 
   useEffect(() => {
     ws.onmessage = (evt) => {
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
       console.log(receivedObj, "=========on message========");
+
+
+      const type = receivedObj?.message_type;
+      if(type === "message/videocall"){
+        setCall(true)
+        setVideoLink( receivedObj?.media_link)
+      }
 
       if (chatroomId === receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
@@ -593,6 +602,12 @@ function MainChat(props) {
           ref={scrollBottom}
           onScroll={onScroll}
         >
+          <div >
+                        {call && (
+                        <Answer  type='message/videocall' image={videoLink} profile={null} />
+                        )}
+
+                      </div>
           {messages.map((e, i) => {
             return (
               <div key={e?.sender + i}
@@ -620,7 +635,10 @@ function MainChat(props) {
                       <div  >
                         {e.media_link ? (
                           <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
-                        ) : (
+                        ) && (
+                          <Answer  type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} />
+                        )
+                        : (
                           <TextView sender={e.sender} profile={e.profile} text={e.message} time={e.time} float={'left'} />
                         )}
                       </div>

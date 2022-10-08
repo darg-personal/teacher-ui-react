@@ -22,6 +22,7 @@ import {
   ImageView,
   ImgUpload,
   TextView,
+  Answer,
 } from "./templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import Record from "./Recorder";
@@ -54,6 +55,9 @@ function UserChat(props) {
     filePreviewUrl:
       "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true",
   });
+  const [call, setCall] = useState(false);
+const [videoLink, setVideoLink] = useState(null);
+
   const userName = props.userName;
   var receiverId = props.userId;
   const type = props.type;
@@ -165,12 +169,7 @@ function UserChat(props) {
         })
       );
       return (
-
-
-
         <div>
-
-          
 <Modal
       {...props}
       size="lg"
@@ -209,25 +208,12 @@ function UserChat(props) {
     } }
     getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
 />
-          {/* <button
-            style={{
-              position: "relative",
-              top: "5%",
-              // left: "80%",
-            }}
-            onClick={clear}
-            >
-            C-Call
-          </button> */}
-
+          
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={clear}>Close</Button>
+        <Button className="bg-danger" onClick={clear}>End Call</Button>
       </Modal.Footer>
     </Modal>
-
-
-
         </div>
       );
     };
@@ -326,6 +312,7 @@ function UserChat(props) {
         const responseData = JSON.stringify(res.data);
         const message = JSON.parse(responseData);
         setMessageCount(message.count);
+        console.log( message.results);
         const prevMsgs = [];
         if (message?.results?.length)
           for (let i = message.results.length - 1; i >= 0; i--) {
@@ -430,6 +417,11 @@ function UserChat(props) {
         unreadMessageCount: receivedObj.unread_message_count,
         userUniqeId: receivedObj.from_user.id + receivedObj.from_user.username,
       });
+      const type = receivedObj?.message_type;
+      if(type === "message/videocall"){
+        setCall(true)
+        setVideoLink( receivedObj?.media_link)
+      }else
       if (receiverId === receivedObj.from_user.id) {
         const massageTime = receivedObj?.created_at || "NA";
         const messageDate = new Date(massageTime);
@@ -628,7 +620,6 @@ function UserChat(props) {
       {open && (
         <RenderInWindow>
           <div>
-
           <Modal
         style={{ height: "600px", width: "800px", textAlign: "center" }}
         aria-labelledby="contained-modal-title-vcenter"
@@ -640,7 +631,6 @@ function UserChat(props) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        
         <JitsiMeeting
               domain={"18.117.227.68:9011"}
               roomName="PleaseUseAGoodRoomName"
@@ -677,33 +667,19 @@ function UserChat(props) {
                 iframeRef.style.height = "400px";
               }}
             />
-            <button
-              style={{
-                position: "absolute",
-                top: "5%",
-                // left: "80%",
-              }}
-              onClick={clear}
-            >
-              C-Call
-            </button>
-
-        
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={props.onHide}>Close</Button>
         </Modal.Footer>
       </Modal>
-
-
-
-
-           
-
           </div>
         </RenderInWindow>
       )}
-
+                      <div >
+                        {call && (
+                        <Answer  type='message/videocall' image={videoLink} profile={null} sender={loggedUser.username}/>
+                        )}
+                      </div>
       {state.file ? (
         <div>
           <CancelSharpIcon
@@ -747,7 +723,8 @@ function UserChat(props) {
                         sender={e.sender}
                         time={e.time}
                       />
-                    ) :
+                    )
+                   :
                     (
                       <TextView
                         sender={"Me"}
@@ -769,7 +746,7 @@ function UserChat(props) {
                         time={e.time}
                         float={"left"}
                       />
-                    ) : (
+                    ):(
                       <TextView
                         sender={e.sender}
                         profile={e.profile}
