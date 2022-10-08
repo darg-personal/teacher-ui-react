@@ -169,6 +169,9 @@ const [videoLink, setVideoLink] = useState(null);
         })
       );
       return (
+
+
+
         <div>
 <Modal
       {...props}
@@ -208,12 +211,25 @@ const [videoLink, setVideoLink] = useState(null);
     } }
     getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
 />
-          
+          {/* <button
+            style={{
+              position: "relative",
+              top: "5%",
+              // left: "80%",
+            }}
+            onClick={clear}
+            >
+            C-Call
+          </button> */}
+
       </Modal.Body>
       <Modal.Footer>
-        <Button className="bg-danger" onClick={clear}>End Call</Button>
+        <Button onClick={clear}>Close</Button>
       </Modal.Footer>
     </Modal>
+
+
+
         </div>
       );
     };
@@ -632,6 +648,7 @@ const [videoLink, setVideoLink] = useState(null);
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+        
         <JitsiMeeting
               domain={"18.117.227.68:9011"}
               roomName="PleaseUseAGoodRoomName"

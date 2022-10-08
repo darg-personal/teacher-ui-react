@@ -5,7 +5,6 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import Modal from 'react-bootstrap/Modal';
 
-
 function answer(data) {
 
 {/* <Modal
@@ -35,6 +34,24 @@ function answer(data) {
   }
 }
 
+// function Answer(){    
+//            <Modal
+//                         style={{ height: "600px", width: "800px", textAlign: "center" }}
+//                         aria-labelledby="contained-modal-title-vcenter"
+//                         centered
+//                         >
+//                         <Modal.Header closeButton>
+//                           <Modal.Title id="contained-modal-title-vcenter">
+//                           </Modal.Title>
+//                         </Modal.Header>
+//                         <Modal.Body>
+//                         <Button onClick={() => answer()}>Answer</Button>
+//                         </Modal.Body>
+//                         <Modal.Footer>
+//                         </Modal.Footer>
+//                       </Modal>
+        
+// }
 export function ImageView({
     type,
     image,
@@ -87,9 +104,41 @@ export function ImageView({
                 <p style={{ marginLeft: "10px" }}>{text !== "NA" ? text : null}</p>
                 <span className="time-right">{time}</span>
             </Card>
+                
         </div>
     );
 }
+
+// export function Answer({
+//     type,
+//     image,
+// })
+// {
+//     console.log(type,image, '=============type=========');
+//     return (
+//         <div className="darker" >
+//                     {type === "message/videocall" && (
+//                     <div>
+//                        <Modal
+//                         style={{ height: "600px", width: "800px", textAlign: "center" }}
+//                         aria-labelledby="contained-modal-title-vcenter"
+//                         centered
+//                         >
+//                         <Modal.Header closeButton>
+//                           <Modal.Title id="contained-modal-title-vcenter">
+//                           </Modal.Title>
+//                         </Modal.Header>
+//                         <Modal.Body>
+//                         <Button onClick={() => answer(image)}>Answer</Button>
+//                         </Modal.Body>
+//                         <Modal.Footer>
+//                         </Modal.Footer>
+//                       </Modal>
+//                     </div>
+//                 )}
+//         </div>
+//     );
+// }
 
 export function Answer({
     type,
