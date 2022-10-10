@@ -22,6 +22,8 @@ import Record from "./Recorder";
 import ReactDOM from "react-dom";
 import { JitsiMeeting } from '@jitsi/react-sdk';
 import CallIcon from '@mui/icons-material/Call';
+import Modal from 'react-bootstrap/Modal';
+import { Button } from "react-bootstrap";
 
 
 function MainChat(props) {
@@ -255,20 +257,33 @@ const [videoLink, setVideoLink] = useState(null);
         );
         console.log("inside videoCall");
       return (
+       
+
         <div>
-<JitsiMeeting
+<Modal
+      {...props}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header onClick={clear} closeButton >
+        <Modal.Title id="contained-modal-title-vcenter">
+          Teach Video Call
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+      <JitsiMeeting
     domain = { "18.117.227.68:9011" }
     roomName = "videocall"
     configOverwrite = {{
       toolbarButtons:['microphone', 'hangup','settings','camera',],
       buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
       hiddenPremeetingButtons: ['invite'],
-      // filmstrip:
       notifications: [],
         startWithAudioMuted: true,
         disableModeratorIndicator: true,
         startScreenSharing: true,
-        enableEmailInStats: false
+        enableEmailInStats: false,
     }}
     interfaceConfigOverwrite = {{
         DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
@@ -280,18 +295,18 @@ const [videoLink, setVideoLink] = useState(null);
         // here you can attach custom event listeners to the Jitsi Meet External API
         // you can also store it locally to execute commands
     } }
-    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '600px'; } }
+    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
 />
-          <button
-            style={{
-              position: "relative",
-              top: "5%",
-              // left: "80%",
-            }}
-            onClick={clear}
-          >
-            C-Call
-          </button>
+   
+
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={clear}>Close</Button>
+      </Modal.Footer>
+    </Modal>
+
+
+
         </div>
       );
     };
@@ -326,43 +341,52 @@ const [videoLink, setVideoLink] = useState(null);
 
       return (
         <div>
-<JitsiMeeting
-    domain = { "18.117.227.68:9011" }
-    roomName = "voicecall"
-    configOverwrite = {{
-      toolbarButtons:['microphone', 'hangup','settings'],
-      buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
-      hiddenPremeetingButtons: ['camera','invite','select-background'],
-      
-      notifications: [],
-        startWithAudioMuted: true,
-        disableModeratorIndicator: true,
-        startScreenSharing: true,
-        enableEmailInStats: false
-    }}
-    interfaceConfigOverwrite = {{
-        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
-    }}
-    userInfo = {{
-        displayName: 'YOUR_USERNAME'
-    }}
-    onApiReady = { (externalApi) => {
-        // here you can attach custom event listeners to the Jitsi Meet External API
-        // you can also store it locally to execute commands
-    } }
-    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '600px'; } }
-/>
-          <button
-            style={{
-              position: "absolute",
-              top: "5%",
-              // left: "80%",
+        <Modal
+              {...props}
+              size="lg"
+              aria-labelledby="contained-modal-title-vcenter"
+              centered
+            >
+              <Modal.Header onClick={clear} closeButton >
+                <Modal.Title id="contained-modal-title-vcenter">
+                  Teach Video Call
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+              <JitsiMeeting
+            domain = { "18.117.227.68:9011" }
+            roomName = "voiceall"
+            configOverwrite = {{
+              toolbarButtons:['microphone', 'hangup','settings'],
+              buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
+              hiddenPremeetingButtons: ['camera','invite','select-background'],
+              notifications: [],
+                startWithAudioMuted: true,
+                disableModeratorIndicator: true,
+                startScreenSharing: true,
+                enableEmailInStats: false,
             }}
-            onClick={clear}
-          >
-            C-Call
-          </button>
-        </div>
+            interfaceConfigOverwrite = {{
+                DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+            }}
+            userInfo = {{
+                displayName: 'YOUR_USERNAME'
+            }}
+            onApiReady = { (externalApi) => {
+                // here you can attach custom event listeners to the Jitsi Meet External API
+                // you can also store it locally to execute commands
+            } }
+            getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
+        />        
+              </Modal.Body>
+              <Modal.Footer>
+                <Button onClick={clear}>Close</Button>
+              </Modal.Footer>
+            </Modal>
+        
+        
+        
+                </div>
       );
     };
     const clear = () => {
