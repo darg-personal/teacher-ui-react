@@ -7,11 +7,11 @@ function getHost() {
     console.log(HOST);
   }
    else if (window.location.origin.includes("teacher-v2.dreampotential.org/")) {
-    HOST = "https://api.dreampotential.org/";
+    HOST = "https://api.dreampotential.org";
     console.log(HOST);
    }
    else if (window.location.origin.includes("teacher-v2.alt-r.world")) {
-    HOST = "https://python-base-api.alt-r.world/";
+    HOST = "https://python-base-api.alt-r.world";
     console.log(HOST);
   } else {
      HOST = "http://18.117.227.68:8041"
