@@ -13,25 +13,30 @@ import { Card, Dropdown } from "react-bootstrap";
 import IconButton from "@mui/material/IconButton";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
-import AttachFileIcon from '@mui/icons-material/AttachFile';
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import VideocamIcon from "@mui/icons-material/Videocam";
-import { ChatHeader, ImageShow, ImageView, ImgUpload, TextView, Answer } from "./templates/MainChat/Chat";
+import {
+  ChatHeader,
+  ImageShow,
+  ImageView,
+  ImgUpload,
+  TextView,
+  Answer,
+} from "./templates/MainChat/Chat";
 import Record from "./Recorder";
 import ReactDOM from "react-dom";
-import { JitsiMeeting } from '@jitsi/react-sdk';
-import CallIcon from '@mui/icons-material/Call';
-import Modal from 'react-bootstrap/Modal';
+import { JitsiMeeting } from "@jitsi/react-sdk";
+import CallIcon from "@mui/icons-material/Call";
+import Modal from "react-bootstrap/Modal";
 import { Button } from "react-bootstrap";
 
-
 function MainChat(props) {
-
   let Token = localStorage.getItem("token");
   let navigate = useNavigate();
   let loggedUser = JSON.parse(localStorage.getItem("user"));
-  const profileSrc = localStorage.getItem("loginUserImage")
+  const profileSrc = localStorage.getItem("loginUserImage");
 
   // Variables
   const inputRef = useRef(null);
@@ -46,8 +51,7 @@ function MainChat(props) {
   const [isSelected, setIsSelected] = useState(false);
   const [state, setState] = useState({
     file: "",
-    filePreviewUrl:
-      null,
+    filePreviewUrl: null,
   });
 
   // Props
@@ -57,30 +61,6 @@ function MainChat(props) {
   const type = props.type;
   const getChatImage = props.getChatImage;
   const [isConnected, setIsConnected] = useState(props.isConnected);
-  const receiveMessageCountDictProp = props.receiveMessageCountDict;
-
-  var tempDict = {};
-  const recieveMessages = (chatroomId, username) => {
-    const uniqeId = chatroomId + username;
-    console.log(tempDict, "receiveMessageCountDict");
-    var recCount = 0;
-    if (tempDict[uniqeId]) {
-      recCount = tempDict[uniqeId] + 1;
-    } else {
-      recCount = 1;
-    }
-
-    var countDict = {};
-    if (receiveMessageCountDictProp) {
-      countDict[uniqeId] = recCount;
-      tempDict = countDict
-      props.receiveMessageCount({
-        receiveMessageCountDict: countDict,
-        uniqeId,
-      });
-    }
-
-  };
 
   useEffect(() => {
     setPage(1);
@@ -132,35 +112,40 @@ function MainChat(props) {
       })
       .catch((error) => {
         console.log("error : ", error);
-      }).finally(() => {
-        setLoad(false);
       })
+      .finally(() => {
+        setLoad(false);
+      });
   }, [chatroom]);
-const [call, setCall] = useState(false);
-const [videoLink, setVideoLink] = useState(null);
+  const [call, setCall] = useState(false);
+  const [videoLink, setVideoLink] = useState(null);
 
   useEffect(() => {
     ws.onmessage = (evt) => {
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
-      console.log(receivedObj, "=========on message========");
-
+      console.log(receivedObj, "=========on message receivedObj========");
+      props.receiveMessageCountForGroup({
+        unreadMessageCountDictForGroup: receivedObj?.unead_message_count_dict,
+        // unreadMessageCount: receivedObj.unread_message_count,
+        channelId: receivedObj?.channel.id,
+        channelName: receivedObj?.channel.name,
+      });
 
       const type = receivedObj?.message_type;
-      if(type === "message/videocall"){
-        setCall(true)
-        setVideoLink( receivedObj?.media_link)
+      if (type === "message/videocall") {
+        setCall(true);
+        setVideoLink(receivedObj?.media_link);
       }
 
       if (chatroomId === receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const message_type = receivedObj?.message_type;
-        const message = receivedObj?.message_text
+        const message = receivedObj?.message_text;
 
         if (message_type.includes("info")) {
-          if (message.includes("remove"))
-          setIsConnected(4)
+          if (message.includes("remove")) setIsConnected(4);
         }
 
         const time = messageDate.toLocaleTimeString("en-US", {
@@ -187,14 +172,7 @@ const [videoLink, setVideoLink] = useState(null);
 
         // setIsConnected()
         setMessages([...prevMsgs]);
-
       }
-      recieveMessages(
-        // receiveMessageCountDict,
-        receivedObj?.channel.id,
-        receivedObj?.channel.name
-      );
-
     };
   }, [messages]);
 
@@ -244,7 +222,7 @@ const [videoLink, setVideoLink] = useState(null);
     document.body.appendChild(videoNode);
     videoNode.style.height = "300px";
     videoNode.style.width = "600px";
-    videoNode.style.position = "relative"
+    videoNode.style.position = "relative";
     const PopupContent = () => {
       console.log("inside videoCall");
       ws.send(
@@ -254,59 +232,63 @@ const [videoLink, setVideoLink] = useState(null);
           media_link: "",
           message_text: "https://18.117.227.68:9011/videocall",
         })
-        );
-        console.log("inside videoCall");
+      );
+      console.log("inside videoCall");
       return (
-       
-
         <div>
-<Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header onClick={clear} closeButton >
-        <Modal.Title id="contained-modal-title-vcenter">
-          Teach Video Call
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-      <JitsiMeeting
-    domain = { "18.117.227.68:9011" }
-    roomName = "videocall"
-    configOverwrite = {{
-      toolbarButtons:['microphone', 'hangup','settings','camera',],
-      buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
-      hiddenPremeetingButtons: ['invite'],
-      notifications: [],
-        startWithAudioMuted: true,
-        disableModeratorIndicator: true,
-        startScreenSharing: true,
-        enableEmailInStats: false,
-    }}
-    interfaceConfigOverwrite = {{
-        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
-    }}
-    userInfo = {{
-        displayName: 'YOUR_USERNAME'
-    }}
-    onApiReady = { (externalApi) => {
-        // here you can attach custom event listeners to the Jitsi Meet External API
-        // you can also store it locally to execute commands
-    } }
-    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
-/>
-   
-
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={clear}>Close</Button>
-      </Modal.Footer>
-    </Modal>
-
-
-
+          <Modal
+            {...props}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+          >
+            <Modal.Header onClick={clear} closeButton>
+              <Modal.Title id="contained-modal-title-vcenter">
+                Teach Video Call
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <JitsiMeeting
+                domain={"18.117.227.68:9011"}
+                roomName="videocall"
+                configOverwrite={{
+                  toolbarButtons: [
+                    "microphone",
+                    "hangup",
+                    "settings",
+                    "camera",
+                  ],
+                  buttonsWithNotifyClick: [
+                    { key: "hangup", preventExecution: true },
+                    { key: "chat", preventExecution: true },
+                  ],
+                  hiddenPremeetingButtons: ["invite"],
+                  notifications: [],
+                  startWithAudioMuted: true,
+                  disableModeratorIndicator: true,
+                  startScreenSharing: true,
+                  enableEmailInStats: false,
+                }}
+                interfaceConfigOverwrite={{
+                  DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+                }}
+                userInfo={{
+                  displayName: "YOUR_USERNAME",
+                }}
+                onApiReady={(externalApi) => {
+                  // here you can attach custom event listeners to the Jitsi Meet External API
+                  // you can also store it locally to execute commands
+                }}
+                getIFrameRef={(iframeRef) => {
+                  iframeRef.style.height = "600px";
+                  iframeRef.style.width = "750px";
+                }}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={clear}>Close</Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       );
     };
@@ -317,7 +299,7 @@ const [videoLink, setVideoLink] = useState(null);
     ReactDOM.render(<PopupContent />, videoNode);
   }
 
-// const uniqueString = require("uuid").uuid.v4();
+  // const uniqueString = require("uuid").uuid.v4();
   const voiceNode = document.createElement("div");
   async function voiceCall(event) {
     event.preventDefault();
@@ -325,7 +307,7 @@ const [videoLink, setVideoLink] = useState(null);
     document.body.appendChild(voiceNode);
     voiceNode.style.height = "300px";
     voiceNode.style.width = "600px";
-    voiceNode.style.position = "relative"
+    voiceNode.style.position = "relative";
     const PopupContent = () => {
       console.log("inside voiceCall");
 
@@ -341,52 +323,59 @@ const [videoLink, setVideoLink] = useState(null);
 
       return (
         <div>
-        <Modal
-              {...props}
-              size="lg"
-              aria-labelledby="contained-modal-title-vcenter"
-              centered
-            >
-              <Modal.Header onClick={clear} closeButton >
-                <Modal.Title id="contained-modal-title-vcenter">
-                  Teach Video Call
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
+          <Modal
+            {...props}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+          >
+            <Modal.Header onClick={clear} closeButton>
+              <Modal.Title id="contained-modal-title-vcenter">
+                Teach Video Call
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
               <JitsiMeeting
-            domain = { "18.117.227.68:9011" }
-            roomName = "voiceall"
-            configOverwrite = {{
-              toolbarButtons:['microphone', 'hangup','settings'],
-              buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
-              hiddenPremeetingButtons: ['camera','invite','select-background'],
-              notifications: [],
-                startWithAudioMuted: true,
-                disableModeratorIndicator: true,
-                startScreenSharing: true,
-                enableEmailInStats: false,
-            }}
-            interfaceConfigOverwrite = {{
-                DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
-            }}
-            userInfo = {{
-                displayName: 'YOUR_USERNAME'
-            }}
-            onApiReady = { (externalApi) => {
-                // here you can attach custom event listeners to the Jitsi Meet External API
-                // you can also store it locally to execute commands
-            } }
-            getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
-        />        
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={clear}>Close</Button>
-              </Modal.Footer>
-            </Modal>
-        
-        
-        
-                </div>
+                domain={"18.117.227.68:9011"}
+                roomName="voiceall"
+                configOverwrite={{
+                  toolbarButtons: ["microphone", "hangup", "settings"],
+                  buttonsWithNotifyClick: [
+                    { key: "hangup", preventExecution: true },
+                    { key: "chat", preventExecution: true },
+                  ],
+                  hiddenPremeetingButtons: [
+                    "camera",
+                    "invite",
+                    "select-background",
+                  ],
+                  notifications: [],
+                  startWithAudioMuted: true,
+                  disableModeratorIndicator: true,
+                  startScreenSharing: true,
+                  enableEmailInStats: false,
+                }}
+                interfaceConfigOverwrite={{
+                  DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+                }}
+                userInfo={{
+                  displayName: "YOUR_USERNAME",
+                }}
+                onApiReady={(externalApi) => {
+                  // here you can attach custom event listeners to the Jitsi Meet External API
+                  // you can also store it locally to execute commands
+                }}
+                getIFrameRef={(iframeRef) => {
+                  iframeRef.style.height = "600px";
+                  iframeRef.style.width = "750px";
+                }}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={clear}>Close</Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
       );
     };
     const clear = () => {
@@ -441,9 +430,10 @@ const [videoLink, setVideoLink] = useState(null);
         }
         setLoad(false);
         setMessages([...prevMsgs, ...messages]);
-      }).finally(() => {
-        setLoad(false);
       })
+      .finally(() => {
+        setLoad(false);
+      });
   }
   //onScroll
   const onScroll = () => {
@@ -484,7 +474,6 @@ const [videoLink, setVideoLink] = useState(null);
     reader.readAsDataURL(file);
   };
 
-
   const ChatOptions = () => {
     return (
       <div className="three-dots">
@@ -503,8 +492,8 @@ const [videoLink, setVideoLink] = useState(null);
           </Dropdown.Menu>
         </Dropdown>
       </div>
-    )
-  }
+    );
+  };
   const onStopRecording = async (recording) => {
     let formData = new FormData();
     formData.append("file", recording, "audio.mp3");
@@ -533,7 +522,6 @@ const [videoLink, setVideoLink] = useState(null);
           day: "2-digit",
         });
 
-
         setState({ file: false });
         document.getElementById("inp").value = "";
       })
@@ -548,45 +536,64 @@ const [videoLink, setVideoLink] = useState(null);
     event.preventDefault();
     let id = require("uuid").v4();
     function popupWindow(url, windowName, win, w, h) {
-      const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
-      const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+      const y = win.top.outerHeight / 2 + win.top.screenY - h / 2;
+      const x = win.top.outerWidth / 2 + win.top.screenX - w / 2;
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
           message_type: "message/videocall",
           media_link: `https://18.117.227.68:9011/${chatroom}${id}`,
           message_text: "",
-        }))
-      return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+        })
+      );
+      return win.open(
+        url,
+        windowName,
+        `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`
+      );
     }
-    popupWindow(`https://18.117.227.68:9011/${chatroom}${id}`, 'test', window, 800, 600);
+    popupWindow(
+      `https://18.117.227.68:9011/${chatroom}${id}`,
+      "test",
+      window,
+      800,
+      600
+    );
   }
 
   return (
     <div className="chatroom">
       <div className="profile-header">
         <div className="header-chat">
-          <ListItemAvatar onClick={() => props.show({ show: true, type: type, chatroomId: chatroomId, websocket: ws })}>
+          <ListItemAvatar
+            onClick={() =>
+              props.show({
+                show: true,
+                type: type,
+                chatroomId: chatroomId,
+                websocket: ws,
+              })
+            }
+          >
             <Avatar alt={chatroom} src={getChatImage} />
           </ListItemAvatar>
-          <li className="" style={{ color: 'white', fontWeight: 'bold' }} >{chatroom}</li>
-
+          <li className="" style={{ color: "white", fontWeight: "bold" }}>
+            {chatroom}
+          </li>
         </div>
       </div>
       <div className="position-fixed  end-0">
-      <CallIcon
-         style={{
-          color: "white",
-          position: "relative",
-          right: "200",
-          top: "15",
-          fontSize: "40",
-          cursor: "pointer",}}
+        <CallIcon
+          style={{
+            color: "white",
+            position: "relative",
+            right: "200",
+            top: "15",
+            fontSize: "40",
+            cursor: "pointer",
+          }}
           onClick={voiceCall}
-          >
-          
-          </CallIcon> 
-  
+        ></CallIcon>
 
         <VideocamIcon
           style={{
@@ -597,9 +604,8 @@ const [videoLink, setVideoLink] = useState(null);
             fontSize: "40",
             cursor: "pointer",
           }}
-           onClick={videoCall}
-        >
-        </VideocamIcon>
+          onClick={videoCall}
+        ></VideocamIcon>
       </div>
       <div className="position-fixed  end-0">
         <ChatOptions />
@@ -608,67 +614,107 @@ const [videoLink, setVideoLink] = useState(null);
 
       {state.file ? (
         <>
-          <CancelSharpIcon style={{ flex: 1, marginLeft: '90%', position: 'relative' }} onClick={() => {
-            setState({
-              file: null,
-              filePreviewUrl: null,
-            });
-            setIsSelected(false)
-          }} color="primary"
-            fontSize="large" />
+          <CancelSharpIcon
+            style={{ flex: 1, marginLeft: "90%", position: "relative" }}
+            onClick={() => {
+              setState({
+                file: null,
+                filePreviewUrl: null,
+              });
+              setIsSelected(false);
+            }}
+            color="primary"
+            fontSize="large"
+          />
           <ImageShow filePreviewUrl={state.filePreviewUrl} />
         </>
       ) : (
-
         <div
           className="content"
           id="scroll"
           ref={scrollBottom}
           onScroll={onScroll}
         >
-          <div >
-                        {call && (
-                        <Answer  type='message/videocall' image={videoLink} profile={null} />
-                        )}
-
-                      </div>
+          <div>
+            {call && (
+              <Answer
+                type="message/videocall"
+                image={videoLink}
+                profile={null}
+              />
+            )}
+          </div>
           {messages.map((e, i) => {
             return (
-              <div key={e?.sender + i}
+              <div
+                key={e?.sender + i}
                 style={{
-                  marginTop: '2%',
-                  overflow: 'auto'
-                }}>
-                {e.message_type === 'group-info-update' ?
+                  marginTop: "2%",
+                  overflow: "auto",
+                }}
+              >
+                {e.message_type === "group-info-update" ? (
                   <div id="center">
-                    <div className=" user-add-remove" >
-                      <p >{`${e.message}`}</p>
+                    <div className=" user-add-remove">
+                      <p>{`${e.message}`}</p>
                     </div>
                   </div>
-                  :
+                ) : (
                   <div>
                     {e.sender === loggedUser.username ? (
-                      <div >
+                      <div>
                         {e.media_link ? (
-                          <ImageView type={e.message_type} image={e.media_link} profile={profileSrc} text={e.message} sender={e.sender} time={e.time} />
+                          <ImageView
+                            type={e.message_type}
+                            image={e.media_link}
+                            profile={profileSrc}
+                            text={e.message}
+                            sender={e.sender}
+                            time={e.time}
+                          />
                         ) : (
-                          <TextView sender={'Me'} profile={profileSrc} text={e.message} time={e.time} />
+                          <TextView
+                            sender={"Me"}
+                            profile={profileSrc}
+                            text={e.message}
+                            time={e.time}
+                          />
                         )}
                       </div>
                     ) : (
-                      <div  >
+                      <div>
                         {e.media_link ? (
-                          <ImageView type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} sender={e.sender} time={e.time} float={'left'} />
-                        ) && (
-                          <Answer  type={e.message_type} image={e.media_link} profile={e.profile} text={`${e.message}`} />
-                        )
-                        : (
-                          <TextView sender={e.sender} profile={e.profile} text={e.message} time={e.time} float={'left'} />
+                          (
+                            <ImageView
+                              type={e.message_type}
+                              image={e.media_link}
+                              profile={e.profile}
+                              text={`${e.message}`}
+                              sender={e.sender}
+                              time={e.time}
+                              float={"left"}
+                            />
+                          ) && (
+                            <Answer
+                              type={e.message_type}
+                              image={e.media_link}
+                              profile={e.profile}
+                              text={`${e.message}`}
+                            />
+                          )
+                        ) : (
+                          <TextView
+                            sender={e.sender}
+                            profile={e.profile}
+                            text={e.message}
+                            time={e.time}
+                            float={"left"}
+                          />
                         )}
                       </div>
                     )}
                   </div>
-                }
+                )}
                 {/* <hr/> */}
               </div>
             );
@@ -676,29 +722,26 @@ const [videoLink, setVideoLink] = useState(null);
 
           <Outlet />
         </div>
-      )
-      }
-    
-        <div className="box">
-          <form>
-            <input
-              ref={inputRef}
-              className="input_text"
-              id="inp"
-              type="text"
-              placeholder="Enter Text Here..."
-              onKeyDown={(e) => e.key === "Enter" && handleClick}
-            />
-            <ImgUpload onChange={photoUpload} />
-            <button onClick={handleClick} className="btn btn-outline-success">
-              send
-            </button>
-            <Record onStopRecording={onStopRecording}></Record>
-          </form>
-        </div>
-       
-    
-    </div >
+      )}
+
+      <div className="box">
+        <form>
+          <input
+            ref={inputRef}
+            className="input_text"
+            id="inp"
+            type="text"
+            placeholder="Enter Text Here..."
+            onKeyDown={(e) => e.key === "Enter" && handleClick}
+          />
+          <ImgUpload onChange={photoUpload} />
+          <button onClick={handleClick} className="btn btn-outline-success">
+            send
+          </button>
+          <Record onStopRecording={onStopRecording}></Record>
+        </form>
+      </div>
+    </div>
   );
 }
 

@@ -23,9 +23,12 @@ export class Socket extends Component {
             isConnected: true,
             userStatus: {},
             unreadMessageCountDict: {},
+            unreadMessageCountDictForGroup: {},
             receiveMessageCount: 0,
             chatroomUniqeId: 0,
             userUniqeId: 0,
+            channelId: 0,
+            channelName: null,
             about: null
         };
     }
@@ -45,8 +48,13 @@ export class Socket extends Component {
         this.setState({ unreadMessageCountDict: data.unreadMessageCountDict });
         this.setState({ chatroomUniqeId: data.uniqeId });
         this.setState({ userUniqeId: data.userUniqeId });
-
+        
     };
+    pullReceiveMessageCountForGroup = (data) =>{
+        this.setState({ channelId: data.channelId });
+        this.setState({ channelName: data.channelName });
+        this.setState({ unreadMessageCountDictForGroup: data.unreadMessageCountDictForGroup });
+    }
     //   timeout = 250;
 
     connect = (cRoom, userId, type, isConnected) => {
@@ -149,7 +157,7 @@ export class Socket extends Component {
                         getChatImage={this.state.image}
                         isConnected={this.state.isConnected}
                         show={this.getUserInfo}
-                        receiveMessageCount={this.pullReceiveMessageCount}
+                        receiveMessageCountForGroup={this.pullReceiveMessageCountForGroup}
                     />
                 );
             }
@@ -187,7 +195,10 @@ export class Socket extends Component {
                             receiveMessageCount={this.state.receiveMessageCount}
                             chatroomUniqeId={this.state.chatroomUniqeId}
                             userUniqeId={this.state.userUniqeId}
+                            channelId={this.state.channelId}
+                            channelName={this.state.channelName}
                             unreadMessageCountDict={this.state.unreadMessageCountDict}
+                            unreadMessageCountDictForGroup={this.state.unreadMessageCountDictForGroup}
                         />
                         {this.chatMethod()}
                     </div>

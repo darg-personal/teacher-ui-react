@@ -1,28 +1,17 @@
-import React from "react";
+import React,{useState} from "react";
 import { Avatar, IconButton, ListItemAvatar } from "@mui/material";
 import { Button, Card } from "react-bootstrap";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import Modal from 'react-bootstrap/Modal';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 function answer(data) {
 
-{/* <Modal
-    
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton >
-        <Modal.Title id="contained-modal-title-vcenter">
-          Teach Video Call
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-      </Modal.Body>
-      <Modal.Footer>
-      </Modal.Footer>
-    </Modal> */}
     console.log({ data });
     {
         function popupWindow(url, windowName, win, w, h, username) {
@@ -33,25 +22,6 @@ function answer(data) {
       popupWindow(data, 'test', window, 800, 600);
   }
 }
-
-// function Answer(){    
-//            <Modal
-//                         style={{ height: "600px", width: "800px", textAlign: "center" }}
-//                         aria-labelledby="contained-modal-title-vcenter"
-//                         centered
-//                         >
-//                         <Modal.Header closeButton>
-//                           <Modal.Title id="contained-modal-title-vcenter">
-//                           </Modal.Title>
-//                         </Modal.Header>
-//                         <Modal.Body>
-//                         <Button onClick={() => answer()}>Answer</Button>
-//                         </Modal.Body>
-//                         <Modal.Footer>
-//                         </Modal.Footer>
-//                       </Modal>
-        
-// }
 export function ImageView({
     type,
     image,
@@ -109,37 +79,6 @@ export function ImageView({
     );
 }
 
-// export function Answer({
-//     type,
-//     image,
-// })
-// {
-//     console.log(type,image, '=============type=========');
-//     return (
-//         <div className="darker" >
-//                     {type === "message/videocall" && (
-//                     <div>
-//                        <Modal
-//                         style={{ height: "600px", width: "800px", textAlign: "center" }}
-//                         aria-labelledby="contained-modal-title-vcenter"
-//                         centered
-//                         >
-//                         <Modal.Header closeButton>
-//                           <Modal.Title id="contained-modal-title-vcenter">
-//                           </Modal.Title>
-//                         </Modal.Header>
-//                         <Modal.Body>
-//                         <Button onClick={() => answer(image)}>Answer</Button>
-//                         </Modal.Body>
-//                         <Modal.Footer>
-//                         </Modal.Footer>
-//                       </Modal>
-//                     </div>
-//                 )}
-//         </div>
-//     );
-// }
-
 export function Answer({
     type,
     image,
@@ -147,20 +86,35 @@ export function Answer({
     text,
     sender,
     time,
-})
-{
+}) {
     let loggedUser = JSON.parse(localStorage.getItem("user"));
-
-    console.log(type,image,loggedUser,sender, '=============type======================image=========');
+    console.log(type, image, loggedUser, sender, '=============type======================image=========');
+    // const [status, setStatus] = useState(true);
+    const [open, setOpen] = useState(true);
     return (
-        <div style={{ borderRadius: '100px'}}>
-                    {type === "message/videocall" &&  !loggedUser === !sender &&(
-                     <div  style={{position: 'absolute', top: '2%', left: '70%', borderRadius: '100px'}}>
-                      <Button  className="bg-success" onClick={() => answer(image)
-                    }>Answer</Button>
-                   </div>
-                )}
+        <div>
+       <Dialog
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        open={open}
+      >
+        <DialogTitle id="alert-dialog-title" >
+          {"Admin is calling you"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <h6>Do you Want to Pick The Call</h6>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button className="bg-success" onClick={() => {answer(image); setOpen(false)}}  autoFocus>
+            Start
+          </Button>
+          <Button className="bg-danger" onClick={() => setOpen(false)}>End</Button>
+        </DialogActions>
+      </Dialog>
         </div>
+        
     );
 }
 

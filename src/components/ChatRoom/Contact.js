@@ -15,18 +15,36 @@ function Contact(props) {
   const [isActive, setIsActive] = useState();
   const activeUser = props.activeUser;
 
-  // const [notificationCountForClass, setNotificationCountForClass] = useState({});
+  const [notificationCountForClass, setNotificationCountForClass] = useState({});
   const [notificationCountForUser, setNotificationCountForUser] = useState({});
 
   const unreadMessageCountDict = props.unreadMessageCountDict;
+  const unreadMessageCountDictForGroup = props.unreadMessageCountDictForGroup;
+  console.log(
+    unreadMessageCountDictForGroup,
+    "contact js unreadMessageCountDictForGroup from props"
+  );
   const userUniqeId = props.userUniqeId;
+  const channelId = props.channelId;
+  const channelName = props.channelName;
 
-  // useEffect(() => {
-  //   setNotificationCountForClass({
-  //     ...notificationCountForClass,
-  //     [chatroomId]: receiveMessageCountDict[chatroomId],
-  //   });
-  // }, [chatroomId, receiveMessageCountDict[chatroomId]]);
+  console.log(
+    channelId,
+    channelName,
+    "contact js channelId, channelName from props"
+  );
+
+  useEffect(() => {
+    setNotificationCountForClass({
+      ...notificationCountForClass,
+      [channelId]: unreadMessageCountDictForGroup[login_user.id],
+    });
+  }, [channelId,unreadMessageCountDictForGroup[login_user.id]]);
+
+  useEffect(() => {
+    console.log(login_user.id, "login userrrrrrrr id");
+    console.log(notificationCountForClass, "notificationCountForClass");
+  }, [login_user.id,unreadMessageCountDictForGroup[login_user.id]]);
 
   useEffect(() => {
     setNotificationCountForUser({
@@ -102,9 +120,12 @@ function Contact(props) {
         [userUniqeId]: 0,
       });
     }
-    // setNotificationCountForClass({
-    //   [chatroomId]: 0,
-    // });
+    if (value.id + value.name == channelId + channelName) {
+    setNotificationCountForClass({
+      [channelId]: 0,
+    });
+    }
+
     props.type({
       name: value.name,
       type: value.type,
@@ -131,8 +152,7 @@ function Contact(props) {
             {e.name !== isActive ? (
               e.type === "Channel" ? (
                 <Badge
-                  badgeContent={0}
-                  // badgeContent={notificationCountForClass[e.id + e.name] || 0}
+                  badgeContent={notificationCountForClass[e.id] || 0}
                   color="success"
                 ></Badge>
               ) : (
@@ -141,8 +161,7 @@ function Contact(props) {
                   color="success"
                 ></Badge>
               )
-            ) : null
-            }
+            ) : null}
           </div>
         ))}
       </div>

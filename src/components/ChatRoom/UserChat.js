@@ -291,10 +291,7 @@ const [videoLink, setVideoLink] = useState(null);
               <Modal.Footer>
                 <Button onClick={clear}>Close</Button>
               </Modal.Footer>
-            </Modal>
-        
-        
-        
+            </Modal>          
                 </div>
         
       );
@@ -305,13 +302,6 @@ const [videoLink, setVideoLink] = useState(null);
     };
     ReactDOM.render(<PopupContent />, voiceNode);
   }
-
-
-
-
-
-
-
   useEffect(() => {
     console.log(
       `web socket connection created for ${userName},${receiverId}!!`
