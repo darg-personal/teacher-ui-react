@@ -6,8 +6,8 @@ function getHost() {
     HOST = "http://localhost:8000";
     console.log(HOST);
   } else {
-    // HOST = "http://18.117.227.68:8041"
-    HOST = "https://api.dreampotential.org";
+     HOST = "http://18.117.227.68:8041"
+    //HOST = "https://api.dreampotential.org";
   }
   return HOST;
 }
@@ -17,7 +17,7 @@ function getServer() {
   if (window.location.origin.includes("localhost")) {
     SERVER = "http://localhost:8040/";
   } else {
-    // SERVER = "http://18.117.227.68:8041";
+    //SERVER = "http://18.117.227.68:8041";
     SERVER = "https://api.dreampotential.org";
   }
   return SERVER;
@@ -28,8 +28,8 @@ function getWebsocketHost() {
   if (window.location.origin.includes("localhost")) {
     WEBSOCKET_HOST = "ws://localhost:8000";
   } else {
-    WEBSOCKET_HOST = "wss://api.dreampotential.org";
-    // WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
+    //WEBSOCKET_HOST = "wss://api.dreampotential.org";
+    WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
   }
   return WEBSOCKET_HOST;
 }

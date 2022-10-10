@@ -110,7 +110,7 @@ export const AddOrg = (props) => {
                             </div>
 
                             <div>
-                                <div className={"button-container "} style={{ marginTop: '100%' }}>
+                                <div className={"button-container "} style={{ marginTop: '40%' }}>
                                     <button onClick={addorg}>Add</button>
                                 </div>
                             </div>
