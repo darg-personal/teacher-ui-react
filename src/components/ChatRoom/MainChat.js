@@ -53,6 +53,8 @@ function MainChat(props) {
     file: "",
     filePreviewUrl: null,
   });
+  const [call, setCall] = useState(false);
+  const [videoLink, setVideoLink] = useState(null);
 
   // Props
   const chatroom = props.chatRoom;
@@ -117,8 +119,6 @@ function MainChat(props) {
         setLoad(false);
       });
   }, [chatroom]);
-  const [call, setCall] = useState(false);
-  const [videoLink, setVideoLink] = useState(null);
 
   useEffect(() => {
     ws.onmessage = (evt) => {
@@ -127,13 +127,12 @@ function MainChat(props) {
       console.log(receivedObj, "=========on message receivedObj========");
       props.receiveMessageCountForGroup({
         unreadMessageCountDictForGroup: receivedObj?.unead_message_count_dict,
-        // unreadMessageCount: receivedObj.unread_message_count,
         channelId: receivedObj?.channel.id,
         channelName: receivedObj?.channel.name,
       });
 
       const type = receivedObj?.message_type;
-      if (type === "message/videocall") {
+      if ((type === "message/videocall" || type === "message/voicecall" ) && receivedObj?.user.username !== loggedUser.username) {
         setCall(true);
         setVideoLink(receivedObj?.media_link);
       }
@@ -228,9 +227,9 @@ function MainChat(props) {
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
-          message_type: "message/text",
-          media_link: "",
-          message_text: "https://18.117.227.68:9011/videocall",
+          message_type: "message/videocall",
+          media_link:  `https://conference.dreampotential.org/videocall`,
+          message_text: "",
         })
       );
       console.log("inside videoCall");
@@ -249,7 +248,7 @@ function MainChat(props) {
             </Modal.Header>
             <Modal.Body>
               <JitsiMeeting
-                domain={"18.117.227.68:9011"}
+                domain={"conference.dreampotential.org"}
                 roomName="videocall"
                 configOverwrite={{
                   toolbarButtons: [
@@ -286,7 +285,7 @@ function MainChat(props) {
               />
             </Modal.Body>
             <Modal.Footer>
-              <Button onClick={clear}>Close</Button>
+              <Button variant="danger" onClick={clear}>Leave</Button>
             </Modal.Footer>
           </Modal>
         </div>
@@ -314,9 +313,9 @@ function MainChat(props) {
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
-          message_type: "message/text",
-          media_link: "",
-          message_text: "https://18.117.227.68:9011/voicecall",
+          message_type: "message/voicecall",
+          media_link: `https://conference.dreampotential.org/voicecall`,
+          message_text: '',
         })
       );
       console.log("inside voiceCall");
@@ -331,13 +330,13 @@ function MainChat(props) {
           >
             <Modal.Header onClick={clear} closeButton>
               <Modal.Title id="contained-modal-title-vcenter">
-                Teach Video Call
+                Teach Voice Call
               </Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <JitsiMeeting
-                domain={"18.117.227.68:9011"}
-                roomName="voiceall"
+                domain={"conference.dreampotential.org"}
+                roomName="voicecall"
                 configOverwrite={{
                   toolbarButtons: ["microphone", "hangup", "settings"],
                   buttonsWithNotifyClick: [
@@ -372,7 +371,7 @@ function MainChat(props) {
               />
             </Modal.Body>
             <Modal.Footer>
-              <Button onClick={clear}>Close</Button>
+              <Button variant="danger" onClick={clear}>Leave</Button>
             </Modal.Footer>
           </Modal>
         </div>
@@ -450,14 +449,15 @@ function MainChat(props) {
   };
   //useEffect
   useEffect(() => {
-    const { scrollTop } = scrollBottom.current;
-    if (scrollBottom && scrollTop !== 0) {
+    // const { scrollTop } = scrollBottom.current;
+    // if (scrollBottom && scrollTop !== 0) {
+    if (scrollBottom) {
       scrollBottom.current.addEventListener("DOMNodeInserted", (event) => {
         const { currentTarget: target } = event;
         target.scroll({ top: target.scrollHeight, behavior: "smooth" });
       });
     }
-  }, []);
+  }, [messages]);
 
   const photoUpload = (event) => {
     event.preventDefault();
@@ -542,7 +542,7 @@ function MainChat(props) {
         JSON.stringify({
           meta_attributes: "react",
           message_type: "message/videocall",
-          media_link: `https://18.117.227.68:9011/${chatroom}${id}`,
+          media_link: `https://conference.dreampotential.org/${chatroom}${id}`,
           message_text: "",
         })
       );
@@ -553,7 +553,7 @@ function MainChat(props) {
       );
     }
     popupWindow(
-      `https://18.117.227.68:9011/${chatroom}${id}`,
+      `https://conference.dreampotential.org/${chatroom}${id}`,
       "test",
       window,
       800,
@@ -611,7 +611,11 @@ function MainChat(props) {
         <ChatOptions />
       </div>
       {load ? <Loader /> : null}
-
+      <div >
+                        {call && (
+                        <Answer  type='message/videocall' image={videoLink} profile={null} sender={loggedUser.username}/>
+                        )}
+                      </div>
       {state.file ? (
         <>
           <CancelSharpIcon
@@ -635,15 +639,6 @@ function MainChat(props) {
           ref={scrollBottom}
           onScroll={onScroll}
         >
-          <div>
-            {call && (
-              <Answer
-                type="message/videocall"
-                image={videoLink}
-                profile={null}
-              />
-            )}
-          </div>
           {messages.map((e, i) => {
             return (
               <div
@@ -694,14 +689,7 @@ function MainChat(props) {
                               time={e.time}
                               float={"left"}
                             />
-                          ) && (
-                            <Answer
-                              type={e.message_type}
-                              image={e.media_link}
-                              profile={e.profile}
-                              text={`${e.message}`}
-                            />
-                          )
+                          ) 
                         ) : (
                           <TextView
                             sender={e.sender}

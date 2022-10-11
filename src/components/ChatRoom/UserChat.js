@@ -56,10 +56,11 @@ function UserChat(props) {
       "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true",
   });
   const [call, setCall] = useState(false);
+  const [callType, setCallType] = useState('');
 const [videoLink, setVideoLink] = useState(null);
 
   const userName = props.userName;
-  var receiverId = props.userId;
+  const receiverId = props.userId;
   const type = props.type;
   var ws = props.websocket;
   var tempDict = {};
@@ -164,7 +165,7 @@ const [videoLink, setVideoLink] = useState(null);
         JSON.stringify({
           meta_attributes: "react",
           message_type: "message/videocall",
-          media_link: "https://18.117.227.68:9011/videocall",
+          media_link: "https://conference.dreampotential.org/videocall",
           message_text: "",
         })
       );
@@ -186,7 +187,7 @@ const [videoLink, setVideoLink] = useState(null);
       </Modal.Header>
       <Modal.Body>
       <JitsiMeeting
-    domain = { "18.117.227.68:9011" }
+    domain = { "conference.dreampotential.org" }
     roomName = "videocall"
     configOverwrite = {{
       toolbarButtons:['microphone', 'hangup','settings','camera',],
@@ -244,7 +245,7 @@ const [videoLink, setVideoLink] = useState(null);
         JSON.stringify({
           meta_attributes: "react",
           message_type: "message/voicecall",
-          media_link: "https://18.117.227.68:9011/voicecall",
+          media_link: "https://conference.dreampotential.org/voicecall",
           message_text: "",
         })
         );
@@ -258,13 +259,13 @@ const [videoLink, setVideoLink] = useState(null);
             >
               <Modal.Header onClick={clear} closeButton >
                 <Modal.Title id="contained-modal-title-vcenter">
-                  Teach Video Call
+                  Teach Voice Call
                 </Modal.Title>
               </Modal.Header>
               <Modal.Body>
               <JitsiMeeting
-            domain = { "18.117.227.68:9011" }
-            roomName = "voiceall"
+            domain = { "conference.dreampotential.org" }
+            roomName = "voicecall"
             configOverwrite = {{
               toolbarButtons:['microphone', 'hangup','settings'],
               buttonsWithNotifyClick: [{key:'hangup',preventExecution: true},{key: 'chat',preventExecution: true},],
@@ -289,7 +290,7 @@ const [videoLink, setVideoLink] = useState(null);
         />        
               </Modal.Body>
               <Modal.Footer>
-                <Button onClick={clear}>Close</Button>
+                <Button variant="danger" onClick={clear}>Leave</Button>
               </Modal.Footer>
             </Modal>          
                 </div>
@@ -426,10 +427,11 @@ const [videoLink, setVideoLink] = useState(null);
         userUniqeId: receivedObj.from_user.id + receivedObj.from_user.username,
       });
       const type = receivedObj?.message_type;
-      if(type === "message/videocall"){
+      if(type === "message/videocall" || type === "message/voicecall"){
+        setCallType(type)
         setCall(true)
         setVideoLink( receivedObj?.media_link)
-      }else
+      }
       if (receiverId === receivedObj.from_user.id) {
         const massageTime = receivedObj?.created_at || "NA";
         const messageDate = new Date(massageTime);
@@ -641,7 +643,7 @@ const [videoLink, setVideoLink] = useState(null);
         <Modal.Body>
         
         <JitsiMeeting
-              domain={"18.117.227.68:9011"}
+              domain={"conference.dreampotential.org"}
               roomName="PleaseUseAGoodRoomName"
               configOverwrite={{
                 toolbarButtons: [
@@ -678,7 +680,7 @@ const [videoLink, setVideoLink] = useState(null);
             />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={props.onHide}>Close</Button>
+          <Button variant="danger" onClick={props.onHide}>Leave</Button>
         </Modal.Footer>
       </Modal>
           </div>
@@ -686,7 +688,10 @@ const [videoLink, setVideoLink] = useState(null);
       )}
                       <div >
                         {call && (
-                        <Answer  type='message/videocall' image={videoLink} profile={null} sender={loggedUser.username}/>
+                          callType === 'message/videocall'?
+                          <Answer  type='message/videocall' image={videoLink} profile={null} sender={loggedUser.username}/>
+                          :
+                          <Answer  type='message/voicecall' image={videoLink} profile={null} sender={loggedUser.username}/>
                         )}
                       </div>
       {state.file ? (
