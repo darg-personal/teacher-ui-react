@@ -13,6 +13,8 @@ let login_user = JSON.parse(localStorage.getItem("user"));
 function Contact(props) {
   const [group, setGroup] = useState([]);
   const [isActive, setIsActive] = useState();
+  const [page, setPage] = useState(0);
+  const [allUser, setAllUser] = useState(true);
   const activeUser = props.activeUser;
 
   const [notificationCountForClass, setNotificationCountForClass] = useState({});
@@ -20,56 +22,44 @@ function Contact(props) {
 
   const unreadMessageCountDict = props.unreadMessageCountDict;
   const unreadMessageCountDictForGroup = props.unreadMessageCountDictForGroup;
-  console.log(
-    unreadMessageCountDictForGroup,
-    "contact js unreadMessageCountDictForGroup from props"
-  );
+
   const userUniqeId = props.userUniqeId;
   const channelId = props.channelId;
   const channelName = props.channelName;
-
-  console.log(
-    channelId,
-    channelName,
-    "contact js channelId, channelName from props"
-  );
 
   useEffect(() => {
     setNotificationCountForClass({
       ...notificationCountForClass,
       [channelId]: unreadMessageCountDictForGroup[login_user.id],
     });
-  }, [channelId,unreadMessageCountDictForGroup[login_user.id]]);
-
-  useEffect(() => {
-    console.log(login_user.id, "login userrrrrrrr id");
-    console.log(notificationCountForClass, "notificationCountForClass");
-  }, [login_user.id,unreadMessageCountDictForGroup[login_user.id]]);
-
-  useEffect(() => {
-    setNotificationCountForUser({
-      ...notificationCountForUser,
-      [userUniqeId]: unreadMessageCountDict[userUniqeId],
-    });
-  }, [userUniqeId, unreadMessageCountDict[userUniqeId]]);
+  }, [unreadMessageCountDictForGroup,unreadMessageCountDictForGroup[login_user.id]]);
+    
+    useEffect(() => {
+      setNotificationCountForUser({
+        ...notificationCountForUser,
+        [userUniqeId]: unreadMessageCountDict[userUniqeId],
+      });
+    }, [unreadMessageCountDict, unreadMessageCountDict[userUniqeId]]);
+    
 
   useEffect(() => {
     setIsActive(activeUser.chatRoom);
   }, [activeUser]);
 
   useEffect(() => {
-    getGroupData();
+    getGroupData(0);
   }, []);
-  const getGroupData = () => {
+  const getGroupData = (value) => {
+    let page = value + 1
     axios
-      .get(`${utils.getHost()}/chat/get/user_connected_list/`, {
+      .get(`${utils.getHost()}/chat/get/user_connected_list/?p=${page}`, {
         headers: {
           Authorization: `Bearer ${Token}`,
         },
       })
       .then((response) => {
         const groups = response.data;
-        const prevGroup = [];
+        const prevGroup = [...group];
         const temp = groups.results.length;
         for (let i = 0; i < temp; i++) {
           if (groups.results[i].type === "Channel") {
@@ -102,11 +92,19 @@ function Contact(props) {
             }
           }
         }
+        setGroup([...prevGroup])
         setGroup(
           prevGroup.sort(function (a, b) {
             return a.created_at > b.created_at ? -1 : 1;
           })
         );
+        if (response.data.count > page * 20) {
+          setPage(page + 1)
+        }
+        else
+          setAllUser(false)
+
+      }).then(() => {
       })
       .catch((error) => {
         console.log("Not Able to fetch Groups ", error);
@@ -164,6 +162,11 @@ function Contact(props) {
             ) : null}
           </div>
         ))}
+        {allUser &&
+        <p className="d-flex justify-content-center button-upload-org" style={{ color: 'blue' }} onClick={() => {
+          getGroupData(page);
+        }}>show more</p>
+      }
       </div>
     </>
   );

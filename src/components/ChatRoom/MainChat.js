@@ -44,8 +44,6 @@ function MainChat(props) {
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [messageCount, setMessageCount] = useState(0);
-  // const [receiveMessageCount, setReceiveMessageCount] = useState(1);
-  // const [receiveMessageCountDict, setReceiveMessageCountDict] = useState({});
   const [load, setLoad] = useState(false);
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
@@ -63,6 +61,7 @@ function MainChat(props) {
   const type = props.type;
   const getChatImage = props.getChatImage;
   const [isConnected, setIsConnected] = useState(props.isConnected);
+  console.log(chatroomId,'***chatroomId from props***');
 
   useEffect(() => {
     setPage(1);
@@ -118,7 +117,7 @@ function MainChat(props) {
       .finally(() => {
         setLoad(false);
       });
-  }, [chatroom]);
+  }, [chatroom,chatroomId]);
 
   useEffect(() => {
     ws.onmessage = (evt) => {
@@ -136,8 +135,8 @@ function MainChat(props) {
         setCall(true);
         setVideoLink(receivedObj?.media_link);
       }
-
-      if (chatroomId === receivedObj.channel.id && isConnected == 0) {
+      console.log(chatroomId,'---chatroomId---',receivedObj.channel.id);
+      if (chatroomId == receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const message_type = receivedObj?.message_type;
@@ -298,7 +297,6 @@ function MainChat(props) {
     ReactDOM.render(<PopupContent />, videoNode);
   }
 
-  // const uniqueString = require("uuid").uuid.v4();
   const voiceNode = document.createElement("div");
   async function voiceCall(event) {
     event.preventDefault();

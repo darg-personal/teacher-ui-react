@@ -55,7 +55,7 @@ function OrgChannel(props) {
     }, []);
 
     const updateShow = () => {
-        props.back({ show: false })
+        setShowAddChannelPage(false)
     }
 
     const navigateToRequestPage = (data) => {
@@ -179,17 +179,17 @@ function OrgChannel(props) {
                     <>
                         <Container>
                             <Button style={{ justifyContent: 'center', margin: '-50px 10px' }} onClick={() => {
-                                updateShow()
+                                props.back({show:false})
                             }}>Back </Button>
                             <Card >
-                                <p style={{ fontSize: '25px', fontFamily: 'bold', alignSelf: 'center' }}>Orginization : {orgName.toUpperCase()}</p>
+                                <p style={{ fontSize: '25px', fontFamily: 'bold', alignSelf: 'center' }}>Orginization : {orgName}</p>
                             </Card>
-                            <p className="button-upload-org" style={{ float: 'right' }}
+                            <p className="button-upload-org1" style={{ float: 'right' }}
                                 onClick={() => setShowAddChannelPage(true)}>Add New Channel</p>
 
-                            <p className="button-upload-org" style={{ float: 'left' }}
+                            <p className="button-upload-org2" style={{ float: 'left' }}
                             // onClick={() => getChannels()}
-                            >{orgName.toUpperCase()} Channel's</p>
+                            >{orgName} Channel's</p>
                             <hr style={{ width: '100%' }}></hr>
 
                         </Container>
@@ -212,7 +212,7 @@ function OrgChannel(props) {
                     </>
 
                     :
-                    <CreateChannelPage goBack={updateShow} />
+                    <CreateChannelPage goBack={updateShow} orgId={orgId} />
                 }
             </div>
         </>

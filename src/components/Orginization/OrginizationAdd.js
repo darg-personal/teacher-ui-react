@@ -4,6 +4,8 @@ import axios from "axios";
 import "./orginization.css";
 import "../../css/auth/auth.scss";
 import "./addorg.css";
+import { ImageShow } from "../ChatRoom/templates/MainChat/Chat";
+import { ImgUpload } from "../ChatRoom/templates/MainChat/Chat";
 
 import { Button } from "react-bootstrap";
 
@@ -12,10 +14,39 @@ export const AddOrg = (props) => {
     let Token = localStorage.getItem("token");
     let loginFields = [
         {
-            placeholder: "Org name",
+            placeholder: "Orginization name",
             value: "",
-            name: "meta_attributes",
+            name: "Name",
             type: "text",
+            hasError: false,
+        },
+        {
+            name: "Address",
+            placeholder: "Orginization address",
+            value: "",
+            type: "text",
+            hasError: false,
+        },
+        {
+            name: "Phone Number",
+            placeholder: "Orginization Phone No. ",
+            value: "",
+            type: "tel",
+            hasError: false,
+        },
+
+        {
+            name: "About",
+            placeholder: "About orginization ",
+            value: "",
+            type: "text",
+            hasError: false,
+        },
+        {
+            name: "Email",
+            placeholder: "Orginization Email-Id",
+            value: "",
+            type: "email",
             hasError: false,
         },
     ];
@@ -26,6 +57,11 @@ export const AddOrg = (props) => {
     const setFieldValue = (value, index) => {
         let fieldData = [...fields];
         fieldData[index].value = value;
+        fieldData[index].address = value;
+        fieldData[index].phoneNumber = value;
+        fieldData[index].about = value;
+        fieldData[index].email = value;
+
         fieldData[index].hasError = value === "";
         updateFields(fieldData);
     };
@@ -35,13 +71,25 @@ export const AddOrg = (props) => {
         let requestObject = {};
         fields.forEach((field) => {
             requestObject[field.name] = field.value;
+            requestObject[field.address] = field.value;
+            requestObject[field.phoneNumber] = field.value;
+            requestObject[field.about] = field.value;
+            requestObject[field.email] = field.value;
+
         });
     };
 
 
     function addorg() {
         let items = [...fields];
-        let valu = { meta_attributes: items[0].value };
+        let valu = {
+            meta_attributes: items[0].value,
+            address: items[1].value,
+            about: items[2].value,
+            phoneNumber: items[2].value,
+            about: items[3].value,
+            email: items[4].value
+        };
         axios
             .post(
                 `${utils.getHost()}/chat/get/org`,
@@ -61,7 +109,11 @@ export const AddOrg = (props) => {
                         meta_attributes: org.meta_attributes,
                         orgId: org.id,
                         user: org.user,
-                        created_at: org.created_at
+                        created_at: org.created_at,
+                        address: org.address,
+                        phoneNumber: org.phoneNumber,
+                        about: org.about,
+                        email: org.email,
                     })
             })
             .catch((error) => {
@@ -78,10 +130,11 @@ export const AddOrg = (props) => {
                 <div className={"auth-container"}>
                     <Button onClick={() => {
                         props.goBack()
-                    }}>Back </Button>
+                    }}>
+                        <span>&#8592;</span>Back </Button>
                     <div className={"auth-content"}>
                         <div className={"auth-header"}>
-                            <h4>Add_Org</h4>
+                            <h4>Add Orginization</h4>
                         </div>
 
                         <form
@@ -93,11 +146,14 @@ export const AddOrg = (props) => {
                             <div className={"input-list centered-data"}>
                                 {fields.map((field, index) => {
                                     return (
-                                        <div className={`input-control`} key={index}>
+                                        <div className={`input-control`} >
+                                            {field.name}
                                             <input
                                                 type={field.type}
                                                 value={field.value}
                                                 name={field.name}
+                                                About={field.About}
+                                                Address={field.Address}
                                                 onChange={(event) =>
                                                     setFieldValue(event.target.value, index)
                                                 }
@@ -108,9 +164,12 @@ export const AddOrg = (props) => {
                                     );
                                 })}
                             </div>
-
+                            <ImageShow />
+                            <div style={{ float: 'right' }}>
+                                <ImgUpload />
+                            </div>
                             <div>
-                                <div className={"button-container "} style={{ marginTop: '100%' }}>
+                                <div className={"button-container "} style={{ marginTop: '20%' }}>
                                     <button onClick={addorg}>Add</button>
                                 </div>
                             </div>

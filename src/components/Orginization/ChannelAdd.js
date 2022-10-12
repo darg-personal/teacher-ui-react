@@ -21,7 +21,7 @@ export const CreateChannelPage = (props) => {
     ]
 
     const [fields, updateFields] = useState(channelNameFields);
-    const [Org, setOrg] = useState(channelNameFields);
+    const [Org, setOrg] = useState(props.orgId);
     const [Orginizations, setOrginizations] = useState([]);
     const [state, setState] = useState({
         file: "",
@@ -84,7 +84,6 @@ export const CreateChannelPage = (props) => {
                     tempstore.push({ org: alldata[i].meta_attributes, orgId: alldata[i].id })
             }
             setOrginizations(tempstore)
-            setOrg(tempstore[0].orgId)
         }).catch(resp => {
             alert("Indeed No Org")
         })

@@ -418,9 +418,9 @@ const [videoLink, setVideoLink] = useState(null);
       // listen to data sent from the websocket server
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
-      console.log("receivedObj  ",receivedObj);
+      console.log("*******receivedObj From Onmessage******** ",receivedObj);
       tempDict[receivedObj.from_user.id + receivedObj.from_user.username] =
-        receivedObj.unread_message_count;
+      receivedObj.unread_message_count;
       props.receiveMessageCount({
         unreadMessageCountDict: tempDict,
         unreadMessageCount: receivedObj.unread_message_count,
@@ -428,6 +428,7 @@ const [videoLink, setVideoLink] = useState(null);
       });
       const type = receivedObj?.message_type;
       if(type === "message/videocall" || type === "message/voicecall"){
+        console.log('------video call ---------');
         setCallType(type)
         setCall(true)
         setVideoLink( receivedObj?.media_link)

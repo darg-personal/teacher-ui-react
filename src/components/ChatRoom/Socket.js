@@ -14,7 +14,7 @@ export class Socket extends Component {
         this.state = {
             ws: {},
             chatRoom: "",
-            chatRoomId: null,
+            chatRoomId: 0,
             type: null,
             chatroomObj: [],
             temp: null,

@@ -96,10 +96,10 @@ export default function Orginization() {
                                     <Container>
                                         <div className='search-bar' >
                                             <div className="d-flex justify-content-center">
-                                                <h3>Orginization</h3>
+                                                <h3>Orginization's</h3>
                                             </div>
                                             <p type="click"
-                                                style={{ float: 'right', backgroundColor: 'transparent' }}
+                                                style={{ float: 'right' }}
                                                 className="button-upload-org" onClick={(data) => {
                                                     // handleSubmission()
                                                     setShow(true)
@@ -142,7 +142,7 @@ export default function Orginization() {
                                                     <h6 className="d-flex justify-content-center"> No More Orginizations ...</h6>
                                                 </>
                                                 :
-                                                <p style={{ color: "red" }}>Looks like You don't have Orginization</p>
+                                                <p style={{ color: "red" }}>Looks like you don't have Orginization</p>
                                             }
                                         </div>
                                     </Container>

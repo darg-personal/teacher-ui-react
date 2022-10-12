@@ -32,7 +32,6 @@ export function ImageView({
     float = "right",
 }) 
 {
-    console.log(image,'image...................!');
     return (
         <div className="darker" id={float}>
             <Card
