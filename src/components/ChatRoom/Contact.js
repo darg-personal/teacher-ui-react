@@ -112,6 +112,7 @@ function Contact(props) {
   };
 
   const handleClick = (value) => {
+    console.log(value,'value from handleclick');
     setIsActive(value.name);
     if (value.id + value.name == userUniqeId) {
       setNotificationCountForUser({

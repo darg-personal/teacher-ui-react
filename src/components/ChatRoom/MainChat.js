@@ -61,7 +61,7 @@ function MainChat(props) {
   const type = props.type;
   const getChatImage = props.getChatImage;
   const [isConnected, setIsConnected] = useState(props.isConnected);
-  console.log(chatroomId,'***chatroomId from props***');
+  
 
   useEffect(() => {
     setPage(1);

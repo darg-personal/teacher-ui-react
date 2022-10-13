@@ -34,6 +34,7 @@ export class Socket extends Component {
     }
 
     pull_data = (data) => {
+        console.log(data,'data in pull data in socket js');
         this.setState({ chatRoom: data.name });
         // tempChatRoomId = data.id;
         this.setState({ chatRoomId: data.id });
@@ -191,7 +192,9 @@ export class Socket extends Component {
             <>
                 {Token ? (
                     <div className="chatroom">
-                        <Contact type={this.pull_data} activeUser={this.state}
+                        <Contact 
+                            type={this.pull_data} 
+                            activeUser={this.state}
                             receiveMessageCount={this.state.receiveMessageCount}
                             chatroomUniqeId={this.state.chatroomUniqeId}
                             userUniqeId={this.state.userUniqeId}

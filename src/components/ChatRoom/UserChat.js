@@ -33,6 +33,10 @@ import CallIcon from '@mui/icons-material/Call';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { FullScreen } from "react-full-screen";
 import Modal from 'react-bootstrap/Modal';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+toast.configure()
+
 
 function UserChat(props) {
   // const handle = useFullScreenHandle();
@@ -50,6 +54,8 @@ function UserChat(props) {
   const getChatImage = props.getChatImage;
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
+  const [open, setOpen] = useState();
+  const [tempReceiverId, setTempReceiverId] = useState();
   const [state, setState] = useState({
     file: "",
     filePreviewUrl:
@@ -57,12 +63,19 @@ function UserChat(props) {
   });
   const [call, setCall] = useState(false);
   const [callType, setCallType] = useState('');
-const [videoLink, setVideoLink] = useState(null);
+  const [videoLink, setVideoLink] = useState(null);
 
   const userName = props.userName;
   const receiverId = props.userId;
   const type = props.type;
   var ws = props.websocket;
+
+  useEffect(()=>{
+    setTempReceiverId(receiverId)
+    console.log(receiverId,'receiverId from usechat useEffect');
+  },[messages,props])
+
+  // console.log(receiverId,'receiverId from UserChat props ');
   var tempDict = {};
 
   useEffect(() => {
@@ -320,7 +333,6 @@ const [videoLink, setVideoLink] = useState(null);
         const responseData = JSON.stringify(res.data);
         const message = JSON.parse(responseData);
         setMessageCount(message.count);
-        console.log( message.results);
         const prevMsgs = [];
         if (message?.results?.length)
           for (let i = message.results.length - 1; i >= 0; i--) {
@@ -419,6 +431,10 @@ const [videoLink, setVideoLink] = useState(null);
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
       console.log("*******receivedObj From Onmessage******** ",receivedObj);
+      if(loggedUser.id !== receivedObj.from_user.id){
+      // if(loggedUser.id !== receiverId){
+         notify();
+      }                 
       tempDict[receivedObj.from_user.id + receivedObj.from_user.username] =
       receivedObj.unread_message_count;
       props.receiveMessageCount({
@@ -433,7 +449,8 @@ const [videoLink, setVideoLink] = useState(null);
         setCall(true)
         setVideoLink( receivedObj?.media_link)
       }
-      if (receiverId === receivedObj.from_user.id) {
+      console.log(tempReceiverId,'tempReceiverId from on message');
+      if (tempReceiverId === receivedObj.from_user.id) {
         const massageTime = receivedObj?.created_at || "NA";
         const messageDate = new Date(massageTime);
         const message_type = receivedObj?.message_type;
@@ -463,7 +480,7 @@ const [videoLink, setVideoLink] = useState(null);
         setMessages([...prevMsgs]);
       }
     };
-  }, [messages]);
+  }, [messages,tempReceiverId]);
 
   const photoUpload = (event) => {
     event.preventDefault();
@@ -535,9 +552,6 @@ const [videoLink, setVideoLink] = useState(null);
   const clear = () => {
     setOpen(false);
   };
-
- 
-
   const RenderInWindow = (props) => {
     const [container, setContainer] = useState(null);
     const newWindow = useRef(window);
@@ -562,9 +576,19 @@ const [videoLink, setVideoLink] = useState(null);
     return container && createPortal(props.children, container);
   };
 
+  const notify = ()=>{
+    toast('New Message Recevied..!', {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+  }
 
-
-  const [open, setOpen] = useState();
   return (
     <>
       {/* Page content */}
