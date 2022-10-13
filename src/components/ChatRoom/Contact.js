@@ -99,7 +99,7 @@ function Contact(props) {
           })
         );
         if (response.data.count > page * 20) {
-          setPage(page + 1)
+          setPage(page)
         }
         else
           setAllUser(false)
