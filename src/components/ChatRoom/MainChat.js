@@ -24,6 +24,7 @@ import {
   ImgUpload,
   TextView,
   Answer,
+  notify,
 } from "./templates/MainChat/Chat";
 import Record from "./Recorder";
 import ReactDOM from "react-dom";
@@ -61,7 +62,6 @@ function MainChat(props) {
   const type = props.type;
   const getChatImage = props.getChatImage;
   const [isConnected, setIsConnected] = useState(props.isConnected);
-  
 
   useEffect(() => {
     setPage(1);
@@ -129,13 +129,15 @@ function MainChat(props) {
         channelId: receivedObj?.channel.id,
         channelName: receivedObj?.channel.name,
       });
-
-      const type = receivedObj?.message_type;
-      if ((type === "message/videocall" || type === "message/voicecall" ) && receivedObj?.user.username !== loggedUser.username) {
+      console.log(loggedUser.id,receivedObj?.user.id,'loggeduser id, receivedObj?.user.id');
+      if(loggedUser.id !== receivedObj?.user.id){
+        notify();
+      }  
+      const messageType = receivedObj?.message_type;
+      if ((messageType === "message/videocall" || messageType === "message/voicecall" ) && receivedObj?.user.username !== loggedUser.username) {
         setCall(true);
         setVideoLink(receivedObj?.media_link);
       }
-      console.log(chatroomId,'---chatroomId---',receivedObj.channel.id);
       if (chatroomId == receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
@@ -168,7 +170,6 @@ function MainChat(props) {
         const prevMsgs = [...messages];
         prevMsgs.push(msgObj);
 
-        // setIsConnected()
         setMessages([...prevMsgs]);
       }
     };

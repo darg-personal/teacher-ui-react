@@ -23,6 +23,7 @@ import {
   ImgUpload,
   TextView,
   Answer,
+  notify,
 } from "./templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import Record from "./Recorder";
@@ -33,10 +34,6 @@ import CallIcon from '@mui/icons-material/Call';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { FullScreen } from "react-full-screen";
 import Modal from 'react-bootstrap/Modal';
-import {toast} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-toast.configure()
-
 
 function UserChat(props) {
   // const handle = useFullScreenHandle();
@@ -432,7 +429,6 @@ function UserChat(props) {
       const receivedObj = JSON.parse(message);
       console.log("*******receivedObj From Onmessage******** ",receivedObj);
       if(loggedUser.id !== receivedObj.from_user.id){
-      // if(loggedUser.id !== receiverId){
          notify();
       }                 
       tempDict[receivedObj.from_user.id + receivedObj.from_user.username] =
@@ -442,8 +438,8 @@ function UserChat(props) {
         unreadMessageCount: receivedObj.unread_message_count,
         userUniqeId: receivedObj.from_user.id + receivedObj.from_user.username,
       });
-      const type = receivedObj?.message_type;
-      if(type === "message/videocall" || type === "message/voicecall"){
+      const messageType = receivedObj?.message_type;
+      if(messageType === "message/videocall" || messageType === "message/voicecall"){
         console.log('------video call ---------');
         setCallType(type)
         setCall(true)
@@ -575,19 +571,6 @@ function UserChat(props) {
 
     return container && createPortal(props.children, container);
   };
-
-  const notify = ()=>{
-    toast('New Message Recevied..!', {
-      position: "top-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      });
-  }
 
   return (
     <>
