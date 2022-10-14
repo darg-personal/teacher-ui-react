@@ -164,7 +164,6 @@ export class Socket extends Component {
                         show={this.getUserInfo}
                         receiveMessageCount={this.pullReceiveMessageCount}
                         receiveMessageCountDict={this.state.receiveMessageCountDict}
-
                     />
                 );
             }

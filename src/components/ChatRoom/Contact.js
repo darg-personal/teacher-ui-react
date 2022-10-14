@@ -56,6 +56,7 @@ function Contact(props) {
       })
       .then((response) => {
         const groups = response.data;
+        console.log(groups);
         const prevGroup = [];
         const temp = groups.results.length;
         for (let i = 0; i < temp; i++) {

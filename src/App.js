@@ -34,6 +34,7 @@ import OrgChannel from "./components/Orginization/OrginazationChannel";
 import UserRequest from "./components/Orginization/channelPage";
 import SearchChannelAndUser from "./components/SearchChannelAndUser/SearchChannelAndUser";
 import CreatePassword from "./pages/auth/CreatePassword";
+import Places from "./components/map_places/Places";
 // import SocketContext, { socket } from "context/socket";
 // import MyComponent from "./components/Service/MyComponent";
 function App() {
@@ -70,7 +71,8 @@ function App() {
             <Route path={"user_request"} element={<UserRequest />} />
             <Route path={"channels"} element={<SearchChannelAndUser />} />
             <Route path={"CreatePassword"} element={<CreatePassword />} />
-            
+            <Route path={"map"} element={<map />} />
+            <Route path={"place"} element={<Places />}/>
           </Route>
         </Routes>
       </Router>
