@@ -93,7 +93,7 @@ export default function Orginization() {
                             <Header />
                             <div className='App'>
                                 {!show ?
-                                    <Container>
+                                    <Container style={{backgroundColor:'transparent'}}>
                                         <div className='search-bar' >
                                             <div className="d-flex justify-content-center">
                                                 <h3>Orginization's</h3>
@@ -120,7 +120,8 @@ export default function Orginization() {
                                                             <div style={{
                                                                 background: 'skyblue', height: '90px',
                                                                 marginLeft: '25px', width: '80%', color: "white", padding: '5px',
-                                                                borderRadius: '10px', display: 'flex'
+                                                                borderRadius: '10px', display: 'flex',
+                                                                cursor:'pointer'
                                                             }} onClick={() =>
                                                                 getChannels(e)
                                                             }>

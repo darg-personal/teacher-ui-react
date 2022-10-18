@@ -18,25 +18,54 @@ export const CreateChannelPage = (props) => {
             type: "text",
             hasError: false
         },
+        {
+            placeholder: "about",
+            value: "",
+            About: "about",
+            type: "text",
+            hasError: false
+        },
     ]
 
     const [fields, updateFields] = useState(channelNameFields);
     const [Org, setOrg] = useState(props.orgId);
     const [Orginizations, setOrginizations] = useState([]);
+    const [selectedFile, setSelectedFile] = useState();
+    const [isSelected, setIsSelected] = useState(false);
     const [state, setState] = useState({
         file: "",
         filePreviewUrl:
-            require('../../assets/teacherlogo.png'),
+            'https://s3.us-west-1.amazonaws.com/sfappv2.1/Test/upload/b7d4e1bf-8de6-4412-9dcc-736d8da0c944.jpg'
     });
 
-    async function CreateChannel() {
+    async function CreateChannel(event) {
+        event.preventDefault();
         let items = [...fields]
         let formData = new FormData();
         formData.append("name", items[0].value);
         formData.append("org", Org);
-        formData.append("image", state.file);
+        formData.append("about", items[1].value);
 
-        if (state.file) {
+        let file_url;
+        if (isSelected) {
+            let formImage = new FormData();
+            formImage.append("file", selectedFile);
+            await axios
+                .post(`${utils.getHost()}/profile/upload`, formImage)
+                .then((resp) => {
+                    file_url = resp.data.file_url;
+                    formData.append("image", file_url);
+                })
+                .then(() => {
+                    setIsSelected(false)
+                })
+                .catch((error) => {
+                    setState({ file: false });
+                    alert("connection is breaked",error);
+                });
+        } else {
+            file_url = null;
+        }
             await axios.post(`${utils.getHost()}/chat/get/channel`, formData,
                 {
                     headers: {
@@ -45,7 +74,8 @@ export const CreateChannelPage = (props) => {
                     }
                 }).then(data => {
                     let value = data?.data?.msg
-                    let valu = { Channel: value.id, designation: 0, user: value.created_by, org: value.org };
+                    let valu = { Channel: value.id, designation: 0, user: value.created_by, org: value.org, about: value.about,
+                     };
                     axios
                         .post(
                             `${utils.getHost()}/chat/get/channelmember`,
@@ -61,11 +91,8 @@ export const CreateChannelPage = (props) => {
                     }, 5000);
                 }).catch(resp => {
                     alert("NetWork Error....", resp)
-            })
-        }
-        else {
-            alert('Please Upload custom Profile')
-        }
+                })
+        
     }
 
     async function GetOrginizations() {
@@ -110,6 +137,8 @@ export const CreateChannelPage = (props) => {
         event.preventDefault();
         const reader = new FileReader();
         const file = event.target.files[0];
+        setSelectedFile(event.target.files[0]);
+        setIsSelected(true);
         reader.onloadend = () => {
             setState({
                 file: file,
@@ -138,19 +167,21 @@ export const CreateChannelPage = (props) => {
                             ))}
                         </select>
                     </div>
-                    <p>Channel Name</p>
                     {
                         fields.map((field, index) => {
-                            return <div className={`input-control`} key={index}>
-                                <input
-                                    type={field.type}
-                                    value={field.value}
-                                    name={field.name}
-                                    onChange={event => updateFieldValue(event.target.value, index)}
-                                    placeholder={field.placeholder}
-                                    className={`${field.hasError ? 'input-error' : ''}`}
-                                />
-                            </div>
+                            return <>
+                                <p>{field.placeholder}</p>
+                                <div className={`input-control`} key={index}>
+                                    <input
+                                        type={field.type}
+                                        value={field.value}
+                                        name={field.name}
+                                        onChange={event => updateFieldValue(event.target.value, index)}
+                                        placeholder={field.placeholder}
+                                        className={`${field.hasError ? 'input-error' : ''}`}
+                                    />
+                                </div>
+                            </>
                         })
                     }
                 </div>
@@ -161,7 +192,7 @@ export const CreateChannelPage = (props) => {
                             onClick={() => {
                                 setState({
                                     file: null,
-                                    filePreviewUrl: require('../../assets/teacherlogo.png'),
+
                                 });
                             }}
                             color="primary"
@@ -171,7 +202,7 @@ export const CreateChannelPage = (props) => {
                         null)}
                     <ImageShow filePreviewUrl={state.filePreviewUrl} />
                     <div style={{ float: 'right' }}>
-                        <ImgUpload onChange={photoUpload} />
+                        <ImgUpload onChange={photoUpload} uplaodType={'sendChannelImage'} />
                     </div>
                 </div>
                 <div className={'centered-data'}>

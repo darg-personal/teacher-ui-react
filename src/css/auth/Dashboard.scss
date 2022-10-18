@@ -3,7 +3,16 @@
     align-items: flex-start;
     // header scss start
     .header-main{
-        width: calc(100% - 230px);
+        // width: calc(100% - 230px);
+        width: calc(250% - 230px);
+        max-width: 85%;
+        margin: right 1px;;
+        margin-left: auto;
+        padding: 0rem;
+        display: block;
+        right: 0px;
+        top: 0;
+        bottom: 0;
         .container{
             @media (min-width:1200px) {
                 max-width: 1400px !important;
@@ -59,7 +68,16 @@
     }
     // sidebar scss start
     .sidebar-wrap{
-        width: 230px;
+        // width: 230px;
+        height: 100% !important;
+        max-width: 990%;
+        margin: auto;
+        padding: 1;
+        position:fixed;
+        top: 0;
+        bottom: 0;
+        overflow-y: scroll;
+        width: 15%;
         background-color: #132644;
         .sidebar-data{
             .teach-wrap{
