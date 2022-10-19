@@ -52,7 +52,7 @@ function UserChat(props) {
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
   const [open, setOpen] = useState();
-  const [tempReceiverId, setTempReceiverId] = useState();
+  const [tempReceiverId, setTempReceiverId] = useState(null);
   const [state, setState] = useState({
     file: "",
     filePreviewUrl:
@@ -68,12 +68,69 @@ function UserChat(props) {
   var ws = props.websocket;
 
   useEffect(()=>{
+    // console.log(receiverId,'---------------receiverId--------------------');
     setTempReceiverId(receiverId)
-    console.log(receiverId,'receiverId from usechat useEffect');
-  },[messages,props])
+  },[props])
 
-  // console.log(receiverId,'receiverId from UserChat props ');
   var tempDict = {};
+
+  useEffect(() => {
+    ws.onmessage = (evt) => {
+      // listen to data sent from the websocket server
+      const message = JSON.parse(JSON.stringify(evt.data));
+      const receivedObj = JSON.parse(message);
+      console.log("*******receivedObj From Onmessage******** ",receivedObj);
+      tempDict[receivedObj.from_user.id + receivedObj.from_user.username] =
+      receivedObj.unread_message_count;
+      props.receiveMessageCount({
+        unreadMessageCountDict: tempDict,
+        unreadMessageCount: receivedObj.unread_message_count,
+        userUniqeId: receivedObj.from_user.id + receivedObj.from_user.username,
+      });
+      console.log(loggedUser.id ,receivedObj.from_user.id, receivedObj.to_user.id,receiverId,'loggedUser.id ,receivedObj.from_user.id, receivedObj.to_user.id,receiverId');
+      if(loggedUser.id !== receivedObj.from_user.id){
+         notify();
+      }
+      const messageType = receivedObj?.message_type;
+      if(messageType === "message/videocall" || messageType === "message/voicecall"){
+        console.log('------video call---------');
+        setCallType(type)
+        setCall(true)
+        setVideoLink( receivedObj?.media_link)
+      }
+      // console.log(tempReceiverId,'tempReceiverId from on message');
+      if (tempReceiverId == receivedObj.from_user.id) {
+        const massageTime = receivedObj?.created_at || "NA";
+        const messageDate = new Date(massageTime);
+        const message_type = receivedObj?.message_type;
+
+        const time = messageDate.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const date = messageDate.toLocaleDateString("en-US", {
+          weekday: "short",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+
+        const msgObj = {
+          sender: receivedObj?.from_user.username || "NA",
+          message: receivedObj?.message_text || "NA",
+          time: time || "NA",
+          date: date || "NA",
+          profile: receivedObj?.user_profile.image || null,
+          message_type: message_type || "message/text",
+          media_link: receivedObj?.media_link || null,
+        };
+        const prevMsgs = [...messages];
+        prevMsgs.push(msgObj);
+        setMessages([...prevMsgs]);
+      }
+    // }
+    };
+  }, [messages]);
 
   useEffect(() => {
     if (scrollBottom) {
@@ -221,7 +278,7 @@ function UserChat(props) {
     } }
     getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
 />
-   
+
 
       </Modal.Body>
       <Modal.Footer>
@@ -240,7 +297,7 @@ function UserChat(props) {
     };
     ReactDOM.render(<PopupContent />, videoNode);
   }
-  
+
 // const uniqueString = require("uuid").uuid.v4();
   const voiceNode = document.createElement("div");
   async function voiceCall(event) {
@@ -297,14 +354,14 @@ function UserChat(props) {
                 // you can also store it locally to execute commands
             } }
             getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
-        />        
+        />
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="danger" onClick={clear}>Leave</Button>
               </Modal.Footer>
-            </Modal>          
+            </Modal>
                 </div>
-        
+
       );
     };
     const clear = () => {
@@ -421,62 +478,6 @@ function UserChat(props) {
         setLoad(false);
       });
   }
-
-  useEffect(() => {
-    ws.onmessage = (evt) => {
-      // listen to data sent from the websocket server
-      const message = JSON.parse(JSON.stringify(evt.data));
-      const receivedObj = JSON.parse(message);
-      console.log("*******receivedObj From Onmessage******** ",receivedObj);
-      if(loggedUser.id !== receivedObj.from_user.id){
-         notify();
-      }                 
-      tempDict[receivedObj.from_user.id + receivedObj.from_user.username] =
-      receivedObj.unread_message_count;
-      props.receiveMessageCount({
-        unreadMessageCountDict: tempDict,
-        unreadMessageCount: receivedObj.unread_message_count,
-        userUniqeId: receivedObj.from_user.id + receivedObj.from_user.username,
-      });
-      const messageType = receivedObj?.message_type;
-      if(messageType === "message/videocall" || messageType === "message/voicecall"){
-        console.log('------video call ---------');
-        setCallType(type)
-        setCall(true)
-        setVideoLink( receivedObj?.media_link)
-      }
-      console.log(tempReceiverId,'tempReceiverId from on message');
-      if (tempReceiverId === receivedObj.from_user.id) {
-        const massageTime = receivedObj?.created_at || "NA";
-        const messageDate = new Date(massageTime);
-        const message_type = receivedObj?.message_type;
-
-        const time = messageDate.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-        const date = messageDate.toLocaleDateString("en-US", {
-          weekday: "short",
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        });
-
-        const msgObj = {
-          sender: receivedObj?.from_user.username || "NA",
-          message: receivedObj?.message_text || "NA",
-          time: time || "NA",
-          date: date || "NA",
-          profile: receivedObj?.user_profile.image || null,
-          message_type: message_type || "message/text",
-          media_link: receivedObj?.media_link || null,
-        };
-        const prevMsgs = [...messages];
-        prevMsgs.push(msgObj);
-        setMessages([...prevMsgs]);
-      }
-    };
-  }, [messages,tempReceiverId]);
 
   const photoUpload = (event) => {
     event.preventDefault();
@@ -599,8 +600,8 @@ function UserChat(props) {
           cursor: "pointer",}}
           onClick={voiceCall}
           >
-          
-          </CallIcon> 
+
+          </CallIcon>
 
         <VideocamIcon
           style={{
@@ -612,7 +613,7 @@ function UserChat(props) {
             cursor: "pointer",
           }}
         onClick={videoCall}
-        
+
         ></VideocamIcon>
       </div>
       <div className="position-fixed  end-0">
@@ -649,7 +650,7 @@ function UserChat(props) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        
+
         <JitsiMeeting
               domain={"conference.dreampotential.org"}
               roomName="PleaseUseAGoodRoomName"
@@ -780,7 +781,7 @@ function UserChat(props) {
 
                   </div>
                 )}
-                
+
               </div>
             );
           })}

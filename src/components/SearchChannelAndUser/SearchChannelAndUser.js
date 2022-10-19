@@ -30,6 +30,9 @@ export default function SearchChannelAndUser() {
     const [output, setOutput] = useState([])
     const [status, setStatus] = useState(2)
     const [request, setRequest] = useState({})
+    const [onSearchRequest, setOnSearchRequest] = useState({})
+    const [searchGroup, setSearchGroup] = useState([]);
+    const [inputSearch, setInputSearch] = useState('');
 
     async function getOrginizations() {
         axios
@@ -64,7 +67,6 @@ export default function SearchChannelAndUser() {
                                 ...request,
                                 req
                             });
-
                         }
                 }
                 console.log({ request });
@@ -151,6 +153,159 @@ export default function SearchChannelAndUser() {
             });
         }, 5000);
     }
+
+    const ShowData = () => {
+        return (<div className='output'>
+            {output.map((e, i) => (
+                <div key={i}>
+                    <div style={{
+                        background: 'skyblue', height: 'auto',
+                        width: '80%', color: "white", padding: '5px',
+                        borderRadius: '10px'
+                    }}>
+                        <ListItemAvatar >
+                            <Avatar alt={e.ChannelName} src={e.image} style={{
+                                alignItems: 'center',
+                                height: '35px',
+                                width: '35px'
+                            }} />
+                        </ListItemAvatar>
+                        <div style={{
+                            marginTop: "-25px",
+                            paddingLeft: "80px"
+                        }} >
+                            <span >Channel Name : {e.ChannelName}</span>
+                            {requestType.terminated == request[e.type + e.orgId + e.ChannelId] &&
+                                <span style={{ float: 'right' }} >
+                                    <Button disabled class="btn btn-secondary">Request</Button>
+                                </span>}
+                            {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
+                                ||
+                                requestType.reRequest == request[e.type + e.orgId + e.ChannelId])
+                                &&
+                                <span style={{ float: 'right' }} >
+                                    <Button onClick={() => { sendRequest(e) }
+                                    }>Request</Button>
+
+                                </span>}
+                            {requestType.Leave == request[e.type + e.orgId + e.ChannelId] &&
+                                <span style={{ float: 'right' }} >
+                                    <Button onClick={() => { leaveRequest(e) }
+                                    }>Leave</Button>
+                                </span>}
+
+                            {requestType.cancel == request[e.type + e.orgId + e.ChannelId]
+                                && <span style={{ float: 'right' }} >
+                                    <Button onClick={() => { sendCancleRequest(e) }
+                                    }>Cancel</Button>
+                                </span>}
+                            <p >ORGINIZATION: {e.orgName}</p>
+                            <span style={{ float: 'right' }} >About : {e.about}</span>
+                            <p >OWNER:  {e.owner}</p>
+                        </div>
+
+                    </div>
+                    <hr style={{ width: '100%' }}></hr>
+                </div>
+            ))}
+        </div>)
+    }
+
+    const DisplaySearch = () => {
+        return (<div className='output'>
+            {searchGroup.map((e, i) => (
+                <div key={i}>
+                    <div style={{
+                        background: 'skyblue', height: 'auto',
+                        width: '80%', color: "white", padding: '5px',
+                        borderRadius: '10px'
+                    }}>
+                        <ListItemAvatar >
+                            <Avatar alt={e.ChannelName} src={e.image} style={{
+                                alignItems: 'center',
+                                height: '35px',
+                                width: '35px'
+                            }} />
+                        </ListItemAvatar>
+                        <div style={{
+                            marginTop: "-25px",
+                            paddingLeft: "80px"
+                        }} >
+                            <span >Channel Name : {e.ChannelName}</span>
+                            {requestType.terminated == request[e.type + e.orgId + e.ChannelId] &&
+                                <span style={{ float: 'right' }} >
+                                    <Button disabled class="btn btn-secondary">Request</Button>
+                                </span>}
+                            {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
+                                ||
+                                requestType.reRequest == request[e.type + e.orgId + e.ChannelId])
+                                &&
+                                <span style={{ float: 'right' }} >
+                                    <Button onClick={() => { sendRequest(e) }
+                                    }>Request</Button>
+
+                                </span>}
+                            {requestType.Leave == request[e.type + e.orgId + e.ChannelId] &&
+                                <span style={{ float: 'right' }} >
+                                    <Button onClick={() => { leaveRequest(e) }
+                                    }>Leave</Button>
+                                </span>}
+
+                            {requestType.cancel == request[e.type + e.orgId + e.ChannelId]
+                                && <span style={{ float: 'right' }} >
+                                    <Button onClick={() => { sendCancleRequest(e) }
+                                    }>Cancel</Button>
+                                </span>}
+                            <p >ORGINIZATION: {e.orgName}</p>
+                            <span style={{ float: 'right' }} >About : {e.about}</span>
+                            <p >OWNER:  {e.owner}</p>
+                        </div>
+
+                    </div>
+                    <hr style={{ width: '100%' }}></hr>
+                </div>
+            ))}
+        </div>)
+    }
+
+    function getChat(targetValue) {
+        axios
+            .get(`${utils.getHost()}/chat/get/user_and_group_list/?search=${targetValue}`, {
+                headers: {
+                    Authorization: `Bearer ${Token}`,
+                },
+            })
+            .then(response => {
+                const responseData = JSON.stringify(response.data);
+                const data = JSON.parse(responseData);
+                let val = []
+                let tempData = data.results
+                for (let i = 0; i < tempData.length; i++) {
+                    if (tempData[i]?.org != 1)
+                        if (tempData[i]?.org?.user?.username !== login_user.username) {
+                            console.log(tempData[i]?.requested);
+                            val.push({
+                                "image": tempData[i]?.image,
+                                "orgId": tempData[i]?.org?.id,
+                                "orgName": tempData[i]?.org?.meta_attributes, "ChannelId": tempData[i]?.id,
+                                "ChannelName": tempData[i]?.name,
+                                "owner": tempData[i]?.org?.user?.username, "about": tempData[i]?.about,
+                                "type": "Channel"
+                            })
+                            const uniqueId = tempData[i].type + tempData[i]?.org?.id + tempData[i]?.id
+                            var req = onSearchRequest;
+                            req[uniqueId] = tempData[i]?.requested;
+                            setOnSearchRequest({
+                                ...onSearchRequest,
+                                req
+                            });
+                        }
+                }
+                setSearchGroup(val)
+            })
+    }
+
+
     return (
         <>
             {
@@ -165,78 +320,27 @@ export default function SearchChannelAndUser() {
                                         <h3>Groups / Users</h3>
                                     </div>
                                     <div className='d-flex justify-content-center' style={{ marginLeft: '15px' }} >
-                                        <input onChange={e => console.log("setInput(e.target.value)")}
-                                            type="text" placeholder='Search User/Group/...' aria-label="Search "
+                                        <input onChange={e => {
+                                            setInputSearch(e.target.value)
+                                            if (e.target.value.length > 0) {
+                                                getChat(e.target.value)
+                                            }
+                                            }
+                                        }
+                                            type="text" placeholder='Search Group/...' aria-label="Search "
                                         />
-                                        {/* <p type="click"
-                                            style={{ backgroundColor: 'transparent' }}
-                                            className=" button-upload-org justify-content-right" onClick={(data) => {
-                                                getOrginizations()
-                                            }}>Refresh </p> */}
                                     </div>
                                     <hr style={{ width: '100%' }}></hr>
-                                    {output.length > 0 ?
-                                        <div className='output'>
-                                            {output.map((e, i) => (
-                                                <div key={i}>
-                                                    <div style={{
-                                                        background: 'skyblue', height: 'auto',
-                                                        width: '80%', color: "white", padding: '5px',
-                                                        borderRadius: '10px'
-                                                    }}>
-                                                        {/* {'' + e.orgId + e.ChannelId} */}
-                                                        <ListItemAvatar >
-                                                            <Avatar alt={e.ChannelName} src={e.image} style={{
-                                                                // padding: '5px',
-                                                                alignItems: 'center',
-                                                                height: '35px',
-                                                                width: '35px'
-                                                            }} />
-                                                        </ListItemAvatar>
-                                                        <div style={{
-                                                            marginTop: "-25px",
-                                                            paddingLeft: "80px"
-                                                        }} >
-                                                            <span >Channel Name : {e.ChannelName}</span>
-                                                            {requestType.terminated == request[e.type + e.orgId + e.ChannelId] &&
-                                                                <span style={{ float: 'right' }} >
-                                                                    <Button disabled class="btn btn-secondary">Request</Button>
-                                                                </span>}
-                                                            {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
-                                                                ||
-                                                                requestType.reRequest == request[e.type + e.orgId + e.ChannelId])
-                                                                &&
-                                                                <span style={{ float: 'right' }} >
-                                                                    <Button onClick={() => { sendRequest(e) }
-                                                                    }>Request</Button>
-
-                                                                </span>}
-                                                            {requestType.Leave == request[e.type + e.orgId + e.ChannelId] &&
-                                                                <span style={{ float: 'right' }} >
-                                                                    <Button onClick={() => { leaveRequest(e) }
-                                                                    }>Leave</Button>
-                                                                </span>}
-
-                                                            {requestType.cancel == request[e.type + e.orgId + e.ChannelId]
-                                                                && <span style={{ float: 'right' }} >
-                                                                    <Button onClick={() => { sendCancleRequest(e) }
-                                                                    }>Cancel</Button>
-                                                                </span>}
-                                                            <p >ORGINIZATION: {e.orgName}</p>
-                                                            <span style={{ float: 'right' }} >About : {e.about}</span>
-                                                            <p >OWNER:  {e.owner}</p>
-                                                        </div>
-
-                                                    </div>
-                                                    <hr style={{ width: '100%' }}></hr>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        :
-                                        <div className="d-flex justify-content-center">
-                                            <h1>No Groups/ User To Show</h1>
-                                        </div>
-                                    }
+                                    {inputSearch.length > 0 && DisplaySearch()}
+                                    {inputSearch.length == 0 && <>
+                                        {output.length > 0 ?
+                                            ShowData()
+                                            :
+                                            <div className="d-flex justify-content-center">
+                                                <h1>No Groups/ User To Show</h1>
+                                            </div>
+                                        }
+                                    </>}
                                 </Container>
 
 

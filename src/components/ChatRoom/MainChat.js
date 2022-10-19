@@ -129,7 +129,7 @@ function MainChat(props) {
         channelId: receivedObj?.channel.id,
         channelName: receivedObj?.channel.name,
       });
-      console.log(loggedUser.id,receivedObj?.user.id,'loggeduser id, receivedObj?.user.id');
+      // console.log(loggedUser.id,receivedObj?.user.id,'loggeduser id, receivedObj?.user.id');
       if(loggedUser.id !== receivedObj?.user.id){
         notify();
       }  
@@ -138,6 +138,7 @@ function MainChat(props) {
         setCall(true);
         setVideoLink(receivedObj?.media_link);
       }
+      console.log(chatroomId,receivedObj.channel.id,'chatrrrom id from on message mainchat');
       if (chatroomId == receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
@@ -531,34 +532,6 @@ function MainChat(props) {
       });
   };
 
-  function handelclickpopupcall(event) {
-    event.preventDefault();
-    let id = require("uuid").v4();
-    function popupWindow(url, windowName, win, w, h) {
-      const y = win.top.outerHeight / 2 + win.top.screenY - h / 2;
-      const x = win.top.outerWidth / 2 + win.top.screenX - w / 2;
-      ws.send(
-        JSON.stringify({
-          meta_attributes: "react",
-          message_type: "message/videocall",
-          media_link: `https://conference.dreampotential.org/${chatroom}${id}`,
-          message_text: "",
-        })
-      );
-      return win.open(
-        url,
-        windowName,
-        `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`
-      );
-    }
-    popupWindow(
-      `https://conference.dreampotential.org/${chatroom}${id}`,
-      "test",
-      window,
-      800,
-      600
-    );
-  }
 
   return (
     <div className="chatroom">

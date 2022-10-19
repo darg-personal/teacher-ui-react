@@ -7,6 +7,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { Badge } from "@mui/material";
+import { DisplaySearchUser } from "../Axios/ChatPannel/ChatPannel";
 
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
@@ -15,6 +16,8 @@ function Contact(props) {
   const [isActive, setIsActive] = useState();
   const [page, setPage] = useState(0);
   const [allUser, setAllUser] = useState(true);
+  const [searchGroup, setSearchGroup] = useState([]);
+  const [inputSearch, setInputSearch] = useState('');
   const activeUser = props.activeUser;
 
   const [notificationCountForClass, setNotificationCountForClass] = useState({});
@@ -135,9 +138,64 @@ function Contact(props) {
     });
   };
 
+  function getChat(targetValue) {
+    console.log(targetValue.length);
+    if (targetValue.length > 0) {
+      const val = DisplaySearchUser(targetValue);
+      val.then((resp) => {
+        setSearchGroup([...resp])
+      })
+      return true;
+    }
+    return false
+  }
+
+  const DisplaySearch = () => {
+    return (<>
+      {searchGroup && searchGroup.map((e, i) => (
+        <div
+          key={e.id + e.name}
+          className={e.name === isActive ? "link active" : "link"}
+          onClick={() => handleClick(e)}
+        >
+          <ListItemAvatar>
+            <Avatar alt={e.name} src={e.image} />
+          </ListItemAvatar>
+          <ListItemText primary={e.name} secondary="last seen 08:00" />
+          {e.name !== isActive ? (
+            e.type === "Channel" ? (
+              <Badge
+                badgeContent={notificationCountForClass[e.id] || 0}
+                color="success"
+              ></Badge>
+            ) : (
+              <Badge
+                badgeContent={notificationCountForUser[e.id + e.name] || 0}
+                color="success"
+              ></Badge>
+            )
+          ) : null}
+        </div>
+      ))}
+    </>
+    )
+  }
+
   return (
     <>
       <div className="sidebar">
+      <div >
+          <input onChange={e => {
+            setInputSearch(e.target.value)
+
+            getChat(e.target.value)
+          }}
+            type="text" placeholder='Search User...' aria-label="Search"
+            style={{ borderRadius: '20', borderWidth: 1, width: '100%' }}
+          />
+        </div>
+        {inputSearch.length > 0 && DisplaySearch()}
+        {inputSearch.length == 0 && <>
         {group.map((e, i) => (
           <div
             key={e.id + e.name}
@@ -168,6 +226,8 @@ function Contact(props) {
           getGroupData(page);
         }}>show more</p>
       }
+      </>
+        }
       </div>
     </>
   );
