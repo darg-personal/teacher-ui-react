@@ -219,7 +219,7 @@ export const AddOrg = (props) => {
                                 <ImgUpload onChange={photoUpload} />
                             </div>
                             <div>
-                                <div className={"button-container "} style={{ marginTop: '20%' }}>
+                               <div className={"button-container "} style={{ marginTop: '40%' }}>
                                     <button onClick={addorg}>Add</button>
                                 </div>
                             </div>

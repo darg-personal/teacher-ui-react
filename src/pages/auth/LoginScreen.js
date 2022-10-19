@@ -68,10 +68,17 @@ const LoginScreen = () => {
     updateFeedbackData({ ...feedbackTemplate });
     updateSendingRequest(true);
 
+    const options = {
+      headers: {
+          "Access-Control-Allow-Origin": "*"
+      }
+    };
+
     axios.post(
       // "http://192.168.1.37:8000/profile/user/login",
       `${utils.getHost()}/profile/user/login`,
-      requestObject
+      requestObject,
+     // options
     )
       .then((response) => {
         console.log({ response });
