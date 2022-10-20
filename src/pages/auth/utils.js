@@ -5,7 +5,7 @@ function getHost() {
     var HOST = '';  
     if (window.location.origin.includes("localhost")) { 
         // HOST = 'http://localhost:8000';
-        HOST = 'http://192.168.29.147:8000';
+        HOST = 'http://192.168.29.147:9000';
         // HOST = 'http://192.168.1.30:8000';
         console.log(HOST);
       }
@@ -35,8 +35,8 @@ function getHost() {
     var WEBSOCKET_HOST = '';
     if (window.location.origin.includes("localhost")) {
         // WEBSOCKET_HOST = 'ws://localhost:8000';
-        WEBSOCKET_HOST = 'ws://localhost:8000';
-        WEBSOCKET_HOST = 'ws://192.168.29.147:8000';
+        // WEBSOCKET_HOST = 'ws://localhost:8000';
+        WEBSOCKET_HOST = 'ws://192.168.29.147:9000';
         // WEBSOCKET_HOST = 'ws://192.168.29.187:8000';
       }
       else{

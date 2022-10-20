@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import utils from "../../pages/auth/utils";
 
 const AddNewLoacation = () => {
 
@@ -23,7 +23,7 @@ const AddNewLoacation = () => {
 
         await axios({
           method: 'post',
-          url:'http://127.0.0.1:8000/sfapp2/api/place/create/',
+          url:`${utils.getHost()}/sfapp2/api/place/create/`,
           data: formField
         }).then(response=>{
           console.log(response.data);

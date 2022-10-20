@@ -3,6 +3,7 @@ import './mixins.scss'
 import React, { useEffect, useRef, useState } from "react";
 import { GoogleMap, InfoWindow, Marker,DirectionsService,DirectionsRenderer } from "@react-google-maps/api";
 import axios from "axios";
+import utils from "../../pages/auth/utils";
 // import {withGoogleMap,withScriptjs,DirectionsRenderer,} from 'react-google-maps';
 // import AddNewLoacation from './addNewLoacation'
 
@@ -121,7 +122,7 @@ function Map() {
   const getCoordinates = async () => {
     try {
       let coordinates = await axios.get(
-        "http://127.0.0.1:8000/sfapp2/api/places"
+        `${utils.getHost()}/sfapp2/api/places`
       );
       coordinates = coordinates.data;
       console.log(coordinates,'AA GAYE');
