@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./contact.css";
 import axios from "axios";
 import { useEffect } from "react";
 import utils from "../../pages/auth/utils";
@@ -10,6 +9,7 @@ import { Badge } from "@mui/material";
 import { DisplaySearchUser } from "../Axios/ChatPannel/ChatPannel";
 import { FaSearch } from "react-icons/fa";
 import { ImArrowLeft2 } from "react-icons/im";
+import "./contact.css";
 
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
@@ -38,7 +38,7 @@ function Contact(props) {
       ...notificationCountForClass,
       [channelId]: unreadMessageCountDictForGroup[login_user.id],
     });
-  }, [unreadMessageCountDictForGroup,unreadMessageCountDictForGroup[login_user.id]]);
+  }, [unreadMessageCountDictForGroup, unreadMessageCountDictForGroup[login_user.id]]);
 
   useEffect(() => {
     setNotificationCountForUser({
@@ -118,7 +118,7 @@ function Contact(props) {
   };
 
   const handleClick = (value) => {
-    console.log(value,'value from handleclick');
+    console.log(value, 'value from handleclick');
     setIsActive(value.name);
     if (value.id + value.name == userUniqeId) {
       setNotificationCountForUser({
@@ -187,12 +187,9 @@ function Contact(props) {
   return (
     <div className="sidebar">
       <div style={{
-        border: 'none',
-        outline: 'none',
         padding: '10px 16px',
         backgroundColor: '#b9b4b4',
         fontSize: '18px',
-        display: 'flex',
       }}>
         <ListItemAvatar>
           <Avatar alt={`xyz`} src={login_userImage} />
@@ -211,15 +208,14 @@ function Contact(props) {
         }
         <input onChange={e => {
           setInputSearch(e.target.value)
-
           getChat(e.target.value)
         }}
           value={inputSearch}
           type="text" placeholder='Search User ...'
-          style={{ border: 'none', width: '80%', borderRadius: '20px', outline: 'none' , backgroundColor:'#e2dfdf'}}
+          style={{ border: 'none', width: '80%', borderRadius: '20px', outline: 'none', backgroundColor: '#e2dfdf' }}
         />
       </div>
-        <hr style={{width: '100%'}} />
+      <hr style={{ width: '100%' }} />
 
       {inputSearch.length > 0 && DisplaySearch()}
       {
@@ -234,7 +230,7 @@ function Contact(props) {
                   <Avatar alt={e.name} src={e.image} style={{ height: '50px', width: '50px' }} />
                 </ListItemAvatar>
                 <>
-                <ListItemText primary={e.name}  secondary="last seen 09:00"/>
+                  <ListItemText primary={e.name} secondary="last seen 09:00" />
                 </>
                 {e.name !== isActive ? (
                   e.type === "Channel" ? (
@@ -250,7 +246,7 @@ function Contact(props) {
                   )
                 ) : null}
               </div>
-              <hr style={{justifyItems:'flex-end', marginTop: '1px' ,marginBottom:'1px',width:'80%',marginLeft:'20%'}} />
+              <hr style={{ marginTop: '1px', marginBottom: '1px', width: '80%', marginLeft: '20%' }} />
             </div>
           ))}
           {allUser &&

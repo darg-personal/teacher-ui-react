@@ -1,33 +1,19 @@
-.chatroom{
-  /* border-radius: 5px;
-} */
-
-box-sizing: border-box;
+.groupChat{
   height: 100vh;
-  width: 100vw;
+  width: 100%;
 }
-/* Chat containers */
 .container{
   min-width: 50px;
   width: 30px;
   max-width: fit-content;
-  /* border: 2px solid #dedede;
-  background-color: hwb(0 95% 5%);
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin: 10px 10px; */
-  /* height: 130px; */
 }
 
-/* Darker chat container */
 .darker{
   border-color: #ccc;
   background-color: rgb(70, 68, 68);
   color: white;
 }
 
-
-/* Style time text */
 .time-right{
   float: right;
   margin-top: 10px;
@@ -43,8 +29,6 @@ input{
   border: 2px solid #555;
 }
 
-/* Style images */
-/* .container img{ */
 .message-avatar{
   float: left;
   max-width: 40px;
@@ -52,15 +36,12 @@ input{
   border-radius: 50%;
 }
 
-
-/* Style the right image */
 .container img.right{
   float: right;
   margin-left: 20px;
   margin-right: 0;
 }
 
-/* avatar name */
 .name{
   color: rgb(0, 0, 0);
   font-size: 15px;
@@ -71,31 +52,25 @@ input{
 }
 
 .content{
-  margin-left: 25%;
   padding: 1px 16px;
   height: 80%;
-  width: 75%;
+  width: 100%;
   overflow-y: auto;
   overflow-wrap: break-word;
-  /* background-color: #aaa; */
-
 }
 
-
 .box{
+  border-width: 3px;
   position: fixed;
-  width: 75%;
-  margin-top: 5px;
+  width: 100%;
   padding: 0px 5px;
-  margin-left: 23%;
-  bottom: 0;
-
+  bottom: 3px;
 }
 
 .input_text{
-  height: 59px;
+  height: 60px;
   border-radius: 10px;
-  width: 80%;
+  width: 70%;
 }
 
 .btn-outline-success{
@@ -128,7 +103,6 @@ input{
   font-size: 16px;
   font-weight: bold;
   border-radius: 0px 10px 10px 10px;
-  /* margin-right: 10%; */
   max-width: 40%;
 
 }
@@ -136,7 +110,6 @@ input{
 #left img{
   float: left;
   margin-left: 10px;
-  /* margin-right:0; */
 }
 
 #left p{
@@ -144,8 +117,6 @@ input{
   color: white;
 }
 
-/* .chat-content
-} */
 .responsive-image{
   margin: 0px;
   height: 25px;
@@ -158,18 +129,14 @@ input{
 
 .header-chat{
   display: flex;
-  /* justify-content: space-between; */
+  justify-content: space-between;
   padding: 2px 0px;
 }
 
 .profile-header{
-  position: relative;
-  list-style-type: none;
   padding: 16px 10px;
-  overflow: hidden;
   background-color: #075E54;
-  width: 79%;
-  float: right;
+  width: 100%;
 }
 
 

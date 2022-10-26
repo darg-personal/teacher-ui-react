@@ -1,30 +1,26 @@
 import React, { createRef, useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import "./mainChat.css";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import { BiDotsVerticalRounded } from "react-icons/bi";
-import { AiOutlineArrowLeft } from "react-icons/ai";
-import { Card, Dropdown } from "react-bootstrap";
-import IconButton from "@mui/material/IconButton";
+import { Dropdown } from "react-bootstrap";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
-import CardHeader from "react-bootstrap/esm/CardHeader";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import {
-  ChatHeader,
   ImageShow,
   ImageView,
   ImgUpload,
   TextView,
   Answer,
   notify,
+  ChatHeader,
 } from "./templates/MainChat/Chat";
 import Record from "./Recorder";
 import ReactDOM from "react-dom";
@@ -57,6 +53,7 @@ function MainChat(props) {
   const [call, setCall] = useState(false);
   const [callType, setCallType] = useState('');
   const [videoLink, setVideoLink] = useState(null);
+  const [sendVoiceNote, setSendVoiceNote] = useState(true);
 
   // Props
   const chatroom = props.chatRoom;
@@ -219,6 +216,7 @@ function MainChat(props) {
       document.getElementById("inp").value = "";
     }
   }
+
   const videoNode = document.createElement("div");
   function videoCall(event) {
     event.preventDefault();
@@ -361,7 +359,7 @@ function MainChat(props) {
     };
     ReactDOM.render(<PopupContent />, voiceNode);
   }
-  //OnScroll fetch more data from pagination api
+
   function updateData(value) {
     axios
       .get(
@@ -412,7 +410,7 @@ function MainChat(props) {
         setLoad(false);
       });
   }
-  //onScroll
+
   const onScroll = () => {
     if (scrollBottom.current) {
       const { scrollTop } = scrollBottom.current;
@@ -425,10 +423,8 @@ function MainChat(props) {
       }
     }
   };
-  //useEffect
+
   useEffect(() => {
-    // const { scrollTop } = scrollBottom.current;
-    // if (scrollBottom && scrollTop !== 0) {
     if (scrollBottom) {
       scrollBottom.current.addEventListener("DOMNodeInserted", (event) => {
         const { currentTarget: target } = event;
@@ -452,26 +448,6 @@ function MainChat(props) {
     reader.readAsDataURL(file);
   };
 
-  const ChatOptions = () => {
-    return (
-      <div className="three-dots">
-        <i className="bi bi-three-dots-vertical"></i>
-        <Dropdown>
-          <Dropdown.Toggle variant="white" id="dropdown-basic">
-            <BiDotsVerticalRounded
-              id="dropdown-basic"
-              style={{ color: "#FFF" }}
-            ></BiDotsVerticalRounded>
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu className="drop">
-            <Dropdown.Item>Settings</Dropdown.Item>
-            <Dropdown.Item>Details</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
-    );
-  };
   const onStopRecording = async (recording) => {
     let formData = new FormData();
     formData.append("file", recording, "audio.mp3");
@@ -510,56 +486,18 @@ function MainChat(props) {
       });
   };
 
-
   return (
-    <div className="chatroom">
-      <div className="profile-header">
-        <div className="header-chat">
-          <ListItemAvatar
-            onClick={() =>
-              props.show({
-                show: true,
-                type: type,
-                chatroomId: chatroomId,
-                websocket: ws,
-              })
-            }
-          >
-            <Avatar alt={chatroom} src={getChatImage} />
-          </ListItemAvatar>
-          <li className="" style={{ color: "white", fontWeight: "bold" }}>
-            {chatroom}
-          </li>
-        </div>
-      </div>
-      <div className="position-fixed  end-0">
-        <CallIcon
-          style={{
-            color: "white",
-            position: "relative",
-            right: "200",
-            top: "15",
-            fontSize: "40",
-            cursor: "pointer",
-          }}
-          onClick={voiceCall}
-        ></CallIcon>
-
-        <VideocamIcon
-          style={{
-            color: "white",
-            position: "relative",
-            right: "100",
-            top: "15",
-            fontSize: "40",
-            cursor: "pointer",
-          }}
-          onClick={videoCall}
-        ></VideocamIcon>
-      </div>
-      <div className="position-fixed  end-0">
-        <ChatOptions />
-      </div>
+    <div className="groupChat">
+      <ChatHeader
+        name={chatroom}
+        props={props}
+        type={type}
+        image={getChatImage}
+        ws={ws}
+        onclickVoice={(e) => voiceCall(e)}
+        onclickVedio={(e) => videoCall(e)}
+        chatroomId = {chatroomId}
+      />
       {load ? <Loader /> : null}
       <div >
         {call && (
@@ -666,21 +604,23 @@ function MainChat(props) {
       )}
 
       <div className="box">
-        <form>
-          <input
-            ref={inputRef}
-            className="input_text"
-            id="inp"
-            type="text"
-            placeholder="Enter Text Here..."
-            onKeyDown={(e) => e.key === "Enter" && handleClick}
-          />
-          <ImgUpload onChange={photoUpload} />
+        <input
+          ref={inputRef}
+          className="input_text"
+          id="inp"
+          type="text"
+          placeholder="Enter Text Here..."
+          onKeyDown={(e) => e.key === "Enter" || handleClick}
+          onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
+        />
+        <ImgUpload onChange={photoUpload} />
+        {!sendVoiceNote ?
           <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
             <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }} ></SendRoundedIcon>
           </button>
-          <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
-        </form>
+          :
+          <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer', color: 'green' }} sx={{ fontSize: 40 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
+        }
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 .sidebar {
     margin: 0;
     padding: 0;
-    width: 21%;
-    background-color: #b9b4b4;
-    position: fixed;
+    min-width: 20%;
+    max-width: 25%;
+    background-color: #b4b9b4;
     height: 100%;
     overflow: auto;
   }
@@ -18,32 +18,30 @@
     background-color: 'red'
   } 
 
+
   .link {
-    border: none;
-    outline: none;
     padding: 10px 16px;
-    background-color: #b9b4b4;
+    background-color: #889b33;
     cursor: pointer;
     font-size: 18px;
     display: flex;
   }
   .active {
-    background-color: #222;
+    background-color: rgb(148, 190, 90);
     color: white;
   }
   .link:hover {
-    background-color: #666;
+    background-color: rgb(156, 188, 139);
     color: white;
   }
-*/
+
   .sidebar a {
     display: block;
-    color: black;
+    color: #889b33;
     padding: 16px;
     text-decoration: none;
   }
 
-  /* On screens that are less than 700px wide, make the sidebar into a topbar */
   @media screen and (max-width: 700px) {
     .sidebar {
       width: 100%;
@@ -58,7 +56,6 @@
     }
   }
 
-  /* On screens that are less than 400px, display the bar vertically, instead of horizontally */
   @media screen and (max-width: 400px) {
     .sidebar a {
       text-align: center;

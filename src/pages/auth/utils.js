@@ -6,17 +6,19 @@ function getHost() {
     HOST = "http://localhost:8000";
     console.log(HOST);
   }
-   else if (window.location.origin.includes("teacher-v2.dreampotential.org/")) {
+  else if (window.location.origin.includes("teacher-v2.dreampotential.org/")) {
     HOST = "https://api.dreampotential.org";
     console.log(HOST);
-   }
-   else if (window.location.origin.includes("teacher-v2.alt-r.world")) {
+  }
+  else if (window.location.origin.includes("teacher-v2.alt-r.world")) {
     HOST = "https://python-base-api.alt-r.world";
     console.log(HOST);
   } else {
-     HOST = "http://18.117.227.68:8041"
+    HOST = "http://18.117.227.68:8041"
     //HOST = "https://api.dreampotential.org";
   }
+  HOST = "http://18.117.227.68:8041"
+
   return HOST;
 }
 
@@ -39,6 +41,8 @@ function getWebsocketHost() {
     //WEBSOCKET_HOST = "wss://api.dreampotential.org";
     WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
   }
+  WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
+
   return WEBSOCKET_HOST;
 }
 

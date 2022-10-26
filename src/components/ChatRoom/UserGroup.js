@@ -59,7 +59,8 @@ function UserGroup(props) {
   }
 
   useEffect(() => {
-    if (chatRoomId)
+    console.log(chatRoomId);
+    if (type === 'Channel')
       getUsers();
   }, [name, chatRoomId, image]);
 
@@ -93,17 +94,13 @@ function UserGroup(props) {
       })
   }
   return (
-    <>
+    <div className="chatProfile">
       <Card
         style={{
-          margin: "0px",
           width: "30rem",
           paddingLeft: "2px",
-          textAlign: "left",
-          left: "35%",
           height: "5rem",
-        }}
-      >
+        }}      >
         <Card.Body>
           <Card.Text>
             <ul className="header-user">
@@ -122,7 +119,6 @@ function UserGroup(props) {
           margin: "3px",
           textAlign: "center",
           width: "30rem",
-          left: "35%",
           height: "auto",
         }}
       >
@@ -136,7 +132,7 @@ function UserGroup(props) {
         </Card.Body>
       </Card>
       <Card
-        style={{ margin: "3px", width: "30rem", left: "35%", height: "5rem" }}
+        style={{ margin: "3px", width: "30rem", height: "5rem" }}
       >
         <Card.Body>
           <span style={{ fontSize: '10px', color: 'gray' }}>About</span>
@@ -145,7 +141,7 @@ function UserGroup(props) {
       </Card>
       {type === 'Channel' ?
         <Card
-          style={{ margin: "3px", width: "30rem", left: "35%", height: "auto" }}
+          style={{ margin: "3px", width: "30rem", height: "auto" }}
         >
           <Card.Body>
             User's
@@ -176,16 +172,16 @@ function UserGroup(props) {
         </Card>
         : null}
       <Card
-        style={{ margin: "3px", width: "30rem", left: "35%", height: "7.5rem" }}
+        style={{ margin: "3px", width: "30rem", height: "7.5rem" }}
       >
         <Card.Body>
           <Card.Text>Block {name}</Card.Text>
           <Card.Text>Report {name}</Card.Text>
           {type === 'Channel' ?
-            <Card.Text style={{ color: "blue" }} onClick={exitGroup}>Exit Group</Card.Text>
+            <Card.Text style={{ color: "blue",cursor:'pointer' }} onClick={exitGroup}>Exit Group</Card.Text>
             : null} </Card.Body>
       </Card>
-    </>
+    </div>
   );
 }
 

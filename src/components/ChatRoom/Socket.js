@@ -5,7 +5,7 @@ import UserChat from "./UserChat";
 import Contact from "./Contact";
 import UserGroup from "./UserGroup";
 import { Navigate } from "react-router-dom";
-
+import './chatroom.css'
 let Token = localStorage.getItem("token");
 // var tempChatRoomId
 export class Socket extends Component {
@@ -87,30 +87,8 @@ export class Socket extends Component {
       this.setState({ temp: getSocket });
       this.setState({ userStatus: userst });
       this.setState({ isConnected: isConnected });
-      //   that.timeout = 250; // reset timer to 250 on open of websocket connection
-      //   clearTimeout(connectInterval); // clear Interval on on open of websocket connection
     };
 
-    // getSocket.onclose = (e) => {
-    //   console.log(
-    //     `Socket is closed. Reconnect will be attempted in ${Math.min(
-    //       10000 / 1000,
-    //       (that.timeout + that.timeout) / 1000
-    //     )} second.`,
-    //     e.reason
-    //   );
-    //   that.timeout = that.timeout + that.timeout; //increment retry interval
-    //   connectInterval = setTimeout(this.check, Math.min(10000, that.timeout)); //call check function after timeout
-    // };
-
-    // getSocket.onerror = (err) => {
-    //   console.error(
-    //     "Socket encountered error: ",
-    //     err.message,
-    //     "Closing socket"
-    //   );
-    //   getSocket.close();
-    // };
   };
 
   check = (cRoom, id, type, isConnected) => {
@@ -142,6 +120,13 @@ export class Socket extends Component {
     this.setState({ show: false });
     if (data.ws) this.setState({ temp: data.ws });
   }
+
+  getUserInfo = (data) => {
+    console.log(data);
+    this.setState({ show: data.show });
+    if (data.websocket) this.setState({ temp: data.websocket });
+    this.setState({ chatRoomId: data.chatroomId });
+  };
   chatMethod = () => {
     if (this.state.show && this.state.isConnected == 0) {
       return (
@@ -162,7 +147,6 @@ export class Socket extends Component {
         return (
           <MainChat
             chatRoom={this.state.chatRoom}
-            // chatRoomId={tempChatRoomId}
             chatRoomId={this.state.chatRoomId}
             type={this.state.type}
             websocket={this.state.temp}
@@ -177,7 +161,6 @@ export class Socket extends Component {
           return (
             <UserChat
               userName={this.state.chatRoom}
-              // userId={tempChatRoomId}
               userId={this.state.chatRoomId}
               type={this.state.type}
               websocket={this.state.temp}
@@ -191,13 +174,6 @@ export class Socket extends Component {
       }
     }
   };
-
-  getUserInfo = (data) => {
-    this.setState({ show: data.show });
-    if (data.websocket) this.setState({ temp: data.websocket });
-    this.setState({ chatRoomId: data.chatroomId });
-  };
-
   render() {
     return (
       <>
