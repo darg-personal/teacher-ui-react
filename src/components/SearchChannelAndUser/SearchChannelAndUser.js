@@ -195,7 +195,7 @@ export default function SearchChannelAndUser() {
                             <span >Channel Name : {e.ChannelName}</span>
                             {requestType.terminated == request[e.type + e.orgId + e.ChannelId] &&
                                 <span style={{ float: 'right' }} >
-                                    <Button disabled class="btn btn-secondary">Request</Button>
+                                    <Button disabled className="btn btn-secondary">Request</Button>
                                 </span>}
                             {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
                                 ||
@@ -278,7 +278,8 @@ export default function SearchChannelAndUser() {
                             <div className='App'>
                                 <Container>
                                     <div className="d-flex justify-content-center">
-                                        <h3>Groups / Users</h3>
+                                        {/* <h3>Groups / Users</h3> */}
+                                        <h3>Groups </h3>
                                     </div>
                                     <div className='d-flex justify-content-center' style={{ marginLeft: '15px' }} >
                                         <input onChange={e => {

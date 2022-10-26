@@ -138,6 +138,10 @@ export class Socket extends Component {
   reDirect = (data) => {
     this.pull_data(data);
   };
+  setShowDetail = (data) => {
+    this.setState({ show: false });
+    if (data.ws) this.setState({ temp: data.ws });
+  }
   chatMethod = () => {
     if (this.state.show && this.state.isConnected == 0) {
       return (
@@ -145,7 +149,7 @@ export class Socket extends Component {
           name={this.state.chatRoom}
           chatRoomId={this.state.chatRoomId}
           type={this.state.type}
-          show={this.getUserInfo}
+          show={this.setShowDetail}
           image={this.state.image}
           websocket={this.state.temp}
           updateGrupinfo={this.updateGroupinfo}

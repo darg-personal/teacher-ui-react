@@ -60,6 +60,21 @@ export const AddOrg = (props) => {
 
     });
 
+    const [successAlert, setSuccessAlert] = useState(false);
+    const [errorAlert, setErrorAlert] = useState(false);
+    const successBanner = {
+        color: "#fff",
+        backgroundColor: "green",
+        borderRadius: 2, padding: '1%',
+        justifyContent: 'center'
+    };
+    const errorBanner = {
+        color: "#fff",
+        backgroundColor: "red",
+        borderRadius: 2, padding: '1%',
+        justifyContent: 'center'
+    }
+
     const setFieldValue = (value, index) => {
         let fieldData = [...fields];
         fieldData[index].value = value;
@@ -85,6 +100,7 @@ export const AddOrg = (props) => {
         });
     };
 
+    const [alert, setAlert] = useState();
 
     async function addorg(event) {
         event.preventDefault();
@@ -133,28 +149,34 @@ export const AddOrg = (props) => {
             )
             .then((response) => {
                 const org = response.data.data;
-                if (response.status == 203)
-                    alert(`Orginization Name. ${response?.data?.error?.meta_attributes}`)
-                if (response.status == 201)
-                    props.updateNewOrginization({
-                        meta_attributes: org.meta_attributes,
-                        orgId: org.id,
-                        user: org.user,
-                        created_at: org.created_at,
-                        address: org.address,
-                        phoneNumber: org.phoneNumber,
-                        about: org.about,
-                        email: org.email,
-                        thumb: org.image
-                    })
+                if (response.status == 203) {
+                    console.log(response?.data?.error);
+                    setErrorAlert(true)
+                    if (response?.data?.error?.meta_attributes)
+                        setAlert(`Orginization Name. is ${response?.data?.error?.meta_attributes}`)
+                    else
+                        setAlert(`PhoneNumber : ${response?.data?.error?.phone_number}`)
+                } if (response.status == 201) {
+                    setSuccessAlert(true)
+                    setTimeout(() => {
+                        props.updateNewOrginization({
+                            meta_attributes: org.meta_attributes,
+                            orgId: org.id,
+                            user: org.user,
+                            created_at: org.created_at,
+                            address: org.address,
+                            phoneNumber: org.phoneNumber,
+                            about: org.about,
+                            email: org.email,
+                            thumb: org.image
+                        })
+                    }, 4999);
+                }
             })
             .catch((error) => {
 
             });
     }
-    // const { getRootProps, getInputProps } = useDropzone()
-    const [files, setFiles] = useState([]);
-
     const { getRootProps, getInputProps } = useDropzone({
         accept: 'image/*',
         onDrop: (event) => {
@@ -172,7 +194,23 @@ export const AddOrg = (props) => {
 
     return (
         <>
-
+            <div className={"centered-data"}>
+                {successAlert &&
+                    <div style={successBanner}>
+                        <span className="d-flex justify-content-center">
+                            {`${fields[0].value} is Created Successfully`}
+                        </span>
+                    </div>
+                }
+                {errorAlert &&
+                    <div style={errorBanner}>
+                        <span className="d-flex justify-content-center">
+                            {`${alert}`}
+                            <span > &nbsp;&nbsp;&nbsp;&nbsp;x </span>
+                        </span>
+                    </div>
+                }
+            </div>
             <div
                 className={"login-section page-container"}
                 style={{ display: "flex" }}

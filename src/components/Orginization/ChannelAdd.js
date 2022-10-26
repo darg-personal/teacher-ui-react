@@ -27,6 +27,7 @@ export const CreateChannelPage = (props) => {
         },
     ]
 
+    const [alert, setAlert] = useState();
     const [fields, updateFields] = useState(channelNameFields);
     const [Org, setOrg] = useState(props.orgId);
     const [Orginizations, setOrginizations] = useState([]);
@@ -38,6 +39,8 @@ export const CreateChannelPage = (props) => {
     });
 
     async function CreateChannel(event) {
+        setErrorAlert(false)
+        setSuccessAlert(false)
         event.preventDefault();
         let items = [...fields]
         // let formData = new FormData();
@@ -99,7 +102,7 @@ export const CreateChannelPage = (props) => {
                         }
                     ).then((resp) => {
                         let temp = resp?.data?.msg;
-                        console.log();
+                        setSuccessAlert(true)
                         setTimeout(() => {
                             props.channelCreated({
                                 channeName: items[0].value, channelThumb: file_url,
@@ -109,7 +112,9 @@ export const CreateChannelPage = (props) => {
                         }, 5000);
                     })
             }).catch(resp => {
-                alert(resp)
+                setErrorAlert(true)
+                console.log(resp?.message);
+                setAlert(resp?.message + '\t Try with another Name')
             })
 
     }
@@ -164,80 +169,115 @@ export const CreateChannelPage = (props) => {
             });
         }
     });
-
-    return <div className={'login-section page-container'}>
-        <div className={'auth-container'}>
-            <Button onClick={() => {
-                props.goBack()
-            }}>Back </Button>
-
-            <div className={'auth-content'}>
-                <div className={'auth-header'}>
-                    <h4> Create Channnel</h4>
-                </div>
-                <div className={'input-list centered-data'}>
-                    <div className="input-control">
-                        <p>Select Orginization</p>
-                        <select value={Org} className="input-control" onChange={setval}>
-                            {Orginizations.map((orginization) => (
-                                <option value={orginization.orgId} >{orginization.org}</option>
-                            ))}
-                        </select>
+    const [successAlert, setSuccessAlert] = useState(false);
+    const [errorAlert, setErrorAlert] = useState(false);
+    const successBanner = {
+        color: "#fff",
+        backgroundColor: "green",
+        borderRadius: 2, padding: '1%',
+        justifyContent: 'center'
+    };
+    const errorBanner = {
+        color: "#fff",
+        backgroundColor: "red",
+        borderRadius: 2, padding: '1%',
+        justifyContent: 'center'
+    }
+    return (
+        <>
+            <div className={"centered-data"}>
+                {successAlert &&
+                    <div style={successBanner}>
+                        <span className="d-flex justify-content-center">
+                            {`${fields[0].value} is Created Successfully`}
+                        </span>
                     </div>
-                    {
-                        fields.map((field, index) => {
-                            return <div key={index}>
-                                <p>{field.placeholder}</p>
-                                <div className={`input-control`} key={index}>
-                                    <input
-                                        type={field.type}
-                                        value={field.value}
-                                        name={field.name}
-                                        onChange={event => updateFieldValue(event.target.value, index)}
-                                        placeholder={field.placeholder}
-                                        className={`${field.hasError ? 'input-error' : ''}`}
-                                    />
-                                </div>
-                            </div>
-                        })
-                    }
-                </div>
-                <div style={{ width: state.file ? '80%' : '60%', marginLeft: state.file ? '10%' : '20%' }}>
-                    {state.file ? (
-                        <CancelSharpIcon
-                            style={{ float: 'right', padding: '5px' }}
-                            onClick={() => {
-                                setState({
-                                    file: null,
-
-                                });
-                            }}
-                            color="primary"
-                            fontSize="large"
-                        />
-                    ) : (
-                        null)}
-                    <div style={{
-                        cursor: 'pointer', padding: '3%',
-                        justifyContent: 'center',
-                    }} {...getRootProps()} >
-                        {state.filePreviewUrl &&
-                            <ImageShow filePreviewUrl={state.filePreviewUrl} />}
-                        <input {...getInputProps()} />
-                        {!state.filePreviewUrl &&
-                            <p>{`Drag or click to select files`}</p>
-                        }
+                }
+                {errorAlert &&
+                    <div style={errorBanner}>
+                        <span className="d-flex justify-content-center">
+                            {`${alert}`}
+                            <span > &nbsp;&nbsp;&nbsp;&nbsp;x </span>
+                        </span>
                     </div>
-                </div>
-                <div className={'centered-data'}>
-                    <div className={'button-container'}>
-                        <button type={'submit'} onClick={CreateChannel}
-                            disabled={fields.filter(field => field.value === '').length > 0}>
-                            Add Channel</button>
-                    </div>
-                </div>
+                }
             </div>
-        </div>
+            <div className={'login-section page-container'}>
 
-    </div>
+                <div className={'auth-container'}>
+                    <Button onClick={() => {
+                        props.goBack()
+                    }}>Back </Button>
+
+                    <div className={'auth-content'}>
+                        <div className={'auth-header'}>
+                            <h4> Create Channnel</h4>
+                        </div>
+                        <div className={'input-list centered-data'}>
+                            <div className="input-control">
+                                <p>Select Orginization</p>
+                                <select value={Org} className="input-control" onChange={setval}>
+                                    {Orginizations.map((orginization) => (
+                                        <option value={orginization.orgId} >{orginization.org}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {
+                                fields.map((field, index) => {
+                                    return <div key={index}>
+                                        <p>{field.placeholder}</p>
+                                        <div className={`input-control`} key={index}>
+                                            <input
+                                                type={field.type}
+                                                value={field.value}
+                                                name={field.name}
+                                                onChange={event => updateFieldValue(event.target.value, index)}
+                                                placeholder={field.placeholder}
+                                                className={`${field.hasError ? 'input-error' : ''}`}
+                                            />
+                                        </div>
+                                    </div>
+                                })
+                            }
+                        </div>
+                        <div style={{ width: state.file ? '80%' : '60%', marginLeft: state.file ? '10%' : '20%' }}>
+                            {state.file ? (
+                                <CancelSharpIcon
+                                    style={{ float: 'right', padding: '5px' }}
+                                    onClick={() => {
+                                        setState({
+                                            file: null,
+
+                                        });
+                                    }}
+                                    color="primary"
+                                    fontSize="large"
+                                />
+                            ) : (
+                                null)}
+                            <div style={{
+                                cursor: 'pointer', padding: '3%',
+                                justifyContent: 'center',
+                            }} {...getRootProps()} >
+                                {state.filePreviewUrl &&
+                                    <ImageShow filePreviewUrl={state.filePreviewUrl} />}
+                                <input {...getInputProps()} />
+                                {!state.filePreviewUrl &&
+                                    <p>{`Drag or click to select files`}</p>
+                                }
+                            </div>
+                        </div>
+                        <div className={'centered-data'}>
+                            <div className={'button-container'}>
+                                <button type={'submit'} onClick={CreateChannel}
+                                    disabled={fields.filter(field => field.value === '').length > 0}>
+                                    Add Channel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </>
+    )
 }
