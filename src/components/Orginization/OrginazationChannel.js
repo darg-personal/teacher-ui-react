@@ -37,7 +37,6 @@ function OrgChannel(props) {
                 console.log({ value });
                 let data = []
                 for (let i = 0; i < value.length; i++) {
-                    // if(value.isExist != 5)
                     data.push({
                         'orgId': value[i]?.org,
                         'name': value[i]?.name,
@@ -54,8 +53,21 @@ function OrgChannel(props) {
         getChannels();
     }, []);
 
-    const updateShow = () => {
-        props.back({ show: false })
+    const goBack = () => {
+        setShowAddChannelPage(false)
+    }
+    const channelCreated = (data) => {
+        console.log(data?.channeName);
+        let temp = []
+        temp.push({
+            'orgId': orgId,
+            'name': data?.channeName,
+            'profile': data?.channelThumb,
+            'isExist': data?.isExist,
+            'channelId': data?.channelId,
+        })
+        setUsers([...temp,...users])
+        setShowAddChannelPage(false)
     }
 
     const navigateToRequestPage = (data) => {
@@ -108,12 +120,9 @@ function OrgChannel(props) {
     function Channels() {
         return <>
             <div style={{
-                margin: 0,
-                padding: 0,
                 width: '25%',
                 overflow: 'auto',
             }}>
-
                 {users.length > 0 ?
                     <>
                         {users.map((user, i) => (
@@ -179,17 +188,17 @@ function OrgChannel(props) {
                     <>
                         <Container>
                             <Button style={{ justifyContent: 'center', margin: '-50px 10px' }} onClick={() => {
-                                updateShow()
+                                props.back({ show: false })
                             }}>Back </Button>
                             <Card >
-                                <p style={{ fontSize: '25px', fontFamily: 'bold', alignSelf: 'center' }}>Orginization : {orgName.toUpperCase()}</p>
+                                <p style={{ fontSize: '25px', fontFamily: 'bold', alignSelf: 'center' }}>Orginization : {orgName}</p>
                             </Card>
-                            <p className="button-upload-org" style={{ float: 'right' }}
+                            <p className="button-upload-org1" style={{ float: 'right' }}
                                 onClick={() => setShowAddChannelPage(true)}>Add New Channel</p>
 
-                            <p className="button-upload-org" style={{ float: 'left' }}
+                            <p className="button-upload-org2" style={{ float: 'left' }}
                             // onClick={() => getChannels()}
-                            >{orgName.toUpperCase()} Channel's</p>
+                            >{orgName} Channel's</p>
                             <hr style={{ width: '100%' }}></hr>
 
                         </Container>
@@ -212,7 +221,7 @@ function OrgChannel(props) {
                     </>
 
                     :
-                    <CreateChannelPage goBack={updateShow} />
+                    <CreateChannelPage channelCreated={channelCreated} orgId={orgId} goBack={goBack} />
                 }
             </div>
         </>

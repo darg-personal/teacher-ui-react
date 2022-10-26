@@ -59,7 +59,8 @@ function UserGroup(props) {
   }
 
   useEffect(() => {
-    getUsers();
+    if (chatRoomId)
+      getUsers();
   }, [name, chatRoomId, image]);
 
   function userinfo(value) {
@@ -108,7 +109,7 @@ function UserGroup(props) {
             <ul className="header-user">
               <li >
                 <ImCross onClick={() => {
-                  props.show({ show: false });
+                  props.show({ show: false, ws: ws });
                 }} />
               </li>
             </ul>
@@ -157,8 +158,8 @@ function UserGroup(props) {
                       <Avatar alt={user.user} src={user.image} style={{ height: '30px', width: '30px' }} />
                       {
                         (loggedUser.username === user.user) ?
-                          <snap style={{color : 'blue'}}>
-                            {user.user} 
+                          <snap style={{ color: 'blue' }}>
+                            {user.user}
                           </snap>
                           :
                           <>

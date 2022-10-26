@@ -1,21 +1,18 @@
-import utils from "../../pages/auth/utils";
 import React, { useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
+import {Container,Row,Col} from 'react-bootstrap';
 import OrgChannel from "./OrginazationChannel";
 import Sidebar from "../../pages/auth/Sidebar";
 import Header from "../../pages/auth/Header";
+import utils from "../../pages/auth/utils";
 import "./orginization.css";
 import "../../css/auth/auth.scss";
 import "./addorg.css";
-
-import { Button, Container } from "react-bootstrap";
-import { Avatar, ListItemAvatar } from "@mui/material";
-import { ImageShow } from "../ChatRoom/templates/MainChat/Chat";
+import OrgCard from "./OrginizationCard";
 import { AddOrg } from "./OrginizationAdd";
 export default function Orginization() {
     let Token = localStorage.getItem("token");
-    let navigate = useNavigate();
     let login_user = JSON.parse(localStorage.getItem("user"));
 
     const [input, setInput] = useState('')
@@ -40,7 +37,11 @@ export default function Orginization() {
                         val.push({
                             "orgId": data[i]?.id,
                             "orgName": data[i]?.meta_attributes,
-                            "owner": data[i]?.user.username
+                            "owner": data[i]?.user.username,
+                            "email":data[i]?.email,
+                            "phone_number":data[i]?.phone_number,
+                            "about":data[i]?.about,
+                            "thumb":data[i]?.image
                         })
                 }
                 setOutput(val)
@@ -79,7 +80,11 @@ export default function Orginization() {
         val.push({
             "orgId": data?.orgId,
             "orgName": data?.meta_attributes,
-            "owner": login_user.username
+            "owner": data?.user,
+            "email":data?.email,
+            "phone_number":data?.phoneNumber,
+            "about":data?.about,
+            "thumb":data?.thumb
         })
         setOutput([...val,...output])
     }
@@ -93,56 +98,36 @@ export default function Orginization() {
                             <Header />
                             <div className='App'>
                                 {!show ?
-                                    <Container>
+                                    <Container style={{backgroundColor:'transparent'}}>
                                         <div className='search-bar' >
                                             <div className="d-flex justify-content-center">
-                                                <h3>Orginization</h3>
+                                                <h3>Orginization's</h3>
                                             </div>
                                             <p type="click"
-                                                style={{ float: 'right', backgroundColor: 'transparent' }}
+                                                style={{ float: 'right' }}
                                                 className="button-upload-org" onClick={(data) => {
                                                     // handleSubmission()
                                                     setShow(true)
                                                     setAddOrg(true)
                                                 }}>ADD New Orginization </p>
-                                            {/* <p type="click"
-                                                style={{ float: 'right', backgroundColor: 'transparent' }}
-                                                className="button-upload-org" onClick={(data) => {
-                                                    getOrginizations()
-                                                }}>Refresh </p> */}
+                        
                                         </div>
                                         <hr style={{ width: '100%' }}></hr>
                                         <div className='output'>
                                             {output.length > 0 ?
                                                 <>
-                                                    {output.map((e, i) => (
-                                                        <div key={i}>
-                                                            <div style={{
-                                                                background: 'skyblue', height: '90px',
-                                                                marginLeft: '25px', width: '80%', color: "white", padding: '5px',
-                                                                borderRadius: '10px', display: 'flex'
-                                                            }} onClick={() =>
-                                                                getChannels(e)
-                                                            }>
-                                                                <ListItemAvatar >
-                                                                    <Avatar alt={e.orgName} src={e.owner} style={{
-                                                                        alignItems: 'center',
-                                                                        height: '35px',
-                                                                        width: '35px'
-                                                                    }} />
-                                                                </ListItemAvatar>
-                                                                <div >
-                                                                    <p >ORGINIZATION: {e.orgName}</p>
-                                                                    <p >OWNER:  {e.owner}</p>
-                                                                </div>
+                                                            <div >
+                                                                <Row>{output.map((e, i)=>(
+                                                                <Col key={i} md={5} >
+                                                                <OrgCard About={e} onClick={getChannels}></OrgCard>
+                                                                </Col>
+                                                            ))}
+                                                            </Row>
                                                             </div>
-                                                            <hr style={{ width: '100%' }}></hr>
-                                                        </div>
-                                                    ))}
                                                     <h6 className="d-flex justify-content-center"> No More Orginizations ...</h6>
                                                 </>
                                                 :
-                                                <p style={{ color: "red" }}>Looks like You don't have Orginization</p>
+                                                <p style={{ color: "red" }}>Looks like you don't have Orginization</p>
                                             }
                                         </div>
                                     </Container>
