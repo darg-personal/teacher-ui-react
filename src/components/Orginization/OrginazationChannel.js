@@ -37,7 +37,6 @@ function OrgChannel(props) {
                 console.log({ value });
                 let data = []
                 for (let i = 0; i < value.length; i++) {
-                    // if(value.isExist != 5)
                     data.push({
                         'orgId': value[i]?.org,
                         'name': value[i]?.name,
@@ -54,7 +53,20 @@ function OrgChannel(props) {
         getChannels();
     }, []);
 
-    const updateShow = () => {
+    const goBack = () => {
+        setShowAddChannelPage(false)
+    }
+    const channelCreated = (data) => {
+        console.log(data?.channeName);
+        let temp = []
+        temp.push({
+            'orgId': orgId,
+            'name': data?.channeName,
+            'profile': data?.channelThumb,
+            'isExist': data?.isExist,
+            'channelId': data?.channelId,
+        })
+        setUsers([...temp,...users])
         setShowAddChannelPage(false)
     }
 
@@ -108,12 +120,9 @@ function OrgChannel(props) {
     function Channels() {
         return <>
             <div style={{
-                margin: 0,
-                padding: 0,
                 width: '25%',
                 overflow: 'auto',
             }}>
-
                 {users.length > 0 ?
                     <>
                         {users.map((user, i) => (
@@ -179,7 +188,7 @@ function OrgChannel(props) {
                     <>
                         <Container>
                             <Button style={{ justifyContent: 'center', margin: '-50px 10px' }} onClick={() => {
-                                props.back({show:false})
+                                props.back({ show: false })
                             }}>Back </Button>
                             <Card >
                                 <p style={{ fontSize: '25px', fontFamily: 'bold', alignSelf: 'center' }}>Orginization : {orgName}</p>
@@ -212,7 +221,7 @@ function OrgChannel(props) {
                     </>
 
                     :
-                    <CreateChannelPage goBack={updateShow} orgId={orgId} />
+                    <CreateChannelPage channelCreated={channelCreated} orgId={orgId} goBack={goBack} />
                 }
             </div>
         </>

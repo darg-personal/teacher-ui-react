@@ -171,9 +171,9 @@ export function ImgUpload({ onChange, src }) {
 };
 
 
-export function ImageShow({ filePreviewUrl }) {
+export function ImageShow({ className, filePreviewUrl }) {
     return (
-        <div className="image-show-view">
+        <div className={className}>
             <img
                 src={filePreviewUrl}
                 height={'40%'}

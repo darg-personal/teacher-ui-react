@@ -717,7 +717,7 @@ function UserChat(props) {
             color="primary"
             fontSize="large"
           />
-          <ImageShow filePreviewUrl={state.filePreviewUrl} />
+          <ImageShow className="image-show-view" filePreviewUrl={state.filePreviewUrl} />
         </div>
       ) : (
         <div

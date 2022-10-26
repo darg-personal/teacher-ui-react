@@ -5,8 +5,7 @@ import "./orginization.css";
 import "../../css/auth/auth.scss";
 import "./addorg.css";
 import { ImageShow } from "../ChatRoom/templates/MainChat/Chat";
-import { ImgUpload } from "../ChatRoom/templates/MainChat/Chat";
-
+import { useDropzone } from 'react-dropzone'
 import { Button } from "react-bootstrap";
 
 
@@ -31,7 +30,7 @@ export const AddOrg = (props) => {
             name: "Phone Number",
             placeholder: "Orginization Phone No. ",
             value: "",
-            type: "tel",
+            type: "text",
             hasError: false,
         },
 
@@ -57,8 +56,8 @@ export const AddOrg = (props) => {
     const [isSelected, setIsSelected] = useState(false);
     const [state, setState] = useState({
         file: "",
-        filePreviewUrl:
-            'https://s3.us-west-1.amazonaws.com/sfappv2.1/Test/upload/b7d4e1bf-8de6-4412-9dcc-736d8da0c944.jpg'
+        filePreviewUrl: ''
+
     });
 
     const setFieldValue = (value, index) => {
@@ -68,7 +67,7 @@ export const AddOrg = (props) => {
         fieldData[index].phoneNumber = value;
         fieldData[index].about = value;
         fieldData[index].email = value;
-      
+
         fieldData[index].hasError = value === "";
         updateFields(fieldData);
     };
@@ -107,7 +106,7 @@ export const AddOrg = (props) => {
                 .catch((error) => {
                     setState({ file: false });
 
-                    alert("connection is breaked",error);
+                    alert("connection is breaked", error);
                 });
         } else {
             file_url = null;
@@ -117,7 +116,7 @@ export const AddOrg = (props) => {
             meta_attributes: items[0].value,
             address: items[1].value,
             about: items[2].value,
-            phoneNumber: items[2].value,
+            phone_number: items[2].value,
             about: items[3].value,
             email: items[4].value,
             image: file_url ? file_url : state.filePreviewUrl
@@ -146,46 +145,46 @@ export const AddOrg = (props) => {
                         phoneNumber: org.phoneNumber,
                         about: org.about,
                         email: org.email,
+                        thumb: org.image
                     })
             })
             .catch((error) => {
 
             });
     }
-    const photoUpload = (event) => {
-        event.preventDefault();
-        const reader = new FileReader();
-        const file = event.target.files[0];
-        console.log(file);
-        setSelectedFile(event.target.files[0]);
-        setIsSelected(true);
-        reader.onloadend = () => {
-            setState({
-                file: file,
-                filePreviewUrl: reader.result,
-            });
-        };
+    // const { getRootProps, getInputProps } = useDropzone()
+    const [files, setFiles] = useState([]);
 
-        console.log(file, reader.result);
-        reader.readAsDataURL(file);
-    };
+    const { getRootProps, getInputProps } = useDropzone({
+        accept: 'image/*',
+        onDrop: (event) => {
+            setSelectedFile(event[0]);
+            setIsSelected(true);
+            let props = event.map(file => Object.assign(file, {
+                preview: URL.createObjectURL(file)
+            }))
+            setState({
+                file: event[0],
+                filePreviewUrl: props[0].preview,
+            });
+        }
+    });
+
     return (
         <>
 
             <div
                 className={"login-section page-container"}
-                style={{ display: "flex", padding: "0px" }}
+                style={{ display: "flex" }}
             >
                 <div className={"auth-container"}>
                     <Button onClick={() => {
                         props.goBack()
-                    }}>
-                        <span>&#8592;</span>Back </Button>
+                    }}>Back </Button>
                     <div className={"auth-content"}>
                         <div className={"auth-header"}>
                             <h4>Add Orginization</h4>
                         </div>
-
                         <form
                             method={"post"}
                             action={""}
@@ -195,7 +194,7 @@ export const AddOrg = (props) => {
                             <div className={"input-list centered-data"}>
                                 {fields.map((field, index) => {
                                     return (
-                                        <div className={`input-control`} >
+                                        <div className={`input-control`} key={field.placeholder} >
                                             {field.name}
                                             <input
                                                 type={field.type}
@@ -213,14 +212,25 @@ export const AddOrg = (props) => {
                                     );
                                 })}
                             </div>
-                            <ImageShow filePreviewUrl={state.filePreviewUrl} />
 
-                            <div style={{ float: 'right' }}>
-                                <ImgUpload onChange={photoUpload} />
+                            <div style={{
+                                padding: '10%',
+                                justifyContent: 'center',
+                                cursor: 'pointer'
+                            }}
+                                {...getRootProps()}>
+                                {state.filePreviewUrl &&
+                                    <ImageShow filePreviewUrl={state.filePreviewUrl} />}
+                                <input {...getInputProps()} />
+                                {!state.filePreviewUrl &&
+                                    <p>{`Drag or click to select files`}</p>
+                                }
                             </div>
                             <div>
                                 <div className={"button-container "} style={{ marginTop: '20%' }}>
-                                    <button onClick={addorg}>Add</button>
+                                    <button onClick={addorg}
+                                        disabled={fields.filter(field => field.value === '').length > 0}
+                                    >Add</button>
                                 </div>
                             </div>
                         </form>
