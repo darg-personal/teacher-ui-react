@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { Avatar, IconButton, ListItemAvatar } from "@mui/material";
 import { Button, Card } from "react-bootstrap";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -9,21 +9,29 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import {toast} from 'react-toastify';
+import Music from './skype_ringtone (1).mp3';
+import CallIcon from "@mui/icons-material/Call";
+import CallEndIcon from '@mui/icons-material/CallEnd';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 toast.configure()
 
-export const notify = (username,type)=>{
-  toast(`New Message Received..!`, {
-    position: "top-center",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-    });
+export const notify = (username, type) => {
+    // toast(`New Message Received..!`, {
+    toast(
+        type == "Channel"
+            ? `New Message In ${username}..!`
+            : `New Message From ${username}..!`,
+        {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+        });
 }
 
 function answer(data) {
@@ -31,12 +39,12 @@ function answer(data) {
     console.log({ data });
     {
         function popupWindow(url, windowName, win, w, h, username) {
-          const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
-          const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
-          return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
-      }
-      popupWindow(data, 'test', window, 800, 600);
-  }
+            const y = win.top.outerHeight / 2 + win.top.screenY - (h / 2);
+            const x = win.top.outerWidth / 2 + win.top.screenX - (w / 2);
+            return win.open(url, windowName, `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${y}, left=${x}`);
+        }
+        popupWindow(data, 'test', window, 800, 600);
+    }
 }
 export function ImageView({
     type,
@@ -46,51 +54,95 @@ export function ImageView({
     sender,
     time,
     float = "right",
-}) 
-{
+}) {
     return (
-        <div className="darker" id={float}>
-            <Card
-                style={{
-                    width: "auto",
-                    height: "60%",
-                    borderColor: "#464444",
-                    background: "#464444",
-                }}
-            >
-                {float === "left" ? (
-                    <CardHeader style={{ borderColor: "transparent" }}>
-                        <span style={{ float: "right" }}>{sender}</span>
-                    </CardHeader>
-                ) : null}
-                {/* <img height='210px' width='auto' style={{
-                      borderRadius: '10px'
-                  }} src={image} /> */}
 
-                {type === "audio/mpeg" && (
-                    <li key={image}>
-                        <audio src={image} controls />
-                    </li>
-                )}
-                {type === "image/jpeg" || type === "image/png" && (
-                    <img
-                        height="210px"
-                        width="auto"
-                        style={{
-                            borderRadius: "10px",
-                        }}
-                        src={image}
-                    />
-                )}
-                {type === "message/videocall" && (
-                <p style={{ marginLeft: "10px" }}>videoCallEnd</p>
 
+        <section className="chat">
+            <div className="messages-chat">
+                <>
+                    <p>
+                        {float === "left" ? (
+                            <span style={{ marginLeft: '7%', fontSize: '12px', backgroundColor: '#E6E7ED', padding: '5px', borderRadius: '10px 5px' }} >{sender}</span>
+                        ) : null}
+                    </p>
+                    <ListItemAvatar style={{ float: { float } }} id={float}>
+                        <Avatar alt={sender} src={profile} style={{
+                            marginLeft: '10px',
+                            height: '35px',
+                            width: '35px',
+                            float: { float }
+                        }} />
+                    </ListItemAvatar>
+                    <div className="messages-chat" id={float}>
+                        {type.includes('audio') && (
+                            <li key={image}>
+                                <audio src={image} controls />
+                            </li>
+                        )}
+                        {type.includes('image') && (
+                            <img
+                                height="210px"
+                                width="auto"
+                                style={{
+                                    borderRadius: "0px 10px 10px 10px ",
+                                }}
+                                src={image}
+                            />
+                        )}
+                         {type === "message/videocall" && (
+                <p style={{ marginLeft: "10px" }}>video Call start</p>
                 )}
-                <p style={{ marginLeft: "10px" }}>{text !== "NA" ? text : null}</p>
-                <span className="time-right">{time}</span>
-            </Card>
-                
-        </div>
+                        {/* {type.includes("videocall") && (
+                            <p style={{ marginLeft: "10px" }}>videoCallEnd</p>
+
+                        )} */}
+
+                    </div>
+
+                </>
+
+                {/* {sender !== "Me" ? (
+        <>
+            {float === "left" ? (
+                <span style={{ marginLeft: '6%', fontSize: '12px' }}>{sender}</span>
+            ) : null}
+            <div className="message">
+                <div
+                    className="photo"     >
+                    <ListItemAvatar>
+                        <Avatar
+                            alt={sender}
+                            src={profile}
+                            style={{
+                                height: "35px",
+                                width: "35px",
+                                backgroundPosition: "center",
+                                display: "block",
+                                backgroundSize: "cover",
+                            }}
+                        />
+                    </ListItemAvatar>
+                </div>
+                <p className="text">{text} </p>
+            </div>
+            <p className="time">{time}</p>
+        </>
+    ) : (
+        <>
+            <div className="message text-only">
+                <div className="response">
+                    <p className="text">{text}</p>
+                </div>
+            </div>
+            <p className="response-time time">{time}</p>
+        </>
+    )} */}
+            </div>
+        </section>
+
+
+
     );
 }
 
@@ -100,65 +152,127 @@ export function Answer({
     profile,
     text,
     sender,
-    time,
-}) {
+    ws,
+})
+{
+   const profileSrc = localStorage.getItem("loginUserImage");
+   const Callend = () => {
+        ws.send(
+            JSON.stringify({
+              meta_attributes: "react",
+              message_type: "message/videocall_end" || 'message/voicecall_end',
+              media_link: 'https://conference.dreampotential.org/videocall',
+              message_text: "Call Ended",
+            })
+          );
+          console.log(open,'open ======');
+        setOpen(false)
+        soundPlayer.pause();
+    }
     let loggedUser = JSON.parse(localStorage.getItem("user"));
-    console.log(type, image, loggedUser, sender, '=============type======================image=========');
-    // const [status, setStatus] = useState(true);
     const [open, setOpen] = useState(true);
+    let soundPlayer = new Audio(Music);
+    {open === true ?  soundPlayer.play() : soundPlayer.pause()}
+    {open === true ?  soundPlayer.loop = true : soundPlayer.pause()}
+    setTimeout(() => {
+            setOpen(false)
+            soundPlayer.pause()
+    },50000)
     return (
         <div>
        <Dialog
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        // open={open().then(open === false ? open === true : open === false)}
         open={open}
-      >
-        <DialogTitle id="alert-dialog-title" >
-          {"Admin is calling you"}
+        >
+        <DialogTitle id="alert-dialog-title">
+          {loggedUser.username}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <h6>Do you Want to Pick The Call</h6>
+        <DialogContentText id="alert-dialog-description">
+            <img src={profileSrc} style={{width: '100px', marginLeft: '41px'}}></img>
+          </DialogContentText>
+          <DialogContentText style={{marginLeft: '27%'}} id="alert-dialog-description">
+            <p style={{fontSize: '8px', marginLeft: '-16px', marginTop: '4px'}}>Do you Want to Pick up The Call</p>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button className="bg-success" onClick={() => {answer(image); setOpen(false)}}  autoFocus>
-            Start
+          <Button style={{marginRight: '43%'}} className="bg-success" onClick={() => {answer(image); setOpen(false); soundPlayer.pause()}}  autoFocus>
+           <CallIcon />
           </Button>
-          <Button className="bg-danger" onClick={() => setOpen(false)}>End</Button>
+          <Button className="bg-danger " onClick={Callend}><CallEndIcon /></Button>
         </DialogActions>
       </Dialog>
         </div>
-        
     );
 }
-
+// #075E54
 export function TextView({ sender, profile, text, time, float = 'right' }) {
     return (
-        <div className="container darker" id={float}>
-            <Card style={{
-                width: 'auto',
-                height: '60%',
-                borderColor: "#aaa", background: 'transparent',
-                borderRight: '0'
-            }}>
-                <ListItemAvatar style={{ float: 'right' }}>
-                    <Avatar alt={sender} src={profile} style={{
-                        marginLeft: '10px',
-                        height: '35px',
-                        width: '35px',
-                        float: 'right'
-                    }} />
-                    {sender === 'Me' ?
-                        <span className="name right">Me</span>
-                        :
-                        <span className="name right">{sender}</span>
-                    }
-                </ListItemAvatar>
-            </Card>
-            <p style={{ marginLeft: 0 }}> {text}</p>
-            <p className="time-right" style={{ marginLeft: 0 }}>{time}</p>
-        </div>
+        // <div >
+        //     {float === "left" ? (
+        //         <span style={{ marginLeft: '6%',fontSize: '12px' }}>{sender}</span>
+        //     ) : null}
+        //     <CardHeader>
+        //         <ListItemAvatar style={{ float: { float } }} id={float}>
+        //             <Avatar alt={sender} src={profile} style={{
+        //                 marginLeft: '10px',
+        //                 height: '35px',
+        //                 width: '35px',
+        //                 float: { float }
+        //             }} />
+        //         </ListItemAvatar>
+        //     </CardHeader>
+        //     <div className="darker" id={float}>
+
+        //         <p style={{ marginLeft: "10px" }}>{text !== "NA" ? text : null}
+        //             <span style={{ marginLeft: 0, fontSize: '12px' }} >&emsp;{time}&ensp;</span>
+        //         </p>
+        //     </div>
+        // </div>
+
+        <section className="chat">
+            <div className="messages-chat">
+                {sender !== "Me" ? (
+                    <>
+                        {float === "left" ? (
+                            <span style={{ marginLeft: '7%', fontSize: '12px', backgroundColor: '#f6f6f6', padding: '5px', borderRadius: '10px 5px' }}>{sender}</span>
+                        ) : null}
+                        <div className="message">
+                            <div
+                                className="photo"     >
+                                <ListItemAvatar>
+                                    <Avatar
+                                        alt={sender}
+                                        src={profile}
+                                        style={{
+                                            height: "35px",
+                                            width: "35px",
+                                            backgroundPosition: "center",
+                                            display: "block",
+                                            backgroundSize: "cover",
+                                        }}
+                                    />
+                                </ListItemAvatar>
+                            </div>
+                            <p className="text">{text} </p>
+                        </div>
+                        <p className="time">{time}</p>
+                    </>
+                ) : (
+                    <>
+                        <div className="message text-only">
+                            <div className="response">
+                                <p className="text">{text}</p>
+                            </div>
+                        </div>
+                        <p className="response-time time">{time}</p>
+                    </>
+                )}
+            </div>
+        </section>
+
     )
 }
 export function ImgUpload({ onChange, src }) {
@@ -171,9 +285,9 @@ export function ImgUpload({ onChange, src }) {
 };
 
 
-export function ImageShow({ filePreviewUrl }) {
+export function ImageShow({ className, filePreviewUrl }) {
     return (
-        <div className="image-show-view">
+        <div className={className}>
             <img
                 src={filePreviewUrl}
                 height={'40%'}

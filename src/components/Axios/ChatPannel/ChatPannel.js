@@ -70,7 +70,7 @@ export const DisplaySearchUser = async (inputSearch) => {
                         name: receivedObj?.username,
                         created_at: receivedObj?.created_at,
                         typeId: receivedObj?.id,
-                        image: groups.results[i].user_profile.image || Avatar,
+                        image: groups.results[i]?.user_profile?.image || Avatar,
                         type: "user",
                         isConnected: 1,
                         about: groups.results[i]?.user_profile?.about,

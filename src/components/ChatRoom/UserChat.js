@@ -34,6 +34,18 @@ import CallIcon from '@mui/icons-material/Call';
 import { DialogComponent } from '@syncfusion/ej2-react-popups';
 import { FullScreen } from "react-full-screen";
 import Modal from 'react-bootstrap/Modal';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Tooltip from '@mui/material/Tooltip';
+import MicIcon from '@mui/icons-material/Mic';
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import sound from './templates/MainChat/mixkit-bubble-pop-up-alert-notification-2357.wav'
+import { border } from "@mui/system";
 
 function UserChat(props) {
   // const handle = useFullScreenHandle();
@@ -73,10 +85,10 @@ function UserChat(props) {
   },[props])
 
   var tempDict = {};
-
+  
+  
   useEffect(() => {
     ws.onmessage = (evt) => {
-      // listen to data sent from the websocket server
       const message = JSON.parse(JSON.stringify(evt.data));
       const receivedObj = JSON.parse(message);
       console.log("*******receivedObj From Onmessage******** ",receivedObj);
@@ -87,23 +99,23 @@ function UserChat(props) {
         unreadMessageCount: receivedObj.unread_message_count,
         userUniqeId: receivedObj.from_user.id + receivedObj.from_user.username,
       });
-      console.log(loggedUser.id ,receivedObj.from_user.id, receivedObj.to_user.id,receiverId,'loggedUser.id ,receivedObj.from_user.id, receivedObj.to_user.id,receiverId');
+      const type = receivedObj?.message_type;
       if(loggedUser.id !== receivedObj.from_user.id){
-         notify();
+        //  notify();
+        notify(receivedObj.from_user.username,type,receivedObj.message_text);
+    
       }
-      const messageType = receivedObj?.message_type;
-      if(messageType === "message/videocall" || messageType === "message/voicecall"){
-        console.log('------video call---------');
+      if(type === "message/videocall" || type === "message/voicecall"){
+        console.log('------video call ---------');
         setCallType(type)
         setCall(true)
         setVideoLink( receivedObj?.media_link)
       }
-      // console.log(tempReceiverId,'tempReceiverId from on message');
-      if (tempReceiverId == receivedObj.from_user.id) {
+      console.log(tempReceiverId,'tempReceiverId from on message');
+      if (tempReceiverId === receivedObj.from_user.id) {
         const massageTime = receivedObj?.created_at || "NA";
         const messageDate = new Date(massageTime);
         const message_type = receivedObj?.message_type;
-
         const time = messageDate.toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit",
@@ -114,7 +126,6 @@ function UserChat(props) {
           month: "2-digit",
           day: "2-digit",
         });
-
         const msgObj = {
           sender: receivedObj?.from_user.username || "NA",
           message: receivedObj?.message_text || "NA",
@@ -127,11 +138,18 @@ function UserChat(props) {
         const prevMsgs = [...messages];
         prevMsgs.push(msgObj);
         setMessages([...prevMsgs]);
+        if(type === "message/videocall_end" || type === "message/voicecall_end")
+        {
+          ReactDOM.unmountComponentAtNode(videoNode);
+          videoNode.remove();
+          ReactDOM.unmountComponentAtNode(voiceNode);
+          voiceNode.remove();
+          let soundPlayer = new Audio(sound);
+          soundPlayer.play()
+        }
       }
-    // }
     };
-  }, [messages]);
-
+  }, [messages,props]);
   useEffect(() => {
     if (scrollBottom) {
       scrollBottom.current.addEventListener("DOMNodeInserted", (event) => {
@@ -220,7 +238,7 @@ function UserChat(props) {
   }
 
   const videoNode = document.createElement("div");
-  function videoCall(event) {
+  function videoCall  (event) {
     event.preventDefault();
     console.log("Video call");
     document.body.appendChild(videoNode);
@@ -237,18 +255,17 @@ function UserChat(props) {
         })
       );
       return (
-
-
-
         <div>
-<Modal
-      {...props}
+ <Modal
+      show={true}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
+      fullscreen={true}
+      dialogClassName="modal-90w"
     >
-      <Modal.Header onClick={clear} closeButton >
-        <Modal.Title id="contained-modal-title-vcenter">
+      <Modal.Header className="bg-primary" onClick={videoclear} closeButton >
+        <Modal.Title className="text-white" id="contained-modal-title-vcenter">
           Teach Video Call
         </Modal.Title>
       </Modal.Header>
@@ -273,34 +290,27 @@ function UserChat(props) {
         displayName: 'YOUR_USERNAME'
     }}
     onApiReady = { (externalApi) => {
-        // here you can attach custom event listeners to the Jitsi Meet External API
-        // you can also store it locally to execute commands
-    } }
-    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
+    }}
+    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '440px';iframeRef.style.width = '1340px'; } }
 />
-
-
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={clear}>Close</Button>
+        <Tooltip title="Leave the meeting"><Button variant="danger" onClick={videoclear}>End Call</Button></Tooltip>
       </Modal.Footer>
-    </Modal>
-
-
-
+    </Modal> 
         </div>
       );
     };
-    const clear = () => {
+    const videoclear = () => {
       ReactDOM.unmountComponentAtNode(videoNode);
       videoNode.remove();
-    };
+     };
     ReactDOM.render(<PopupContent />, videoNode);
   }
 
 // const uniqueString = require("uuid").uuid.v4();
-  const voiceNode = document.createElement("div");
-  async function voiceCall(event) {
+const voiceNode = document.createElement("div");
+  function voiceCall(event) {
     event.preventDefault();
     console.log("voiceCall");
     document.body.appendChild(voiceNode);
@@ -319,12 +329,14 @@ function UserChat(props) {
         return (
         <div>
         <Modal
-              {...props}
+              show={true}
               size="lg"
               aria-labelledby="contained-modal-title-vcenter"
               centered
+              fullscreen={true}
+              dialogClassName="modal-90w"
             >
-              <Modal.Header onClick={clear} closeButton >
+              <Modal.Header onClick={voiceclear} closeButton >
                 <Modal.Title id="contained-modal-title-vcenter">
                   Teach Voice Call
                 </Modal.Title>
@@ -350,24 +362,22 @@ function UserChat(props) {
                 displayName: 'YOUR_USERNAME'
             }}
             onApiReady = { (externalApi) => {
-                // here you can attach custom event listeners to the Jitsi Meet External API
-                // you can also store it locally to execute commands
-            } }
-            getIFrameRef = { (iframeRef) => { iframeRef.style.height = '600px';iframeRef.style.width = '750px'; } }
+            }}
+            getIFrameRef = { (iframeRef) => { iframeRef.style.height = '440px';iframeRef.style.width = '1340px'; }}
         />
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="danger" onClick={clear}>Leave</Button>
+              <Tooltip title="Leave the meeting"><Button variant="danger" onClick={() => {voiceclear(voiceclear)}}>End Call</Button></Tooltip>
               </Modal.Footer>
             </Modal>
                 </div>
-
       );
     };
-    const clear = () => {
+    const voiceclear = () => {
       ReactDOM.unmountComponentAtNode(voiceNode);
       voiceNode.remove();
-    };
+     
+     }; 
     ReactDOM.render(<PopupContent />, voiceNode);
   }
   useEffect(() => {
@@ -636,71 +646,12 @@ function UserChat(props) {
         </div>
       </div>
       {load ? <Loader /> : null}
-      {open && (
-        <RenderInWindow>
-          <div>
-          <Modal
-        style={{ height: "600px", width: "800px", textAlign: "center" }}
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">
-            Meeting
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-
-        <JitsiMeeting
-              domain={"conference.dreampotential.org"}
-              roomName="PleaseUseAGoodRoomName"
-              configOverwrite={{
-                toolbarButtons: [
-                  "microphone",
-                  "chat",
-                  "fullscreen",
-                  "hangup",
-                  "settings",
-                  "toggle-camera",
-                ],
-                buttonsWithNotifyClick: [
-                  { key: "hangup", preventExecution: true },
-                  { key: "chat", preventExecution: true },
-                ],
-                hiddenPremeetingButtons: ["camera"],
-                startWithAudioMuted: true,
-                disableModeratorIndicator: true,
-                startScreenSharing: true,
-                enableEmailInStats: false,
-              }}
-              interfaceConfigOverwrite={{
-                DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-              }}
-              userInfo={{
-                displayName: "YOUR_USER",
-              }}
-              onApiReady={(externalApi) => {
-                // here you can attach custom event listeners to the Jitsi Meet External API
-                // you can also store it locally to execute commands
-              }}
-              getIFrameRef={(iframeRef) => {
-                iframeRef.style.height = "400px";
-              }}
-            />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="danger" onClick={props.onHide}>Leave</Button>
-        </Modal.Footer>
-      </Modal>
-          </div>
-        </RenderInWindow>
-      )}
                       <div >
                         {call && (
                           callType === 'message/videocall'?
-                          <Answer  type='message/videocall' image={videoLink} profile={null} sender={loggedUser.username}/>
+                          <Answer  type='message/videocall' image={videoLink} profile={null} sender={loggedUser.username} ws={ws}/>
                           :
-                          <Answer  type='message/voicecall' image={videoLink} profile={null} sender={loggedUser.username}/>
+                          <Answer  type='message/voicecall' image={videoLink} profile={null} sender={loggedUser.username} ws={ws}/>
                         )}
                       </div>
       {state.file ? (
@@ -717,7 +668,7 @@ function UserChat(props) {
             color="primary"
             fontSize="large"
           />
-          <ImageShow filePreviewUrl={state.filePreviewUrl} />
+          <ImageShow className="image-show-view" filePreviewUrl={state.filePreviewUrl} />
         </div>
       ) : (
         <div
@@ -788,7 +739,7 @@ function UserChat(props) {
           <Outlet />
         </div>
       )}
-      <div className="box">
+        <div className="box">
         <form>
           <input
             ref={inputRef}
@@ -796,13 +747,13 @@ function UserChat(props) {
             id="inp"
             type="text"
             placeholder="Enter Text Here..."
-            onKeyDown={(e) => e.key === "Enter" && handleClick}
+            onKeyDown={(e) => e.key === "Enter" || handleClick}
           />
-          <ImgUpload onChange={photoUpload} />
-          <button onClick={handleClick} className="btn btn-outline-success">
-            send
+          <ImgUpload  onChange={photoUpload} />
+          <button onClick={handleClick} className="btn btn-outline-primry" style={{width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue'}}>
+          <SendRoundedIcon style={{cursor: 'pointer'}} sx={{ fontSize: 40 }} ></SendRoundedIcon>
           </button>
-          <Record onStopRecording={onStopRecording}></Record>
+          <Tooltip title="Record a message"><MicIcon style={{cursor: 'pointer'}} sx={{ fontSize: 40 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
         </form>
       </div>
     </>

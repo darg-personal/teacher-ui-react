@@ -32,7 +32,9 @@ import { JitsiMeeting } from "@jitsi/react-sdk";
 import CallIcon from "@mui/icons-material/Call";
 import Modal from "react-bootstrap/Modal";
 import { Button } from "react-bootstrap";
-
+import Tooltip from '@mui/material/Tooltip';
+import MicIcon from '@mui/icons-material/Mic';
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
 function MainChat(props) {
   let Token = localStorage.getItem("token");
   let navigate = useNavigate();
@@ -53,6 +55,7 @@ function MainChat(props) {
     filePreviewUrl: null,
   });
   const [call, setCall] = useState(false);
+  const [callType, setCallType] = useState('');
   const [videoLink, setVideoLink] = useState(null);
 
   // Props
@@ -117,7 +120,7 @@ function MainChat(props) {
       .finally(() => {
         setLoad(false);
       });
-  }, [chatroom,chatroomId]);
+  }, [chatroom, chatroomId]);
 
   useEffect(() => {
     ws.onmessage = (evt) => {
@@ -129,26 +132,26 @@ function MainChat(props) {
         channelId: receivedObj?.channel.id,
         channelName: receivedObj?.channel.name,
       });
-      // console.log(loggedUser.id,receivedObj?.user.id,'loggeduser id, receivedObj?.user.id');
-      if(loggedUser.id !== receivedObj?.user.id){
-        notify();
-      }  
-      const messageType = receivedObj?.message_type;
-      if ((messageType === "message/videocall" || messageType === "message/voicecall" ) && receivedObj?.user.username !== loggedUser.username) {
+
+      const type = receivedObj?.message_type;
+      if (loggedUser.id !== receivedObj?.user.id) {
+        notify(receivedObj?.channel.name, type, receivedObj.message_text);
+        // notify();
+      }
+      if ((type === "message/videocall" || type === "message/voicecall") && receivedObj?.user.username !== loggedUser.username) {
         setCall(true);
+        setCallType(type)
         setVideoLink(receivedObj?.media_link);
       }
-      console.log(chatroomId,receivedObj.channel.id,'chatrrrom id from on message mainchat');
+      console.log(chatroomId, '---chatroomId---', receivedObj.channel.id);
       if (chatroomId == receivedObj.channel.id && isConnected == 0) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const message_type = receivedObj?.message_type;
         const message = receivedObj?.message_text;
-
         if (message_type.includes("info")) {
           if (message.includes("remove")) setIsConnected(4);
         }
-
         const time = messageDate.toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit",
@@ -171,6 +174,7 @@ function MainChat(props) {
         const prevMsgs = [...messages];
         prevMsgs.push(msgObj);
 
+        // setIsConnected()
         setMessages([...prevMsgs]);
       }
     };
@@ -222,28 +226,28 @@ function MainChat(props) {
     document.body.appendChild(videoNode);
     videoNode.style.height = "300px";
     videoNode.style.width = "600px";
-    videoNode.style.position = "relative";
+    videoNode.style.position = "relative"
     const PopupContent = () => {
-      console.log("inside videoCall");
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
           message_type: "message/videocall",
-          media_link:  `https://conference.dreampotential.org/videocall`,
+          media_link: "https://conference.dreampotential.org/videocall",
           message_text: "",
         })
       );
-      console.log("inside videoCall");
       return (
         <div>
           <Modal
-            {...props}
+            show={true}
             size="lg"
             aria-labelledby="contained-modal-title-vcenter"
             centered
+            fullscreen={true}
+            dialogClassName="modal-90w"
           >
-            <Modal.Header onClick={clear} closeButton>
-              <Modal.Title id="contained-modal-title-vcenter">
+            <Modal.Header className="bg-primary" onClick={videoclear} closeButton >
+              <Modal.Title className="text-white" id="contained-modal-title-vcenter">
                 Teach Video Call
               </Modal.Title>
             </Modal.Header>
@@ -252,17 +256,9 @@ function MainChat(props) {
                 domain={"conference.dreampotential.org"}
                 roomName="videocall"
                 configOverwrite={{
-                  toolbarButtons: [
-                    "microphone",
-                    "hangup",
-                    "settings",
-                    "camera",
-                  ],
-                  buttonsWithNotifyClick: [
-                    { key: "hangup", preventExecution: true },
-                    { key: "chat", preventExecution: true },
-                  ],
-                  hiddenPremeetingButtons: ["invite"],
+                  toolbarButtons: ['microphone', 'hangup', 'settings', 'camera',],
+                  buttonsWithNotifyClick: [{ key: 'hangup', preventExecution: true }, { key: 'chat', preventExecution: true },],
+                  hiddenPremeetingButtons: ['invite'],
                   notifications: [],
                   startWithAudioMuted: true,
                   disableModeratorIndicator: true,
@@ -270,29 +266,24 @@ function MainChat(props) {
                   enableEmailInStats: false,
                 }}
                 interfaceConfigOverwrite={{
-                  DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+                  DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
                 }}
                 userInfo={{
-                  displayName: "YOUR_USERNAME",
+                  displayName: 'YOUR_USERNAME'
                 }}
                 onApiReady={(externalApi) => {
-                  // here you can attach custom event listeners to the Jitsi Meet External API
-                  // you can also store it locally to execute commands
                 }}
-                getIFrameRef={(iframeRef) => {
-                  iframeRef.style.height = "600px";
-                  iframeRef.style.width = "750px";
-                }}
+                getIFrameRef={(iframeRef) => { iframeRef.style.height = '440px'; iframeRef.style.width = '1340px'; }}
               />
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="danger" onClick={clear}>Leave</Button>
+              <Tooltip title="Leave the meeting"><Button variant="danger" onClick={videoclear}>End Call</Button></Tooltip>
             </Modal.Footer>
           </Modal>
         </div>
       );
     };
-    const clear = () => {
+    const videoclear = () => {
       ReactDOM.unmountComponentAtNode(videoNode);
       videoNode.remove();
     };
@@ -300,35 +291,33 @@ function MainChat(props) {
   }
 
   const voiceNode = document.createElement("div");
-  async function voiceCall(event) {
+  function voiceCall(event) {
     event.preventDefault();
     console.log("voiceCall");
     document.body.appendChild(voiceNode);
     voiceNode.style.height = "300px";
     voiceNode.style.width = "600px";
-    voiceNode.style.position = "relative";
+    voiceNode.style.position = "relative"
     const PopupContent = () => {
-      console.log("inside voiceCall");
-
       ws.send(
         JSON.stringify({
           meta_attributes: "react",
           message_type: "message/voicecall",
-          media_link: `https://conference.dreampotential.org/voicecall`,
-          message_text: '',
+          media_link: "https://conference.dreampotential.org/voicecall",
+          message_text: "",
         })
       );
-      console.log("inside voiceCall");
-
       return (
         <div>
           <Modal
-            {...props}
+            show={true}
             size="lg"
             aria-labelledby="contained-modal-title-vcenter"
             centered
+            fullscreen={true}
+            dialogClassName="modal-90w"
           >
-            <Modal.Header onClick={clear} closeButton>
+            <Modal.Header onClick={voiceclear} closeButton >
               <Modal.Title id="contained-modal-title-vcenter">
                 Teach Voice Call
               </Modal.Title>
@@ -338,16 +327,9 @@ function MainChat(props) {
                 domain={"conference.dreampotential.org"}
                 roomName="voicecall"
                 configOverwrite={{
-                  toolbarButtons: ["microphone", "hangup", "settings"],
-                  buttonsWithNotifyClick: [
-                    { key: "hangup", preventExecution: true },
-                    { key: "chat", preventExecution: true },
-                  ],
-                  hiddenPremeetingButtons: [
-                    "camera",
-                    "invite",
-                    "select-background",
-                  ],
+                  toolbarButtons: ['microphone', 'hangup', 'settings'],
+                  buttonsWithNotifyClick: [{ key: 'hangup', preventExecution: true }, { key: 'chat', preventExecution: true },],
+                  hiddenPremeetingButtons: ['camera', 'invite', 'select-background'],
                   notifications: [],
                   startWithAudioMuted: true,
                   disableModeratorIndicator: true,
@@ -355,31 +337,27 @@ function MainChat(props) {
                   enableEmailInStats: false,
                 }}
                 interfaceConfigOverwrite={{
-                  DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+                  DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
                 }}
                 userInfo={{
-                  displayName: "YOUR_USERNAME",
+                  displayName: 'YOUR_USERNAME'
                 }}
                 onApiReady={(externalApi) => {
-                  // here you can attach custom event listeners to the Jitsi Meet External API
-                  // you can also store it locally to execute commands
                 }}
-                getIFrameRef={(iframeRef) => {
-                  iframeRef.style.height = "600px";
-                  iframeRef.style.width = "750px";
-                }}
+                getIFrameRef={(iframeRef) => { iframeRef.style.height = '440px'; iframeRef.style.width = '1340px'; }}
               />
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="danger" onClick={clear}>Leave</Button>
+              <Tooltip title="Leave the meeting"><Button variant="danger" onClick={() => { voiceclear(voiceclear) }}>End Call</Button></Tooltip>
             </Modal.Footer>
           </Modal>
         </div>
       );
     };
-    const clear = () => {
+    const voiceclear = () => {
       ReactDOM.unmountComponentAtNode(voiceNode);
       voiceNode.remove();
+
     };
     ReactDOM.render(<PopupContent />, voiceNode);
   }
@@ -584,10 +562,13 @@ function MainChat(props) {
       </div>
       {load ? <Loader /> : null}
       <div >
-                        {call && (
-                        <Answer  type='message/videocall' image={videoLink} profile={null} sender={loggedUser.username}/>
-                        )}
-                      </div>
+        {call && (
+          callType === 'message/videocall' ?
+            <Answer type='message/videocall' image={videoLink} profile={null} sender={loggedUser.username} ws={ws} />
+            :
+            <Answer type='message/voicecall' image={videoLink} profile={null} sender={loggedUser.username} ws={ws} />
+        )}
+      </div>
       {state.file ? (
         <>
           <CancelSharpIcon
@@ -602,7 +583,7 @@ function MainChat(props) {
             color="primary"
             fontSize="large"
           />
-          <ImageShow filePreviewUrl={state.filePreviewUrl} />
+          <ImageShow className="image-show-view" filePreviewUrl={state.filePreviewUrl} />
         </>
       ) : (
         <div
@@ -661,7 +642,7 @@ function MainChat(props) {
                               time={e.time}
                               float={"left"}
                             />
-                          ) 
+                          )
                         ) : (
                           <TextView
                             sender={e.sender}
@@ -695,10 +676,10 @@ function MainChat(props) {
             onKeyDown={(e) => e.key === "Enter" && handleClick}
           />
           <ImgUpload onChange={photoUpload} />
-          <button onClick={handleClick} className="btn btn-outline-success">
-            send
+          <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
+            <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }} ></SendRoundedIcon>
           </button>
-          <Record onStopRecording={onStopRecording}></Record>
+          <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
         </form>
       </div>
     </div>

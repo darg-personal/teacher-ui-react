@@ -1,14 +1,16 @@
 import utils from "../../pages/auth/utils";
-import React, { useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react'
+import { Navigate, useNavigate } from "react-router-dom";
+import { Button, Container, Row, Col } from 'react-bootstrap';
+
 import axios from "axios";
 import Sidebar from "../../pages/auth/Sidebar";
 import Header from "../../pages/auth/Header";
 import "./SearchChannelAndUser.css";
 import "../../css/auth/auth.scss";
 
-import { Button, Container } from "react-bootstrap";
 import { Avatar, ListItemAvatar } from "@mui/material";
+import SearchChannelCard from "./SearchChannelCard";
 
 // ("0","joined"),   
 //     ("1","cancel"),
@@ -154,61 +156,20 @@ export default function SearchChannelAndUser() {
         }, 5000);
     }
 
+    const setToRequest = (data) => {
+        console.log(data);
+    }
     const ShowData = () => {
-        return (<div className='output'>
-            {output.map((e, i) => (
-                <div key={i}>
-                    <div style={{
-                        background: 'skyblue', height: 'auto',
-                        width: '80%', color: "white", padding: '5px',
-                        borderRadius: '10px'
-                    }}>
-                        <ListItemAvatar >
-                            <Avatar alt={e.ChannelName} src={e.image} style={{
-                                alignItems: 'center',
-                                height: '35px',
-                                width: '35px'
-                            }} />
-                        </ListItemAvatar>
-                        <div style={{
-                            marginTop: "-25px",
-                            paddingLeft: "80px"
-                        }} >
-                            <span >Channel Name : {e.ChannelName}</span>
-                            {requestType.terminated == request[e.type + e.orgId + e.ChannelId] &&
-                                <span style={{ float: 'right' }} >
-                                    <Button disabled class="btn btn-secondary">Request</Button>
-                                </span>}
-                            {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
-                                ||
-                                requestType.reRequest == request[e.type + e.orgId + e.ChannelId])
-                                &&
-                                <span style={{ float: 'right' }} >
-                                    <Button onClick={() => { sendRequest(e) }
-                                    }>Request</Button>
-
-                                </span>}
-                            {requestType.Leave == request[e.type + e.orgId + e.ChannelId] &&
-                                <span style={{ float: 'right' }} >
-                                    <Button onClick={() => { leaveRequest(e) }
-                                    }>Leave</Button>
-                                </span>}
-
-                            {requestType.cancel == request[e.type + e.orgId + e.ChannelId]
-                                && <span style={{ float: 'right' }} >
-                                    <Button onClick={() => { sendCancleRequest(e) }
-                                    }>Cancel</Button>
-                                </span>}
-                            <p >ORGINIZATION: {e.orgName}</p>
-                            <span style={{ float: 'right' }} >About : {e.about}</span>
-                            <p >OWNER:  {e.owner}</p>
-                        </div>
-
-                    </div>
-                    <hr style={{ width: '100%' }}></hr>
-                </div>
-            ))}
-        </div>)
+        return (
+            <div>
+                <Row>{output.map((search, i) => (
+                    <Col key={i} md={5} >
+                        <SearchChannelCard About={search} onClick={setToRequest} />
+                    </Col>
+                ))}
+                </Row>
+            </div>
+        )
     }
 
     const DisplaySearch = () => {
@@ -234,7 +195,7 @@ export default function SearchChannelAndUser() {
                             <span >Channel Name : {e.ChannelName}</span>
                             {requestType.terminated == request[e.type + e.orgId + e.ChannelId] &&
                                 <span style={{ float: 'right' }} >
-                                    <Button disabled class="btn btn-secondary">Request</Button>
+                                    <Button disabled className="btn btn-secondary">Request</Button>
                                 </span>}
                             {(requestType.Request == request[e.type + e.orgId + e.ChannelId]
                                 ||
@@ -317,7 +278,8 @@ export default function SearchChannelAndUser() {
                             <div className='App'>
                                 <Container>
                                     <div className="d-flex justify-content-center">
-                                        <h3>Groups / Users</h3>
+                                        {/* <h3>Groups / Users</h3> */}
+                                        <h3>Groups </h3>
                                     </div>
                                     <div className='d-flex justify-content-center' style={{ marginLeft: '15px' }} >
                                         <input onChange={e => {
@@ -325,7 +287,7 @@ export default function SearchChannelAndUser() {
                                             if (e.target.value.length > 0) {
                                                 getChat(e.target.value)
                                             }
-                                            }
+                                        }
                                         }
                                             type="text" placeholder='Search Group/...' aria-label="Search "
                                         />

@@ -8,14 +8,17 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { Badge } from "@mui/material";
 import { DisplaySearchUser } from "../Axios/ChatPannel/ChatPannel";
+import { FaSearch } from "react-icons/fa";
+import { ImArrowLeft2 } from "react-icons/im";
 
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
+let login_userImage = localStorage.getItem("loginUserImage");
 function Contact(props) {
   const [group, setGroup] = useState([]);
   const [isActive, setIsActive] = useState();
   const [page, setPage] = useState(0);
-  const [allUser, setAllUser] = useState(true);
+  const [allUser, setAllUser] = useState(false);
   const [searchGroup, setSearchGroup] = useState([]);
   const [inputSearch, setInputSearch] = useState('');
   const activeUser = props.activeUser;
@@ -36,14 +39,14 @@ function Contact(props) {
       [channelId]: unreadMessageCountDictForGroup[login_user.id],
     });
   }, [unreadMessageCountDictForGroup,unreadMessageCountDictForGroup[login_user.id]]);
-    
-    useEffect(() => {
-      setNotificationCountForUser({
-        ...notificationCountForUser,
-        [userUniqeId]: unreadMessageCountDict[userUniqeId],
-      });
-    }, [unreadMessageCountDict, unreadMessageCountDict[userUniqeId]]);
-    
+
+  useEffect(() => {
+    setNotificationCountForUser({
+      ...notificationCountForUser,
+      [userUniqeId]: unreadMessageCountDict[userUniqeId],
+    });
+  }, [unreadMessageCountDict, unreadMessageCountDict[userUniqeId]]);
+
 
   useEffect(() => {
     setIsActive(activeUser.chatRoom);
@@ -89,7 +92,7 @@ function Contact(props) {
                 typeId: receivedObj?.id,
                 image: groups.results[i].user_profile.image || Avatar,
                 type: "user",
-                isConnected: 1,
+                isConnected: 0,
                 about: groups.results[i]?.user_profile?.about,
               });
             }
@@ -123,9 +126,9 @@ function Contact(props) {
       });
     }
     if (value.id + value.name == channelId + channelName) {
-    setNotificationCountForClass({
-      [channelId]: 0,
-    });
+      setNotificationCountForClass({
+        [channelId]: 0,
+      });
     }
 
     props.type({
@@ -182,54 +185,82 @@ function Contact(props) {
   }
 
   return (
-    <>
-      <div className="sidebar">
-      <div >
-          <input onChange={e => {
-            setInputSearch(e.target.value)
-
-            getChat(e.target.value)
-          }}
-            type="text" placeholder='Search User...' aria-label="Search"
-            style={{ borderRadius: '20', borderWidth: 1, width: '100%' }}
-          />
-        </div>
-        {inputSearch.length > 0 && DisplaySearch()}
-        {inputSearch.length == 0 && <>
-        {group.map((e, i) => (
-          <div
-            key={e.id + e.name}
-            className={e.name === isActive ? "link active" : "link"}
-            onClick={() => handleClick(e)}
-          >
-            <ListItemAvatar>
-              <Avatar alt={e.name} src={e.image} />
-            </ListItemAvatar>
-            <ListItemText primary={e.name} secondary="last seen 08:00" />
-            {e.name !== isActive ? (
-              e.type === "Channel" ? (
-                <Badge
-                  badgeContent={notificationCountForClass[e.id] || 0}
-                  color="success"
-                ></Badge>
-              ) : (
-                <Badge
-                  badgeContent={notificationCountForUser[e.id + e.name] || 0}
-                  color="success"
-                ></Badge>
-              )
-            ) : null}
-          </div>
-        ))}
-        {allUser &&
-        <p className="d-flex justify-content-center button-upload-org" style={{ color: 'blue' }} onClick={() => {
-          getGroupData(page);
-        }}>show more</p>
-      }
-      </>
-        }
+    <div className="sidebar">
+      <div style={{
+        border: 'none',
+        outline: 'none',
+        padding: '10px 16px',
+        backgroundColor: '#b9b4b4',
+        fontSize: '18px',
+        display: 'flex',
+      }}>
+        <ListItemAvatar>
+          <Avatar alt={`xyz`} src={login_userImage} />
+        </ListItemAvatar>
       </div>
-    </>
+      <div style={{
+        marginLeft: '2px',
+        backgroundColor: '#e2dfdf',
+        fontSize: '15px',
+        padding: '0px 3px',
+        alignItems: 'center',
+        borderRadius: '20px', borderWidth: 1,
+      }}>
+        {inputSearch.length == 0 ?
+          <FaSearch /> : <ImArrowLeft2 onClick={() => setInputSearch('')} />
+        }
+        <input onChange={e => {
+          setInputSearch(e.target.value)
+
+          getChat(e.target.value)
+        }}
+          value={inputSearch}
+          type="text" placeholder='Search User ...'
+          style={{ border: 'none', width: '80%', borderRadius: '20px', outline: 'none' , backgroundColor:'#e2dfdf'}}
+        />
+      </div>
+        <hr style={{width: '100%'}} />
+
+      {inputSearch.length > 0 && DisplaySearch()}
+      {
+        inputSearch.length == 0 && <>
+          {group.map((e, i) => (
+            <div key={e.id + e.name} >
+              <div
+                className={e.name === isActive ? "link active" : "link"}
+                onClick={() => handleClick(e)}
+              >
+                <ListItemAvatar>
+                  <Avatar alt={e.name} src={e.image} style={{ height: '50px', width: '50px' }} />
+                </ListItemAvatar>
+                <>
+                <ListItemText primary={e.name}  secondary="last seen 09:00"/>
+                </>
+                {e.name !== isActive ? (
+                  e.type === "Channel" ? (
+                    <Badge
+                      badgeContent={notificationCountForClass[e.id] || 0}
+                      color="success"
+                    ></Badge>
+                  ) : (
+                    <Badge
+                      badgeContent={notificationCountForUser[e.id + e.name] || 0}
+                      color="success"
+                    ></Badge>
+                  )
+                ) : null}
+              </div>
+              <hr style={{justifyItems:'flex-end', marginTop: '1px' ,marginBottom:'1px',width:'80%',marginLeft:'20%'}} />
+            </div>
+          ))}
+          {allUser &&
+            <p className="d-flex justify-content-center button-upload-org" style={{ color: 'blue' }} onClick={() => {
+              getGroupData(page);
+            }}>show more</p>
+          }
+        </>
+      }
+    </div>
   );
 }
 
