@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Avatar, IconButton, ListItemAvatar } from "@mui/material";
-import { Button, Card } from "react-bootstrap";
+import { Button, Card, Form } from "react-bootstrap";
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import Modal from 'react-bootstrap/Modal';
@@ -16,8 +16,11 @@ import { toast } from 'react-toastify';
 import VideocamIcon from "@mui/icons-material/Videocam";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { Dropdown } from "react-bootstrap";
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
 
 import 'react-toastify/dist/ReactToastify.css';
+import Record from "../../Recorder";
+import { HiOutlineEmojiHappy } from "react-icons/hi";
 toast.configure()
 
 export const notify = (username, type) => {
@@ -50,9 +53,9 @@ function answer(data) {
         popupWindow(data, 'test', window, 800, 600);
     }
 }
-export function ImageView({
+export function ChatLinkView({
     type,
-    image,
+    link,
     profile,
     text,
     sender,
@@ -60,93 +63,103 @@ export function ImageView({
     float = "right",
 }) {
     return (
-
-
-        <section className="chat">
-            <div className="messages-chat">
-                <>
-                    <p>
-                        {float === "left" ? (
-                            <span style={{ marginLeft: '7%', fontSize: '12px', backgroundColor: '#E6E7ED', padding: '5px', borderRadius: '10px 5px' }} >{sender}</span>
-                        ) : null}
-                    </p>
-                    <ListItemAvatar style={{ float: { float } }} id={float}>
-                        <Avatar alt={sender} src={profile} style={{
-                            marginLeft: '10px',
-                            height: '35px',
-                            width: '35px',
-                            float: { float }
-                        }} />
-                    </ListItemAvatar>
-                    <div className="messages-chat" id={float}>
-                        {type.includes('audio') && (
-                            <li key={image}>
-                                <audio src={image} controls />
-                            </li>
-                        )}
-                        {type.includes('image') && (
-                            <img
-                                height="210px"
-                                width="auto"
-                                style={{
-                                    borderRadius: "0px 10px 10px 10px ",
-                                }}
-                                src={image}
-                            />
-                        )}
-                        {type === "message/videocall" && (
-                            <p style={{ marginLeft: "10px" }}>video Call start</p>
-                        )}
-                        {/* {type.includes("videocall") && (
-                            <p style={{ marginLeft: "10px" }}>videoCallEnd</p>
-
-                        )} */}
-
-                    </div>
-
-                </>
-
-                {/* {sender !== "Me" ? (
-        <>
-            {float === "left" ? (
-                <span style={{ marginLeft: '6%', fontSize: '12px' }}>{sender}</span>
-            ) : null}
-            <div className="message">
-                <div
-                    className="photo"     >
-                    <ListItemAvatar>
-                        <Avatar
-                            alt={sender}
-                            src={profile}
+        <div>
+            {type.includes('call') ? (
+                <div className="user-call">
+                    {type.includes('video') ?
+                        <VideocamIcon
                             style={{
-                                height: "35px",
-                                width: "35px",
-                                backgroundPosition: "center",
-                                display: "block",
-                                backgroundSize: "cover",
+                                color: "black", fontSize: "20px",
                             }}
-                        />
-                    </ListItemAvatar>
+                        >
+                            {`  Video `}
+                        </VideocamIcon> :
+                        <CallIcon
+                            style={{
+                                color: "black", fontSize: "20px",
+                            }}
+                        >
+                            {`  Audio `}
+                        </CallIcon>
+                    }
+                    <p > Call at {time}</p>
                 </div>
-                <p className="text">{text} </p>
-            </div>
-            <p className="time">{time}</p>
-        </>
-    ) : (
-        <>
-            <div className="message text-only">
-                <div className="response">
-                    <p className="text">{text}</p>
-                </div>
-            </div>
-            <p className="response-time time">{time}</p>
-        </>
-    )} */}
-            </div>
-        </section>
+            )
+                :
+                (<div className="messages-chat">
+                    {sender !== "Me" ? (
+                        <div style={{ backgroundColor: '#b8d8fd', justifyContent: 'center', borderRadius: '20px', marginLeft: '40px' }} id={float}>
+                            <span style={{
+                                float: 'right', fontSize: '12px',
+                                padding: '0px 5px', borderRadius: '10px 5px'
+                            }}>{sender}</span>
+                            <div className="message">
+                                {type.includes('audio') && (
+                                    <audio src={link} controls style={{
+                                        borderRadius: "10px ",
+                                    }} />
+                                )}
+                                {type.includes('image') && (
+                                    <>
+                                        <img
+                                            height="210px"
+                                            width="auto"
+                                            style={{
+                                                borderRadius: "10px ",
+                                            }}
+                                            src={link}
+                                        />
+                                    </>
 
+                                )}
+                                {/* {type.includes('videocall') && (
+                                <p style={{ marginLeft: "10px" }}>video Call start</p>
+                            )} */}
+                            </div>
+                            <p style={{
+                                float: 'right', fontSize: '12px',
+                                padding: '0px 5px', borderRadius: '10px 5px', color: 'black',
+                            }}>{time}</p>
+                        </div>
+                    ) : (
+                        <div style={{ height: 'auto', backgroundColor: '#d2e6fc', justifyContent: 'center', borderRadius: '20px 20px 0px 3px', marginLeft: '40px' }} id={float} >
+                            <div >
+                                {type.includes('audio') && (
+                                    <li key={link}>
+                                        <audio src={link} controls style={{
+                                            borderRadius: "10px ",
+                                        }} />
+                                    </li>
+                                )}
+                                {type.includes('image') && (
+                                    <>
+                                        <img
+                                            height="210px"
+                                            width="auto"
+                                            style={{
+                                                borderRadius: "10px ",
+                                            }}
+                                            src={link}
+                                        />
+                                    </>
 
+                                )}
+                                {/* {type.includes('videocall') && (
+                                <p style={{ marginLeft: "10px" }}>video Call start</p>
+                            )} */}
 
+                            </div>
+                            <p
+                                style={{
+                                    float: 'right', fontSize: '12px', color: 'black',
+                                    padding: '5px 5px ', borderRadius: '10px 5px'
+                                }}
+                            >{time}</p>
+                        </div>
+                    )}
+                </div>)
+            }
+        </div>
     );
 }
 
@@ -213,52 +226,12 @@ export function Answer({
 // #075E54
 export function TextView({ sender, profile, text, time, float = 'right' }) {
     return (
-        // <div >
-        //     {float === "left" ? (
-        //         <span style={{ marginLeft: '6%',fontSize: '12px' }}>{sender}</span>
-        //     ) : null}
-        //     <CardHeader>
-        //         <ListItemAvatar style={{ float: { float } }} id={float}>
-        //             <Avatar alt={sender} src={profile} style={{
-        //                 marginLeft: '10px',
-        //                 height: '35px',
-        //                 width: '35px',
-        //                 float: { float }
-        //             }} />
-        //         </ListItemAvatar>
-        //     </CardHeader>
-        //     <div className="darker" id={float}>
-
-        //         <p style={{ marginLeft: "10px" }}>{text !== "NA" ? text : null}
-        //             <span style={{ marginLeft: 0, fontSize: '12px' }} >&emsp;{time}&ensp;</span>
-        //         </p>
-        //     </div>
-        // </div>
-
         <section className="chat">
             <div className="messages-chat">
                 {sender !== "Me" ? (
                     <>
-                        {float === "left" ? (
-                            <span style={{ marginLeft: '7%', fontSize: '12px', backgroundColor: '#f6f6f6', padding: '5px', borderRadius: '10px 5px' }}>{sender}</span>
-                        ) : null}
+                        <span style={{ marginLeft: '45px', fontSize: '12px', backgroundColor: '#b8d8fd', padding: '0px 5px', borderRadius: '10px 5px' }}>{sender}</span>
                         <div className="message">
-                            <div
-                                className="photo"     >
-                                <ListItemAvatar>
-                                    <Avatar
-                                        alt={sender}
-                                        src={profile}
-                                        style={{
-                                            height: "35px",
-                                            width: "35px",
-                                            backgroundPosition: "center",
-                                            display: "block",
-                                            backgroundSize: "cover",
-                                        }}
-                                    />
-                                </ListItemAvatar>
-                            </div>
                             <p className="text">{text} </p>
                         </div>
                         <p className="time">{time}</p>
@@ -303,7 +276,7 @@ export function ChatHeader({ name, props, type, image, ws = null, onclickVoice, 
     return (
         <div className="profile-header">
             <div className="header-chat">
-                <ListItemAvatar onClick={() => props.show({ show: true, type: type, websocket: ws, chatroomId : chatroomId  })} className="d-flex justify-content-center">
+                <ListItemAvatar onClick={() => props.show({ show: true, type: type, websocket: ws, chatroomId: chatroomId })} className="d-flex justify-content-center">
                     <Avatar alt={name} src={image} />
                     <span style={{ fontSize: '18px', backgroundColor: '#f6f6f6', padding: '5px', borderRadius: '10px 5px' }}>{name}</span>
                 </ListItemAvatar>
@@ -342,4 +315,32 @@ export function ChatHeader({ name, props, type, image, ws = null, onclickVoice, 
             </div>
         </div>
     )
+}
+
+export function ChatFooter({ inputRef, handleClick, onStopRecording, photoUpload, sendImage }) {
+    const [sendVoiceNote, setSendVoiceNote] = useState(true);
+
+    return (
+        <Form >
+            <div className="box">
+                <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} />                <input
+                    ref={inputRef}
+                    className='input_text'
+                    id="inp"
+                    type="text"
+                    placeholder="Enter Text Here..."
+                    onKeyDown={(e) => e.key === "Enter" || handleClick}
+                    onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
+                    style={{ border: 'none', borderRadius: '20px', outline: 'none', backgroundColor: '#e2dfdf' }}
+                />
+                <ImgUpload onChange={photoUpload} />
+                {!sendVoiceNote || sendImage ?
+                    <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
+                        <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: '40px', color: '#128c7e' }} ></SendRoundedIcon>
+                    </button>
+                    :
+                    <Record onStopRecording={onStopRecording}></Record>
+                }
+            </div>
+        </Form>)
 }

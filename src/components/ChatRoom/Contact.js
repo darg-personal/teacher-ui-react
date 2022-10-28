@@ -10,6 +10,8 @@ import { DisplaySearchUser } from "../Axios/ChatPannel/ChatPannel";
 import { FaSearch } from "react-icons/fa";
 import { ImArrowLeft2 } from "react-icons/im";
 import "./contact.css";
+import { Dropdown } from "react-bootstrap";
+import { BiDotsVerticalRounded } from "react-icons/bi";
 
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
@@ -189,11 +191,25 @@ function Contact(props) {
       <div style={{
         padding: '10px 16px',
         backgroundColor: '#b9b4b4',
-        fontSize: '18px',
+        fontSize: '18px', display: 'flex', justifyContent: 'space-between'
       }}>
         <ListItemAvatar>
           <Avatar alt={`xyz`} src={login_userImage} />
         </ListItemAvatar>
+        <Dropdown>
+          <Dropdown.Toggle variant="white" id="dropdown-basic" style={{ border: 'none', color: 'transparent' }}>
+            <BiDotsVerticalRounded
+              id="dropdown-basic"
+              style={{ color: "#FFF", marginTop: '5px' }}
+              fontSize='25px'
+            ></BiDotsVerticalRounded>
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu className="drop">
+            <Dropdown.Item>Settings</Dropdown.Item>
+            <Dropdown.Item>Details</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
       <div style={{
         marginLeft: '2px',

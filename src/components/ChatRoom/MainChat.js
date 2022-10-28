@@ -8,7 +8,7 @@ import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
 import { BiDotsVerticalRounded } from "react-icons/bi";
-import { Dropdown } from "react-bootstrap";
+import { Dropdown, Form } from "react-bootstrap";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
@@ -21,6 +21,8 @@ import {
   Answer,
   notify,
   ChatHeader,
+  ChatFooter,
+  ChatLinkView,
 } from "./templates/MainChat/Chat";
 import Record from "./Recorder";
 import ReactDOM from "react-dom";
@@ -31,6 +33,7 @@ import { Button } from "react-bootstrap";
 import Tooltip from '@mui/material/Tooltip';
 import MicIcon from '@mui/icons-material/Mic';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import { HiOutlineEmojiHappy } from "react-icons/hi";
 function MainChat(props) {
   let Token = localStorage.getItem("token");
   let navigate = useNavigate();
@@ -496,7 +499,7 @@ function MainChat(props) {
         ws={ws}
         onclickVoice={(e) => voiceCall(e)}
         onclickVedio={(e) => videoCall(e)}
-        chatroomId = {chatroomId}
+        chatroomId={chatroomId}
       />
       {load ? <Loader /> : null}
       <div >
@@ -550,9 +553,9 @@ function MainChat(props) {
                     {e.sender === loggedUser.username ? (
                       <div>
                         {e.media_link ? (
-                          <ImageView
+                          <ChatLinkView
                             type={e.message_type}
-                            image={e.media_link}
+                            link={e.media_link}
                             profile={profileSrc}
                             text={e.message}
                             sender={e.sender}
@@ -571,9 +574,9 @@ function MainChat(props) {
                       <div>
                         {e.media_link ? (
                           (
-                            <ImageView
+                            <ChatLinkView
                               type={e.message_type}
-                              image={e.media_link}
+                              link={e.media_link}
                               profile={e.profile}
                               text={`${e.message}`}
                               sender={e.sender}
@@ -602,8 +605,13 @@ function MainChat(props) {
           <Outlet />
         </div>
       )}
+      {isConnected == 0 ?
+        <div style={{ width: '100%', position: 'relative', paddingLeft: '30px' }}>
+          <ChatFooter inputRef={inputRef} handleClick={e => handleClick(e)} sendImage={state.file}
+            onStopRecording={e => onStopRecording(e)} photoUpload={e => photoUpload(e)} />
+          {/* <Form className="box">
+          <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} />
 
-      <div className="box">
         <input
           ref={inputRef}
           className="input_text"
@@ -612,16 +620,19 @@ function MainChat(props) {
           placeholder="Enter Text Here..."
           onKeyDown={(e) => e.key === "Enter" || handleClick}
           onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
-        />
+          />
         <ImgUpload onChange={photoUpload} />
         {!sendVoiceNote ?
           <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
             <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }} ></SendRoundedIcon>
           </button>
           :
-          <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer', color: 'green' }} sx={{ fontSize: 40 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
+          <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer', color: '#128c7e' }} sx={{ fontSize: 40 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
         }
-      </div>
+      </Form> */}
+        </div> :
+        <p>Not allowed to send message</p>
+      }
     </div>
   );
 }

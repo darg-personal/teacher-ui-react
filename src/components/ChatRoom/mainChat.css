@@ -1,6 +1,8 @@
 .groupChat{
-  height: 100vh;
-  width: 100%;
+  height: 100%;
+  min-width: 80%;
+  max-width: 80%;
+  background-color: rgba(231, 236, 209, 0.789);
 }
 .container{
   min-width: 50px;
@@ -14,13 +16,14 @@
   color: white;
 }
 
-.time-right{
-  float: right;
-  margin-top: 10px;
-  margin-left: 5px;
-  color: rgb(255, 255, 255);
-  font-size: 11px;
+.time-left{
+  font-size: 16px;
+  font-weight: bold;
+  color:rgba(34, 34, 34, 0.597);
+  margin-bottom:10px;
 }
+
+
 
 input{
   width: 75%;
@@ -61,16 +64,27 @@ input{
 
 .box{
   border-width: 3px;
-  position: fixed;
-  width: 100%;
-  padding: 0px 5px;
-  bottom: 3px;
+  border-radius:20px;
+  background-color: #e2dfdf;
+  /* position: fixed; */
+  align-items : center;
+  min-width: 90%;
+  max-width: 90%;
+  display: flex;
+  padding: 0px 10px 0px 10px;
 }
 
 .input_text{
-  height: 60px;
-  border-radius: 10px;
-  width: 70%;
+  height: 58px;
+  border: 30px;
+  border-radius: 30px;
+  background-color: #e2dfdf;
+  outline: none;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  border-radius: 1%;
+  width: 100%;
 }
 
 .btn-outline-success{
@@ -208,10 +222,20 @@ li a:hover{
 }
 
 .user-add-remove{
-  height: 28px;
+  height: 20px;
   background-color: #aaa;
   text-align: center;
   margin-inline: 30%;
+  border-radius: 20px;
+}
+
+.user-call{
+  height: 28px;
+  display: flex;
+  font-size: 14px;
+  background-color: rgba(133, 180, 75, 0.238);
+  justify-content: center;
+  margin-inline: 40%;
   padding: 5px 10px;
   border-radius: 20px;
 }
@@ -260,13 +284,12 @@ li a:hover{
 
 .text-only {
   margin-left: 45px;
-
 }
 
 .time {
   font-size: 14px;
   font-weight: bold;
-  color:lightgrey;
+  color:rgba(34, 34, 34, 0.597);
   margin-bottom:10px;
   margin-left: 85px;
 }
@@ -285,5 +308,9 @@ li a:hover{
 }
 
 .response .text {
-  background-color: #e3effd !important;
+  background-color: #b8d8fd !important;
+}
+
+.message .text {
+  background-color: #d2e6fc !important;
 }

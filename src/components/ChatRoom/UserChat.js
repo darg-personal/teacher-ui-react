@@ -8,16 +8,16 @@ import axios from "axios";
 import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
-import { Button, Dropdown } from "react-bootstrap";
+import { Button, Dropdown, Form } from "react-bootstrap";
 import Avatar from "@mui/material/Avatar";
 import {
   ChatHeader,
   ImageShow,
-  ImageView,
-  ImgUpload,
   TextView,
   Answer,
   notify,
+  ChatFooter,
+  ChatLinkView,
 } from "./templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
 import Record from "./Recorder";
@@ -30,6 +30,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MicIcon from '@mui/icons-material/Mic';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import sound from './templates/MainChat/mixkit-bubble-pop-up-alert-notification-2357.wav'
+import { HiOutlineEmojiHappy } from "react-icons/hi";
 
 function UserChat(props) {
   let Token = localStorage.getItem("token");
@@ -155,6 +156,7 @@ function UserChat(props) {
   };
 
   async function handleClick(event) {
+    console.log("issss,,", event);
     event.preventDefault();
     let context_type;
     let file_url;
@@ -546,9 +548,8 @@ function UserChat(props) {
         ws={ws}
         onclickVoice={(e) => voiceCall(e)}
         onclickVedio={(e) => videoCall(e)}
-        chatroomId = {receiverId}
+        chatroomId={receiverId}
       />
-
       {load ? <Loader /> : null}
       <div >
         {call && (
@@ -593,12 +594,12 @@ function UserChat(props) {
                 {e.sender === loggedUser.username ? (
                   <div>
                     {e.media_link ? (
-                      <ImageView
+                      <ChatLinkView
                         type={e.message_type}
-                        image={e.media_link}
+                        link={e.media_link}
                         profile={profileSrc}
                         text={e.message}
-                        sender={e.sender}
+                        sender={"Me"}
                         time={e.time}
                       />
                     )
@@ -615,9 +616,9 @@ function UserChat(props) {
                 ) : (
                   <div>
                     {e.media_link ? (
-                      <ImageView
+                      <ChatLinkView
                         type={e.message_type}
-                        image={e.media_link}
+                        link={e.media_link}
                         profile={e.profile}
                         text={`${e.message}`}
                         sender={e.sender}
@@ -643,25 +644,32 @@ function UserChat(props) {
           <Outlet />
         </div>
       )}
-      <div className="box">
-        <input
-          ref={inputRef}
-          className="input_text"
-          id="inp"
-          type="text"
-          placeholder="Enter Text Here..."
-          onKeyDown={(e) => e.key === "Enter" || handleClick}
-          onChange={(value)=> value.target.value.length >0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
-        />
-        <ImgUpload onChange={photoUpload} />
-        {!sendVoiceNote ?
-          <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
-            <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }} ></SendRoundedIcon>
+      
+      <div style={{ width: '100%', position: 'relative', paddingLeft: '30px' }}>
+        <ChatFooter inputRef={inputRef} handleClick={e => handleClick(e)} sendImage={state.file}
+          onStopRecording={e => onStopRecording(e)} photoUpload={e => photoUpload(e)} />
 
-          </button>
-          :
-          <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
-        }
+        {/* <Form className="box">
+          <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} onClick={()=>alert('...in progress')}/>
+
+          <input
+            ref={inputRef}
+            className="input_text"
+            id="inp"
+            type="text"
+            placeholder="Enter Text Here..."
+            onKeyDown={(e) => e.key === "Enter" || handleClick}
+            onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
+          />
+          <ImgUpload onChange={photoUpload} />
+          {!sendVoiceNote ?
+            <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: '#128c7e' }}>
+              <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }} ></SendRoundedIcon>
+            </button>
+            :
+            <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer', color: '#128c7e' }} sx={{ fontSize: 30 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
+          }
+        </Form> */}
       </div>
     </div>
   );
