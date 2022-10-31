@@ -156,7 +156,6 @@ function UserChat(props) {
   };
 
   async function handleClick(event) {
-    console.log("issss,,", event);
     event.preventDefault();
     let context_type;
     let file_url;
@@ -219,6 +218,7 @@ function UserChat(props) {
       setState({ file: false });
       document.getElementById("inp").value = "";
     }
+
   }
 
   const videoNode = document.createElement("div");

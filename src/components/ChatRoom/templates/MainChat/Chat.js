@@ -17,6 +17,8 @@ import VideocamIcon from "@mui/icons-material/Videocam";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { Dropdown } from "react-bootstrap";
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import Picker from 'emoji-picker-react';
+
 
 import 'react-toastify/dist/ReactToastify.css';
 import Record from "../../Recorder";
@@ -317,30 +319,58 @@ export function ChatHeader({ name, props, type, image, ws = null, onclickVoice, 
     )
 }
 
-export function ChatFooter({ inputRef, handleClick, onStopRecording, photoUpload, sendImage }) {
-    const [sendVoiceNote, setSendVoiceNote] = useState(true);
+export function ChatFooter({ inputRef, handleClick, onStopRecording, photoUpload, sendImage}) {
+    
+  const [sendVoiceNote, setSendVoiceNote] = useState(true);       
+  const [showPicker, setShowPicker] = useState(false);
+  const [inputStr, setInputStr] = useState('');
 
+  const onEmojiClick = (event, emojiObject) => {
+    console.log(emojiObject,'$$$$$$$$$$$');
+    setInputStr(prevInput => prevInput + emojiObject.emoji);
+    setSendVoiceNote(false)
+  };
+  const onMessageSend = (e) =>{
+    e.preventDefault();
+        handleClick(e);
+        setInputStr('')
+        setShowPicker(false)
+        // inputRef.current.value = ''
+  }
     return (
-        <Form >
+<>
+{showPicker && 
+<div style={{position:'absolute', bottom:'60px'}}>
+         <Picker
+          pickerStyle={{ width: '30%'}}
+          onEmojiClick={onEmojiClick} 
+          emojiStyle={'google'}
+          />
+</div>
+}
+<Form >
             <div className="box">
-                <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} />                <input
+                <HiOutlineEmojiHappy onClick={() => setShowPicker(val => !val)} style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} />                <input
                     ref={inputRef}
+                    value={inputStr}
                     className='input_text'
                     id="inp"
                     type="text"
                     placeholder="Enter Text Here..."
-                    onKeyDown={(e) => e.key === "Enter" || handleClick}
-                    onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
+                    onKeyDown={(e) => e.key === "Enter" && onMessageSend(e)}
+                    onChange={(value) => {value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true); setInputStr(value.target.value)}}
                     style={{ border: 'none', borderRadius: '20px', outline: 'none', backgroundColor: '#e2dfdf' }}
                 />
                 <ImgUpload onChange={photoUpload} />
                 {!sendVoiceNote || sendImage ?
-                    <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
+                    <button onClick={(e)=>onMessageSend(e)} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
                         <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: '40px', color: '#128c7e' }} ></SendRoundedIcon>
                     </button>
                     :
                     <Record onStopRecording={onStopRecording}></Record>
                 }
             </div>
-        </Form>)
+        </Form>
+</>
+        )
 }

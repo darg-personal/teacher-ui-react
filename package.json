@@ -16,6 +16,7 @@
     "axios": "^0.27.2",
     "bootstrap": "^5.2.2",
     "column-resizer": "^1.3.6",
+    "emoji-picker-react": "^3.5.1",
     "immer": "^9.0.15",
     "mic-recorder-to-mp3": "^2.2.2",
     "node-sass": "^7.0.1",
