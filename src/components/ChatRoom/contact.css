@@ -4,7 +4,7 @@
     min-width: 20%;
     max-width: 25%;
     background-color: #b4b9b4;
-    height: 100%;
+    height: 100vh;
     overflow: auto;
   }
   ::-webkit-scrollbar{
@@ -19,9 +19,9 @@
   } 
 
 
-  .link {
-    padding: 10px 16px;
-    background-color: #889b33;
+  .chatListView {
+    padding: 0px 16px;
+    /* background-color: #889b33; */
     cursor: pointer;
     font-size: 18px;
     display: flex;
@@ -30,7 +30,7 @@
     background-color: rgb(148, 190, 90);
     color: white;
   }
-  .link:hover {
+  .chatListView:hover {
     background-color: rgb(156, 188, 139);
     color: white;
   }

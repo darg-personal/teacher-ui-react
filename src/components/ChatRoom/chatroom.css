@@ -1,5 +1,6 @@
 .chatroom {
     display: flex;
-    height: 100vh;
+    justify-content: flex-start;
+    height: 100%;
     width: 100%;
 }

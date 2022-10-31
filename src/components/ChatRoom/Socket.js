@@ -6,6 +6,7 @@ import Contact from "./Contact";
 import UserGroup from "./UserGroup";
 import { Navigate } from "react-router-dom";
 import './chatroom.css'
+import NoChatView from "../staticfiles/NoChatView";
 let Token = localStorage.getItem("token");
 // var tempChatRoomId
 export class Socket extends Component {
@@ -17,7 +18,7 @@ export class Socket extends Component {
       chatRoomId: 0,
       type: null,
       chatroomObj: [],
-      temp: null,
+      tempWs: null,
       image: null,
       show: false,
       isConnected: true,
@@ -60,9 +61,9 @@ export class Socket extends Component {
   //   timeout = 250;
   connect = (cRoom, userId, type, isConnected) => {
     console.log("connect is called....>!");
-    this.setState({ temp: null });
+    this.setState({ tempWs: null });
     const ws = [];
-    if (type == "Channel")
+    if (type === "Channel")
       ws.push(
         new WebSocket(
           `${utils.getWebsocketHost()}/msg/channel/?token=${Token}&roomname=${cRoom}`
@@ -84,7 +85,7 @@ export class Socket extends Component {
       wsdict[chatroom] = getSocket;
       userst[chatroom] = isConnected;
       this.setState({ ws: wsdict });
-      this.setState({ temp: getSocket });
+      this.setState({ tempWs: getSocket });
       this.setState({ userStatus: userst });
       this.setState({ isConnected: isConnected });
     };
@@ -95,13 +96,13 @@ export class Socket extends Component {
     console.log("check is called");
     const { ws, userStatus } = this.state;
     if (cRoom in ws) {
-      if (!ws[cRoom] || ws[cRoom].readyState == WebSocket.CLOSED) {
+      if (!ws[cRoom] || ws[cRoom].readyState === WebSocket.CLOSED) {
         if (cRoom) this.connect(cRoom, id, type, isConnected);
       }
-      if (type == "user") {
+      if (type === "user") {
         this.connect(cRoom, id, type, isConnected);
       }
-      this.setState({ temp: ws[cRoom] });
+      this.setState({ tempWs: ws[cRoom] });
       this.setState({ isConnected: userStatus[cRoom] });
     } else {
       if (cRoom) this.connect(cRoom, id, type, isConnected);
@@ -118,17 +119,17 @@ export class Socket extends Component {
   };
   setShowDetail = (data) => {
     this.setState({ show: false });
-    if (data.ws) this.setState({ temp: data.ws });
+    if (data.ws) this.setState({ tempWs: data.ws });
   }
 
   getUserInfo = (data) => {
     console.log(data);
     this.setState({ show: data.show });
-    if (data.websocket) this.setState({ temp: data.websocket });
+    if (data.websocket) this.setState({ tempWs: data.websocket });
     this.setState({ chatRoomId: data.chatroomId });
   };
   chatMethod = () => {
-    if (this.state.show && this.state.isConnected == 0) {
+    if (this.state.show && this.state.isConnected === 0) {
       return (
         <UserGroup
           name={this.state.chatRoom}
@@ -136,20 +137,20 @@ export class Socket extends Component {
           type={this.state.type}
           show={this.setShowDetail}
           image={this.state.image}
-          websocket={this.state.temp}
+          websocket={this.state.tempWs}
           updateGrupinfo={this.updateGroupinfo}
           reDirect={this.reDirect}
           about={this.state.about}
         />
       );
     } else {
-      if (this.state.type === "Channel" && this.state.temp !== null) {
+      if (this.state.type === "Channel" && this.state.tempWs !== null) {
         return (
           <MainChat
             chatRoom={this.state.chatRoom}
             chatRoomId={this.state.chatRoomId}
             type={this.state.type}
-            websocket={this.state.temp}
+            websocket={this.state.tempWs}
             getChatImage={this.state.image}
             isConnected={this.state.isConnected}
             show={this.getUserInfo}
@@ -157,13 +158,13 @@ export class Socket extends Component {
           />
         );
       } else {
-        if (this.state.type === "user" && this.state.temp !== null) {
+        if (this.state.type === "user" && this.state.tempWs !== null) {
           return (
             <UserChat
               userName={this.state.chatRoom}
               userId={this.state.chatRoomId}
               type={this.state.type}
-              websocket={this.state.temp}
+              websocket={this.state.tempWs}
               getChatImage={this.state.image}
               isConnected={this.state.isConnected}
               show={this.getUserInfo}
@@ -192,7 +193,9 @@ export class Socket extends Component {
                 this.state.unreadMessageCountDictForGroup
               }
             />
+            <>
             {this.chatMethod()}
+            </>
           </div>
         ) : (
           <Navigate replace to="/login" />

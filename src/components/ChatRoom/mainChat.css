@@ -1,5 +1,5 @@
 .groupChat{
-  height: 100%;
+  height: 100vh;
   min-width: 80%;
   max-width: 80%;
   background-color: rgba(231, 236, 209, 0.789);
@@ -56,8 +56,9 @@ input{
 
 .content{
   padding: 1px 16px;
-  height: 80%;
+  height: 80vh;
   width: 100%;
+  align-content: center;
   overflow-y: auto;
   overflow-wrap: break-word;
 }
@@ -68,8 +69,8 @@ input{
   background-color: #e2dfdf;
   /* position: fixed; */
   align-items : center;
-  min-width: 90%;
-  max-width: 90%;
+  min-width: 70%;
+  max-width: 75%;
   display: flex;
   padding: 0px 10px 0px 10px;
 }
@@ -151,6 +152,7 @@ input{
   padding: 16px 10px;
   background-color: #075E54;
   width: 100%;
+  /* height: 8vh; */
 }
 
 
@@ -213,12 +215,8 @@ li a:hover{
 }
 
 .image-show-view{
-  display: flex;
-  margin-left: 25%;
-  height: auto;
-  width: auto;
-  justify-content: center;
-  background: #aaa;
+  height: 70vh;
+  width: 'auto';
 }
 
 .user-add-remove{

@@ -1,32 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from 'react-toastify';
+import { Button, Form, Dropdown } from "react-bootstrap";
+
 import { Avatar, IconButton, ListItemAvatar } from "@mui/material";
-import { Button, Card, Form } from "react-bootstrap";
-import AttachFileIcon from '@mui/icons-material/AttachFile';
-import CardHeader from "react-bootstrap/esm/CardHeader";
-import Modal from 'react-bootstrap/Modal';
 import Dialog from '@mui/material/Dialog';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import Music from './skype_ringtone (1).mp3';
+import VideocamIcon from "@mui/icons-material/Videocam";
 import CallIcon from "@mui/icons-material/Call";
 import CallEndIcon from '@mui/icons-material/CallEnd';
-import { toast } from 'react-toastify';
-import VideocamIcon from "@mui/icons-material/Videocam";
-import { BiDotsVerticalRounded } from "react-icons/bi";
-import { Dropdown } from "react-bootstrap";
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
-
-import 'react-toastify/dist/ReactToastify.css';
-import Record from "../../Recorder";
 import { HiOutlineEmojiHappy } from "react-icons/hi";
+import { BiDotsVerticalRounded } from "react-icons/bi";
+
+import Record from "../../Recorder";
+import Music from './skype_ringtone (1).mp3';
+import 'react-toastify/dist/ReactToastify.css';
 toast.configure()
 
 export const notify = (username, type) => {
     // toast(`New Message Received..!`, {
     toast(
-        type == "Channel"
+        type === "Channel"
             ? `New Message In ${username}..!`
             : `New Message From ${username}..!`,
         {
@@ -102,6 +100,7 @@ export function ChatLinkView({
                                 {type.includes('image') && (
                                     <>
                                         <img
+                                            alt={sender}
                                             height="210px"
                                             width="auto"
                                             style={{
@@ -112,9 +111,6 @@ export function ChatLinkView({
                                     </>
 
                                 )}
-                                {/* {type.includes('videocall') && (
-                                <p style={{ marginLeft: "10px" }}>video Call start</p>
-                            )} */}
                             </div>
                             <p style={{
                                 float: 'right', fontSize: '12px',
@@ -122,7 +118,7 @@ export function ChatLinkView({
                             }}>{time}</p>
                         </div>
                     ) : (
-                        <div style={{ height: 'auto', backgroundColor: '#d2e6fc', justifyContent: 'center', borderRadius: '20px 20px 0px 3px', marginLeft: '40px' }} id={float} >
+                        <div style={{ backgroundColor: '#d2e6fc', justifyContent: 'center', borderRadius: '20px 20px 0px 3px', marginLeft: '40px' }} id={float} >
                             <div >
                                 {type.includes('audio') && (
                                     <li key={link}>
@@ -134,6 +130,7 @@ export function ChatLinkView({
                                 {type.includes('image') && (
                                     <>
                                         <img
+                                            alt={sender}
                                             height="210px"
                                             width="auto"
                                             style={{
@@ -207,7 +204,7 @@ export function Answer({
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        <img src={profileSrc} style={{ width: '100px', marginLeft: '41px' }}></img>
+                        <img alt={sender} src={profileSrc} style={{ width: '100px', marginLeft: '41px' }}></img>
                     </DialogContentText>
                     <DialogContentText style={{ marginLeft: '27%' }} id="alert-dialog-description">
                         <p style={{ fontSize: '8px', marginLeft: '-16px', marginTop: '4px' }}>Do you Want to Pick up The Call</p>
@@ -264,10 +261,27 @@ export function ImgUpload({ onChange, src }) {
 export function ImageShow({ className, filePreviewUrl }) {
     return (
         <div className={className}>
-            <img
+            <img class="img-fluid"
+                alt={`xyz`}
                 src={filePreviewUrl}
-                height={'40%'}
-                width={'80%'}
+                style={{
+                    height: "150px",
+                    width: "150%",
+                }}
+            />
+        </div>
+    );
+};
+
+export function ChatImageShow({ className, filePreviewUrl }) {
+    return (
+        <div className="d-flex justify-content-center">
+            <img class="img-fluid"
+                alt={'xyz'}
+                src={filePreviewUrl}
+                height={'150px'}
+                width={'60%'}
+                style={{padding:'10px'}}
             />
         </div>
     );
@@ -276,10 +290,18 @@ export function ChatHeader({ name, props, type, image, ws = null, onclickVoice, 
     return (
         <div className="profile-header">
             <div className="header-chat">
-                <ListItemAvatar onClick={() => props.show({ show: true, type: type, websocket: ws, chatroomId: chatroomId })} className="d-flex justify-content-center">
-                    <Avatar alt={name} src={image} />
-                    <span style={{ fontSize: '18px', backgroundColor: '#f6f6f6', padding: '5px', borderRadius: '10px 5px' }}>{name}</span>
-                </ListItemAvatar>
+                <div style={{ cursor: 'pointer', }} onClick={() => props.show({
+                    show: true,
+                    type: type, websocket: ws, chatroomId: chatroomId
+                })}>
+                    <ListItemAvatar className="d-flex justify-content-center ms-4" >
+                        <Avatar alt={name} src={image} />
+                        <span style={{
+                            marginLeft: '10px', fontSize: '18px',
+                            backgroundColor: '#f6f6f6', padding: '5px 5px', borderRadius: '10px 5px'
+                        }}>{name}</span>
+                    </ListItemAvatar>
+                </div>
                 <div style={{ display: 'flex', float: 'right', alignContent: 'center', margin: '0px 0px' }}>
                     <CallIcon
                         style={{
@@ -298,7 +320,8 @@ export function ChatHeader({ name, props, type, image, ws = null, onclickVoice, 
                         onClick={onclickVedio}
                     ></VideocamIcon>
                     <Dropdown>
-                        <Dropdown.Toggle variant="white" id="dropdown-basic" style={{ border: 'none', color: 'transparent' }}>
+                        <Dropdown.Toggle variant="white" id="dropdown-basic"
+                            style={{ border: 'none', color: 'transparent' }}>
                             <BiDotsVerticalRounded
                                 id="dropdown-basic"
                                 style={{ color: "#FFF", marginTop: '5px' }}
@@ -317,30 +340,47 @@ export function ChatHeader({ name, props, type, image, ws = null, onclickVoice, 
     )
 }
 
-export function ChatFooter({ inputRef, handleClick, onStopRecording, photoUpload, sendImage }) {
+export function ChatFooter({ inputRef, handleClick, onStopRecording, photoUpload, sendImage, isConnected }) {
     const [sendVoiceNote, setSendVoiceNote] = useState(true);
-
+    useEffect(() => {
+        if (inputRef.current.value === "")
+            setSendVoiceNote(true)
+    }, [inputRef.current.value])
     return (
-        <Form >
-            <div className="box">
-                <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} />                <input
-                    ref={inputRef}
-                    className='input_text'
-                    id="inp"
-                    type="text"
-                    placeholder="Enter Text Here..."
-                    onKeyDown={(e) => e.key === "Enter" || handleClick}
-                    onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
-                    style={{ border: 'none', borderRadius: '20px', outline: 'none', backgroundColor: '#e2dfdf' }}
-                />
-                <ImgUpload onChange={photoUpload} />
-                {!sendVoiceNote || sendImage ?
-                    <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
-                        <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: '40px', color: '#128c7e' }} ></SendRoundedIcon>
-                    </button>
-                    :
-                    <Record onStopRecording={onStopRecording}></Record>
-                }
-            </div>
-        </Form>)
+        <Form>
+            {isConnected === 0 ?
+                <div className="box">
+                    <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} />
+                    <input
+                        ref={inputRef}
+                        className='input_text'
+                        id="inp"
+                        type="text"
+                        placeholder="Enter Text Here..."
+                        onKeyDown={(e) => e.key === "Enter" || (handleClick || setSendVoiceNote(true))}
+                        onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) :
+                            setSendVoiceNote(true)}
+                        style={{ border: 'none', borderRadius: '20px', outline: 'none', backgroundColor: '#e2dfdf' }}
+                        autoComplete='off' autoFocus
+                    />
+                    <ImgUpload onChange={photoUpload} />
+                    {!sendVoiceNote || sendImage ?
+                        <button onClick={handleClick || setSendVoiceNote(false)}
+                            className="btn btn-outline-primry" style={{ border: 'none', color: 'dodgerblue', }}>
+                            <SendRoundedIcon onClick={() => setSendVoiceNote(true)}
+                                style={{ cursor: 'pointer' }} sx={{ fontSize: '30px', color: '#128c7e' }} />
+                        </button>
+                        :
+                        <Record onStopRecording={onStopRecording}></Record>
+                    }
+                </div>
+                :
+                <p style={{
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    paddingTop: '30px' ,color:'chocolate'
+                }} >{`Not allowed to send message`}</p>
+            }
+        </Form>
+    )
 }

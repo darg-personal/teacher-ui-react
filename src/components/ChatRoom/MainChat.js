@@ -1,22 +1,14 @@
-import React, { createRef, useState } from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { Outlet } from "react-router-dom";
-import "./mainChat.css";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
-import { useNavigate } from "react-router-dom";
-import { BiDotsVerticalRounded } from "react-icons/bi";
-import { Dropdown, Form } from "react-bootstrap";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
-import VideocamIcon from "@mui/icons-material/Videocam";
 import {
   ImageShow,
-  ImageView,
-  ImgUpload,
   TextView,
   Answer,
   notify,
@@ -24,24 +16,20 @@ import {
   ChatFooter,
   ChatLinkView,
 } from "./templates/MainChat/Chat";
-import Record from "./Recorder";
 import ReactDOM from "react-dom";
 import { JitsiMeeting } from "@jitsi/react-sdk";
-import CallIcon from "@mui/icons-material/Call";
 import Modal from "react-bootstrap/Modal";
 import { Button } from "react-bootstrap";
 import Tooltip from '@mui/material/Tooltip';
-import MicIcon from '@mui/icons-material/Mic';
-import SendRoundedIcon from '@mui/icons-material/SendRounded';
-import { HiOutlineEmojiHappy } from "react-icons/hi";
+import "./mainChat.css";
+
 function MainChat(props) {
   let Token = localStorage.getItem("token");
-  let navigate = useNavigate();
   let loggedUser = JSON.parse(localStorage.getItem("user"));
   const profileSrc = localStorage.getItem("loginUserImage");
 
   // Variables
-  const inputRef = useRef(null);
+  const inputRef = useRef('');
   const scrollBottom = useRef(null);
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
@@ -56,19 +44,18 @@ function MainChat(props) {
   const [call, setCall] = useState(false);
   const [callType, setCallType] = useState('');
   const [videoLink, setVideoLink] = useState(null);
-  const [sendVoiceNote, setSendVoiceNote] = useState(true);
-
+  const [isConnected, setIsConnected] = useState(props.isConnected);
   // Props
   const chatroom = props.chatRoom;
   const ws = props.websocket;
   const chatroomId = props.chatRoomId;
   const type = props.type;
   const getChatImage = props.getChatImage;
-  const [isConnected, setIsConnected] = useState(props.isConnected);
 
   useEffect(() => {
     setPage(1);
     console.log(`web socket connection created for channel ${chatroom}!!`);
+    setIsConnected(props.isConnected)
     axios
       .get(
         `${utils.getHost()}/chat/get/channel/paginated_messages/?channel=${chatroomId}&records=10&p=1`,
@@ -144,7 +131,7 @@ function MainChat(props) {
         setVideoLink(receivedObj?.media_link);
       }
       console.log(chatroomId, '---chatroomId---', receivedObj.channel.id);
-      if (chatroomId == receivedObj.channel.id && isConnected == 0) {
+      if (chatroomId === receivedObj.channel.id && isConnected === 0) {
         const receivedDate = receivedObj?.created_at || "NA";
         const messageDate = new Date(receivedDate);
         const message_type = receivedObj?.message_type;
@@ -605,34 +592,10 @@ function MainChat(props) {
           <Outlet />
         </div>
       )}
-      {isConnected == 0 ?
-        <div style={{ width: '100%', position: 'relative', paddingLeft: '30px' }}>
-          <ChatFooter inputRef={inputRef} handleClick={e => handleClick(e)} sendImage={state.file}
-            onStopRecording={e => onStopRecording(e)} photoUpload={e => photoUpload(e)} />
-          {/* <Form className="box">
-          <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} />
-
-        <input
-          ref={inputRef}
-          className="input_text"
-          id="inp"
-          type="text"
-          placeholder="Enter Text Here..."
-          onKeyDown={(e) => e.key === "Enter" || handleClick}
-          onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
-          />
-        <ImgUpload onChange={photoUpload} />
-        {!sendVoiceNote ?
-          <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
-            <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }} ></SendRoundedIcon>
-          </button>
-          :
-          <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer', color: '#128c7e' }} sx={{ fontSize: 40 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
-        }
-      </Form> */}
-        </div> :
-        <p>Not allowed to send message</p>
-      }
+      <div style={{ width: '100%', position: 'relative', paddingLeft: '30px' }}>
+        <ChatFooter inputRef={inputRef} handleClick={e => handleClick(e)} sendImage={state.file}
+          onStopRecording={e => onStopRecording(e)} photoUpload={e => photoUpload(e)} isConnected={isConnected} />
+      </div> 
     </div>
   );
 }

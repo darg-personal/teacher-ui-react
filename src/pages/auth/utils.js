@@ -14,10 +14,10 @@ function getHost() {
     HOST = "https://python-base-api.alt-r.world";
     console.log(HOST);
   } else {
-    HOST = "http://18.117.227.68:8041"
     //HOST = "https://api.dreampotential.org";
+    HOST = "http://18.117.227.68:8041"
   }
-  HOST = "http://18.117.227.68:8041"
+  HOST = "http://192.168.1.30:8000"
 
   return HOST;
 }
@@ -41,7 +41,7 @@ function getWebsocketHost() {
     //WEBSOCKET_HOST = "wss://api.dreampotential.org";
     WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
   }
-  WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
+  WEBSOCKET_HOST = 'ws://192.168.1.30:8000';
 
   return WEBSOCKET_HOST;
 }

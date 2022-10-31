@@ -1,13 +1,15 @@
 
-import utils from "../../pages/auth/utils";
 import React, { useState } from 'react'
+import CancelSharpIcon from "@mui/icons-material/CancelSharp";
+
 import axios from "axios";
+import utils from "../../pages/auth/utils";
+import { Button } from "react-bootstrap";
+import { useDropzone } from 'react-dropzone'
+import { ImageShow } from "../ChatRoom/templates/MainChat/Chat";
+import "./addorg.css";
 import "./orginization.css";
 import "../../css/auth/auth.scss";
-import "./addorg.css";
-import { ImageShow } from "../ChatRoom/templates/MainChat/Chat";
-import { useDropzone } from 'react-dropzone'
-import { Button } from "react-bootstrap";
 
 
 export const AddOrg = (props) => {
@@ -179,7 +181,7 @@ export const AddOrg = (props) => {
             });
     }
     const { getRootProps, getInputProps } = useDropzone({
-        accept: 'image/*',
+        accept:{ 'image/*':[]},
         onDrop: (event) => {
             setSelectedFile(event[0]);
             setIsSelected(true);
@@ -252,17 +254,40 @@ export const AddOrg = (props) => {
                                 })}
                             </div>
 
+                            {state.file ? (
+                                <CancelSharpIcon
+                                    style={{ float: 'right', padding: '5px' }}
+                                    onClick={() => {
+                                        setState({
+                                            file: null,
+                                        });
+                                    }}
+                                    color="primary"
+                                    fontSize="large"
+                                />
+                            ) : (
+                                null)}
                             <div style={{
-                                padding: '10%',
-                                justifyContent: 'center',
-                                cursor: 'pointer'
+                                margin: "0px 100px",
+                                position: 'relative',
+                                top: '50px',
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                height: "150px",
+                                width: "50%",
+                                borderRadius: "5px",
+                                backgroundColor: '#D2F1EF'
                             }}
                                 {...getRootProps()}>
                                 {state.filePreviewUrl &&
                                     <ImageShow filePreviewUrl={state.filePreviewUrl} />}
                                 <input {...getInputProps()} />
                                 {!state.filePreviewUrl &&
-                                    <p>{`Drag or click to select files`}</p>
+                                    <p style={{
+                                        justifyContent: 'center',
+                                        textAlign: 'center',
+                                        paddingTop: '60px'
+                                    }} >{`Drag or click to select files`}</p>
                                 }
                             </div>
                             <div>

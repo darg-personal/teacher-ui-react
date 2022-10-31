@@ -72,7 +72,7 @@ export const DisplaySearchUser = async (inputSearch) => {
                         typeId: receivedObj?.id,
                         image: groups.results[i]?.user_profile?.image || Avatar,
                         type: "user",
-                        isConnected: 1,
+                        isConnected: 0,
                         about: groups.results[i]?.user_profile?.about,
                     });
                     // }
