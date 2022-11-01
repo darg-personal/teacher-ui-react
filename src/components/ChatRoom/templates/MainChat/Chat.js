@@ -25,13 +25,13 @@ import Record from "../../Recorder";
 import { HiOutlineEmojiHappy } from "react-icons/hi";
 toast.configure()
 
-export const notify = (username, type) => {
-    // toast(`New Message Received..!`, {
-    toast(
-        type == "Channel"
-            ? `New Message In ${username}..!`
-            : `New Message From ${username}..!`,
-        {
+export const notify = (username, type, messageText, messageType) => {
+    // toast(
+        //     type == "Channel"
+        //         ? `New Message In ${username}..!`
+        //         : `New Message From ${username}..!`,
+        //     {
+        toast(messageType == "message/text" ? `${messageText}` : messageType == "image/png" ? `You receive a image` : messageType == "audio/mpeg" ?  `You receive an audio` : null, {
             position: "top-center",
             autoClose: 5000,
             hideProgressBar: false,
@@ -226,13 +226,15 @@ export function Answer({
     );
 }
 // #075E54
-export function TextView({ sender, profile, text, time, float = 'right' }) {
+export function TextView({ sender, profile, text, time, type }) {
     return (
         <section className="chat">
             <div className="messages-chat">
                 {sender !== "Me" ? (
                     <>
-                        <span style={{ marginLeft: '45px', fontSize: '12px', backgroundColor: '#b8d8fd', padding: '0px 5px', borderRadius: '10px 5px' }}>{sender}</span>
+                        {
+                            type === "Channel" ? <span style={{ marginLeft: '40px', fontSize: '12px', backgroundColor: '#b8d8fd', padding: '2px 5px', borderRadius: '5px' }}>{sender}</span> : null
+                        }
                         <div className="message">
                             <p className="text">{text} </p>
                         </div>
@@ -255,7 +257,7 @@ export function TextView({ sender, profile, text, time, float = 'right' }) {
 }
 export function ImgUpload({ onChange, src }) {
     return (
-        <IconButton color="primary" aria-label="upload picture" component="label" >
+        <IconButton color="primary" aria-label="upload picture" component="label" data-toggle="tooltip" data-placement="top" title="Share image">
             <input hidden accept="image/*" type="file" onChange={onChange} />
             <AttachFileIcon />
         </IconButton>
@@ -283,6 +285,7 @@ export function ChatHeader({ name, props, type, image, ws = null, onclickVoice, 
                     <span style={{ fontSize: '18px', backgroundColor: '#f6f6f6', padding: '5px', borderRadius: '10px 5px' }}>{name}</span>
                 </ListItemAvatar>
                 <div style={{ display: 'flex', float: 'right', alignContent: 'center', margin: '0px 0px' }}>
+                    <div data-toggle="tooltip" data-placement="right" title="Voice Call">
                     <CallIcon
                         style={{
                             color: "white", fontSize: "30px",
@@ -291,16 +294,19 @@ export function ChatHeader({ name, props, type, image, ws = null, onclickVoice, 
                         onClick={onclickVoice}
                     >
                     </CallIcon>
-
-                    <VideocamIcon
+                    </div>
+                        <div  data-toggle="tooltip" data-placement="right" title="Video Call"> 
+                        <VideocamIcon
                         style={{
                             color: "white", fontSize: "30px",
                             cursor: "pointer", margin: '5px 20px'
                         }}
                         onClick={onclickVedio}
                     ></VideocamIcon>
+                        </div>
+
                     <Dropdown>
-                        <Dropdown.Toggle variant="white" id="dropdown-basic" style={{ border: 'none', color: 'transparent' }}>
+                        <Dropdown.Toggle variant="white" id="dropdown-basic" style={{ border: 'none', color: 'transparent' }} data-toggle="tooltip" data-placement="right" title="More options">
                             <BiDotsVerticalRounded
                                 id="dropdown-basic"
                                 style={{ color: "#FFF", marginTop: '5px' }}
@@ -361,7 +367,7 @@ export function ChatFooter({ inputRef, handleClick, onStopRecording, photoUpload
                     onChange={(value) => {value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true); setInputStr(value.target.value)}}
                     style={{ border: 'none', borderRadius: '20px', outline: 'none', backgroundColor: '#e2dfdf' }}
                 />
-                <ImgUpload onChange={photoUpload} />
+                <ImgUpload onChange={photoUpload}/>
                 {!sendVoiceNote || sendImage ?
                     <button onClick={(e)=>onMessageSend(e)} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: 'dodgerblue' }}>
                         <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: '40px', color: '#128c7e' }} ></SendRoundedIcon>

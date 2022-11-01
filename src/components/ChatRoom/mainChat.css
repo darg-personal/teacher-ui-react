@@ -246,10 +246,6 @@ li a:hover{
   overflow: auto;
 }
 
-
-
-
-
 .chat .messages-chat {
   padding: 0px 0px;
 
@@ -291,7 +287,7 @@ li a:hover{
   font-weight: bold;
   color:rgba(34, 34, 34, 0.597);
   margin-bottom:10px;
-  margin-left: 85px;
+  margin-left: 40px;
 }
 
 .response-time {
@@ -314,3 +310,7 @@ li a:hover{
 .message .text {
   background-color: #d2e6fc !important;
 }
+
+/* audio::-webkit-media-controls-panel {
+  background-color: #d2e6fc;
+} */

@@ -12,11 +12,13 @@ import { ImArrowLeft2 } from "react-icons/im";
 import "./contact.css";
 import { Dropdown } from "react-bootstrap";
 import { BiDotsVerticalRounded } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
 let login_userImage = localStorage.getItem("loginUserImage");
 function Contact(props) {
+  let navigate = useNavigate();
   const [group, setGroup] = useState([]);
   const [isActive, setIsActive] = useState();
   const [page, setPage] = useState(0);
@@ -189,13 +191,15 @@ function Contact(props) {
   return (
     <div className="sidebar">
       <div style={{
-        padding: '10px 16px',
+        padding: '14px 0px',
         backgroundColor: '#b9b4b4',
-        fontSize: '18px', display: 'flex', justifyContent: 'space-between'
+        fontSize: '18px', display: 'flex', justifyContent: 'center'
       }}>
-        <ListItemAvatar>
-          <Avatar alt={`xyz`} src={login_userImage} />
+      <i className="fa fa-arrow-left" data-toggle="tooltip" data-placement="right" title="Back to dashboard" aria-hidden="true" style={{marginLeft:"8px", marginTop:"10px", cursor:"pointer"}} onClick={()=>{navigate("/dashboard")}}></i>
+        <ListItemAvatar style={{marginLeft:"8px"}}>
+          <Avatar alt={login_user.username} src={login_userImage} />
         </ListItemAvatar>
+        <ListItemText primary={login_user.username} />
         <Dropdown>
           <Dropdown.Toggle variant="white" id="dropdown-basic" style={{ border: 'none', color: 'transparent' }}>
             <BiDotsVerticalRounded

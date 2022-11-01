@@ -109,10 +109,12 @@ class Record extends React.Component {
             fontSize: '30px', color: '#128c7e',
           }} onClick={this.record} />
           :
+          <div data-toggle="tooltip" data-placement="top" title="Record a message">
           <MicIcon style={{ cursor: 'pointer', color: '#128c7e' }}
             sx={{ fontSize: '30px' }}
             onClick={this.record}
           />
+          </div>
         }
         <ul style={{ listStyle: "none", padding: 0 }}>
           {recordings.map(url => (

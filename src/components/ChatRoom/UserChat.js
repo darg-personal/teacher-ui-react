@@ -86,7 +86,7 @@ function UserChat(props) {
       const type = receivedObj?.message_type;
       if (loggedUser.id !== receivedObj.from_user.id) {
         //  notify();
-        notify(receivedObj.from_user.username, type, receivedObj.message_text);
+        notify(receivedObj.from_user.username, type, receivedObj.message_text,receivedObj.message_type);
 
       }
       if (type === "message/videocall" || type === "message/voicecall") {
@@ -610,6 +610,7 @@ function UserChat(props) {
                           profile={profileSrc}
                           text={e.message}
                           time={e.time}
+                          type={type}
                         />
                       )}
                   </div>
@@ -632,6 +633,7 @@ function UserChat(props) {
                         text={e.message}
                         time={e.time}
                         float={"left"}
+                        type={type}
                       />
                     )}
 

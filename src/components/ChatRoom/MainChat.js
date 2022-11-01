@@ -567,6 +567,7 @@ function MainChat(props) {
                             profile={profileSrc}
                             text={e.message}
                             time={e.time}
+                            type={type}
                           />
                         )}
                       </div>
@@ -591,6 +592,7 @@ function MainChat(props) {
                             text={e.message}
                             time={e.time}
                             float={"left"}
+                            type={type}
                           />
                         )}
                       </div>
