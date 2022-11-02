@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
-import utils from "../../pages/auth/utils";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
@@ -9,16 +8,16 @@ import { Badge } from "@mui/material";
 import { DisplaySearchUser } from "../Axios/ChatPannel/ChatPannel";
 import { FaSearch } from "react-icons/fa";
 import { ImArrowLeft2 } from "react-icons/im";
-import "./contact.css";
 import { Dropdown } from "react-bootstrap";
 import { BiDotsVerticalRounded } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import utils from "../../pages/auth/utils";
+import "./contact.css";
 
 let Token = localStorage.getItem("token");
 let login_user = JSON.parse(localStorage.getItem("user"));
 let login_userImage = localStorage.getItem("loginUserImage");
 function Contact(props) {
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
   const [group, setGroup] = useState([]);
   const [isActive, setIsActive] = useState();
   const [page, setPage] = useState(0);
@@ -124,12 +123,12 @@ function Contact(props) {
   const handleClick = (value) => {
     console.log(value, 'value from handleclick');
     setIsActive(value.name);
-    if (value.id + value.name == userUniqeId) {
+    if (value.id + value.name === userUniqeId) {
       setNotificationCountForUser({
         [userUniqeId]: 0,
       });
     }
-    if (value.id + value.name == channelId + channelName) {
+    if (value.id + value.name === channelId + channelName) {
       setNotificationCountForClass({
         [channelId]: 0,
       });
@@ -160,28 +159,28 @@ function Contact(props) {
   const DisplaySearch = () => {
     return (<>
       {searchGroup && searchGroup.map((e, i) => (
-        <div
-          key={e.id + e.name}
-          className={e.name === isActive ? "link active" : "link"}
-          onClick={() => handleClick(e)}
-        >
-          <ListItemAvatar>
-            <Avatar alt={e.name} src={e.image} />
-          </ListItemAvatar>
-          <ListItemText primary={e.name} secondary="last seen 08:00" />
-          {e.name !== isActive ? (
-            e.type === "Channel" ? (
-              <Badge
-                badgeContent={notificationCountForClass[e.id] || 0}
-                color="success"
-              ></Badge>
-            ) : (
-              <Badge
-                badgeContent={notificationCountForUser[e.id + e.name] || 0}
-                color="success"
-              ></Badge>
-            )
-          ) : null}
+        <div key={e.id + e.name + i} >
+          <div className={e.name === isActive ? "chatListView active" : "chatListView"}
+            onClick={() => handleClick(e)} >
+            <ListItemAvatar>
+              <Avatar alt={e.name} src={e.image} style={{ height: '45px', width: '45px' }} />
+            </ListItemAvatar>
+            <ListItemText primary={e.name} secondary="last seen 09:00" style={{ fontSize: '16  px' }} />
+            {e.name !== isActive ? (
+              e.type === "Channel" ? (
+                <Badge style={{ alignSelf: 'center' }}
+                  badgeContent={notificationCountForClass[e.id] || 0}
+                  color="success"
+                ></Badge>
+              ) : (
+                <Badge style={{ alignSelf: 'center' }}
+                  badgeContent={notificationCountForUser[e.id + e.name] || 0}
+                  color="success"
+                ></Badge>
+              )
+            ) : null}
+          </div>
+          <hr style={{ marginTop: '1px', marginBottom: '1px', width: '80%', marginLeft: '20%' }} />
         </div>
       ))}
     </>
@@ -191,24 +190,21 @@ function Contact(props) {
   return (
     <div className="sidebar">
       <div style={{
-        padding: '14px 0px',
-        backgroundColor: '#b9b4b4',
-        fontSize: '18px', display: 'flex', justifyContent: 'center'
+        fontSize: '18px', display: 'flex', margin: '10px 0px 20px 20px', alignSelf: 'center', justifyContent: 'space-between'
       }}>
-      <i className="fa fa-arrow-left" data-toggle="tooltip" data-placement="right" title="Back to dashboard" aria-hidden="true" style={{marginLeft:"8px", marginTop:"10px", cursor:"pointer"}} onClick={()=>{navigate("/dashboard")}}></i>
-        <ListItemAvatar style={{marginLeft:"8px"}}>
-          <Avatar alt={login_user.username} src={login_userImage} />
+        <ListItemAvatar>
+          <Avatar alt={`xyz`} src={login_userImage} style={{ height: '40px', width: '40px' }} />
         </ListItemAvatar>
         <ListItemText primary={login_user.username} />
         <Dropdown>
           <Dropdown.Toggle variant="white" id="dropdown-basic" style={{ border: 'none', color: 'transparent' }}>
             <BiDotsVerticalRounded
               id="dropdown-basic"
-              style={{ color: "#FFF", marginTop: '5px' }}
+              style={{ color: "#FFF", }}
               fontSize='25px'
-            ></BiDotsVerticalRounded>
+            />
+            {/* </BiDotsVerticalRounded> */}
           </Dropdown.Toggle>
-
           <Dropdown.Menu className="drop">
             <Dropdown.Item>Settings</Dropdown.Item>
             <Dropdown.Item>Details</Dropdown.Item>
@@ -223,7 +219,7 @@ function Contact(props) {
         alignItems: 'center',
         borderRadius: '20px', borderWidth: 1,
       }}>
-        {inputSearch.length == 0 ?
+        {inputSearch.length === 0 ?
           <FaSearch /> : <ImArrowLeft2 onClick={() => setInputSearch('')} />
         }
         <input onChange={e => {
@@ -239,27 +235,23 @@ function Contact(props) {
 
       {inputSearch.length > 0 && DisplaySearch()}
       {
-        inputSearch.length == 0 && <>
+        inputSearch.length === 0 && <>
           {group.map((e, i) => (
-            <div key={e.id + e.name} >
-              <div
-                className={e.name === isActive ? "link active" : "link"}
-                onClick={() => handleClick(e)}
-              >
+            <div key={e.id + e.name + i} >
+              <div className={e.name === isActive ? "chatListView active" : "chatListView"}
+                onClick={() => handleClick(e)} >
                 <ListItemAvatar>
-                  <Avatar alt={e.name} src={e.image} style={{ height: '50px', width: '50px' }} />
+                  <Avatar alt={e.name} src={e.image} style={{ height: '45px', width: '45px' }} />
                 </ListItemAvatar>
-                <>
-                  <ListItemText primary={e.name} secondary="last seen 09:00" />
-                </>
+                <ListItemText primary={e.name} secondary="last seen 09:00" style={{ fontSize: '16  px' }} />
                 {e.name !== isActive ? (
                   e.type === "Channel" ? (
-                    <Badge
+                    <Badge style={{ alignSelf: 'center' }}
                       badgeContent={notificationCountForClass[e.id] || 0}
                       color="success"
                     ></Badge>
                   ) : (
-                    <Badge
+                    <Badge style={{ alignSelf: 'center' }}
                       badgeContent={notificationCountForUser[e.id + e.name] || 0}
                       color="success"
                     ></Badge>
@@ -270,7 +262,7 @@ function Contact(props) {
             </div>
           ))}
           {allUser &&
-            <p className="d-flex justify-content-center button-upload-org" style={{ color: 'blue' }} onClick={() => {
+            <p className="d-flex justify-content-center" style={{ color: 'blue', cursor: 'pointer' }} onClick={() => {
               getGroupData(page);
             }}>show more</p>
           }

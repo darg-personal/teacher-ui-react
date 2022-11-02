@@ -1,9 +1,8 @@
 
 import React from "react";
 import vmsg from "vmsg";
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import {RiDeleteBinFill} from 'react-icons/ri';
 import MicIcon from '@mui/icons-material/Mic';
-import Tooltip from '@mui/material/Tooltip';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 
 
@@ -26,7 +25,6 @@ class Record extends React.Component {
     if (isRunning) {
       clearInterval(this.timerID);
     } else {
-      let { mm, ss, ms } = this.state;
       this.timerID = setInterval(() => {
         ms++;
         if (ms >= 100) {
@@ -82,11 +80,11 @@ class Record extends React.Component {
   };
 
   render() {
-    const { isLoading, isRecording, recordings, isRunning } = this.state;
+    const { isRecording, recordings, } = this.state;
     return (
       <React.Fragment>
          {
-          isRecording && <HighlightOffIcon onClick={async () => {
+          isRecording && <RiDeleteBinFill style={{cursor: 'pointer', color:'red',fontSize:'30px',marginRight:'20px'}} onClick={async () => {
             recorder.stopRecording()
             this.setState({ isLoading: false, isRecording: false, mm: 0, ss: 0, ms: 0, isRunning: true });
             this.clickHandler()

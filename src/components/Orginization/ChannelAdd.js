@@ -240,14 +240,13 @@ export const CreateChannelPage = (props) => {
                                 })
                             }
                         </div>
-                        <div style={{ width: state.file ? '80%' : '60%', marginLeft: state.file ? '10%' : '20%' }}>
+                        <div >
                             {state.file ? (
                                 <CancelSharpIcon
                                     style={{ float: 'right', padding: '5px' }}
                                     onClick={() => {
                                         setState({
                                             file: null,
-
                                         });
                                     }}
                                     color="primary"
@@ -256,14 +255,24 @@ export const CreateChannelPage = (props) => {
                             ) : (
                                 null)}
                             <div style={{
-                                cursor: 'pointer', padding: '3%',
-                                justifyContent: 'center',
+                                margin: "0px 100px",
+                                position: 'relative',
+                                top: '50px',
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                height: "150px",
+                                width: "50%",
+                                borderRadius: "5px",
+                                backgroundColor: '#D2F1EF'
                             }} {...getRootProps()} >
                                 {state.filePreviewUrl &&
                                     <ImageShow filePreviewUrl={state.filePreviewUrl} />}
                                 <input {...getInputProps()} />
                                 {!state.filePreviewUrl &&
-                                    <p>{`Drag or click to select files`}</p>
+                                    <p style={{
+                                        textAlign:'center',
+                                        paddingTop:'60px'
+                                    }} >{`Drag or click to select files`}</p>
                                 }
                             </div>
                         </div>

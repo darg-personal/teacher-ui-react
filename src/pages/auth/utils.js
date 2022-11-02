@@ -14,8 +14,8 @@ function getHost() {
     HOST = "https://python-base-api.alt-r.world";
     console.log(HOST);
   } else {
-    HOST = "http://18.117.227.68:8041"
     //HOST = "https://api.dreampotential.org";
+    HOST = "http://18.117.227.68:8041"
   }
 
   return HOST;

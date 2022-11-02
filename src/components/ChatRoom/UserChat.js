@@ -1,4 +1,4 @@
-import React, { createRef, useState } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { useEffect } from "react";
 import { useRef } from "react";
@@ -7,12 +7,11 @@ import "./mainChat.css";
 import axios from "axios";
 import utils from "../../pages/auth/utils";
 import Loader from "./Loader";
-import { useNavigate } from "react-router-dom";
-import { Button, Dropdown, Form } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import Avatar from "@mui/material/Avatar";
 import {
   ChatHeader,
-  ImageShow,
+  ChatImageShow,
   TextView,
   Answer,
   notify,
@@ -20,52 +19,46 @@ import {
   ChatLinkView,
 } from "./templates/MainChat/Chat";
 import CancelSharpIcon from "@mui/icons-material/CancelSharp";
-import Record from "./Recorder";
 import { JitsiMeeting } from "@jitsi/react-sdk";
-import { createPortal } from "react-dom";
-import CallIcon from '@mui/icons-material/Call';
 import Modal from 'react-bootstrap/Modal';
 import 'react-toastify/dist/ReactToastify.css';
 import Tooltip from '@mui/material/Tooltip';
-import MicIcon from '@mui/icons-material/Mic';
-import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import sound from './templates/MainChat/mixkit-bubble-pop-up-alert-notification-2357.wav'
-import { HiOutlineEmojiHappy } from "react-icons/hi";
+import { MyDropzone } from "../staticfiles/NoChatView";
+
+let Token = localStorage.getItem("token");
+let loggedUser = JSON.parse(localStorage.getItem("user"));
+const profileSrc = localStorage.getItem("loginUserImage");
 
 function UserChat(props) {
-  let Token = localStorage.getItem("token");
-  let loggedUser = JSON.parse(localStorage.getItem("user"));
-  const profileSrc = localStorage.getItem("loginUserImage");
-  let navigate = useNavigate();
-
-  const inputRef = useRef(null);
+  const inputRef = useRef('');
   const scrollBottom = useRef(null);
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [messageCount, setMessageCount] = useState(0);
   const [load, setLoad] = useState(false);
-  const getChatImage = props.getChatImage;
   const [selectedFile, setSelectedFile] = useState();
   const [isSelected, setIsSelected] = useState(false);
-  const [sendVoiceNote, setSendVoiceNote] = useState(true);
-  const [tempReceiverId, setTempReceiverId] = useState(null);
+  const [tempReceiverId, setTempReceiverId] = useState(null); 
   const [state, setState] = useState({
     file: "",
     filePreviewUrl:
-      "https://github.com/OlgaKoplik/CodePen/blob/master/profile.jpg?raw=true",
+      "https://s3.us-west-1.amazonaws.com/sfappv2.1/Test/upload/fdc1b363-a729-4d31-a7a9-e09019bfcd9f.png",
   });
   const [call, setCall] = useState(false);
   const [callType, setCallType] = useState('');
   const [videoLink, setVideoLink] = useState(null);
+  const [isConnected, setIsConnected] = useState(props.isConnected);
 
+  var ws = props.websocket;
+  const type = props.type;
   const userName = props.userName;
   const receiverId = props.userId;
-  const type = props.type;
-  var ws = props.websocket;
+  const getChatImage = props.getChatImage;
 
   useEffect(() => {
-    // console.log(receiverId,'---------------receiverId--------------------');
-    setTempReceiverId(receiverId)
+    setTempReceiverId(props.userId)
+    setIsConnected(props.isConnected)
   }, [props])
 
   var tempDict = {};
@@ -145,7 +138,7 @@ function UserChat(props) {
   const onScroll = () => {
     if (scrollBottom.current) {
       const { scrollTop } = scrollBottom.current;
-      if (scrollTop == 0) {
+      if (scrollTop === 0) {
         setPage(page + 1);
         if (page * 10 <= messageCount) {
           setLoad(true);
@@ -214,7 +207,6 @@ function UserChat(props) {
       prevMsgs.push(a);
       setMessages([...prevMsgs]);
       setIsSelected(false);
-      setSendVoiceNote(true)
       setState({ file: false });
       document.getElementById("inp").value = "";
     }
@@ -292,7 +284,6 @@ function UserChat(props) {
     ReactDOM.render(<PopupContent />, videoNode);
   }
 
-  // const uniqueString = require("uuid").uuid.v4();
   const voiceNode = document.createElement("div");
   function voiceCall(event) {
     event.preventDefault();
@@ -370,7 +361,7 @@ function UserChat(props) {
     );
     axios
       .get(
-        `${utils.getHost()}/chat/get/user/paginated_messages/?user=${receiverId}&records=10`,
+        `${utils.getHost()}/chat/get/user/paginated_messages/?user=${receiverId}&records=10&p=1`,
         {
           headers: {
             Authorization: `Bearer ${Token}`,
@@ -419,7 +410,7 @@ function UserChat(props) {
       .catch((error) => {
         console.log("error : ", error);
       });
-  }, [userName]);
+  }, [userName, receiverId]);
 
   function updateData(value) {
     axios
@@ -537,7 +528,6 @@ function UserChat(props) {
         alert("connection is breaked");
       });
   };
-  const node = document.createElement("div");
   return (
     <div className="groupChat">
       <ChatHeader
@@ -559,119 +549,119 @@ function UserChat(props) {
             <Answer type='message/voicecall' image={videoLink} profile={null} sender={loggedUser.username} ws={ws} />
         )}
       </div>
-      {state.file ? (
-        <div>
-          <CancelSharpIcon
-            style={{ flex: 1, marginLeft: "90%", position: "relative" }}
-            onClick={() => {
-              setState({
-                file: null,
-                filePreviewUrl: null,
-              });
-              setIsSelected(false);
-            }}
-            color="primary"
-            fontSize="large"
-          />
-          <ImageShow className="image-show-view" filePreviewUrl={state.filePreviewUrl} />
-        </div>
-      ) : (
-        <div
-          className="content"
-          id="scroll"
-          ref={scrollBottom}
-          onScroll={onScroll}
-        >
-          {messages.map((e, i) => {
-            return (
-              <div
-                key={i}
-                style={{
-                  marginTop: "2%",
-                  overflow: "auto",
-                }}
-              >
-                {e.sender === loggedUser.username ? (
-                  <div>
-                    {e.media_link ? (
-                      <ChatLinkView
-                        type={e.message_type}
-                        link={e.media_link}
-                        profile={profileSrc}
-                        text={e.message}
-                        sender={"Me"}
-                        time={e.time}
-                      />
-                    )
-                      :
-                      (
-                        <TextView
-                          sender={"Me"}
-                          profile={profileSrc}
-                          text={e.message}
-                          time={e.time}
-                          type={type}
-                        />
-                      )}
-                  </div>
-                ) : (
-                  <div>
-                    {e.media_link ? (
-                      <ChatLinkView
-                        type={e.message_type}
-                        link={e.media_link}
-                        profile={e.profile}
-                        text={`${e.message}`}
-                        sender={e.sender}
-                        time={e.time}
-                        float={"left"}
-                      />
+      {true &&
+      <Container style={{ background: 'transparent' }}>
+        <div style={{
+          display: 'contents',
+          margin: "0px 10x",
+          height: "80vh",
+          width: "100%",
+          borderRadius: "5px",
+        }}>
+          {state.file ? (
+            <div style={{
+              borderRadius: "5px",
+              // backgroundColor: 'red'
+            }}>
+              <ChatImageShow filePreviewUrl={state.filePreviewUrl} />
+              <div style={{
+                justifyContent: "center",
+                margin: "0px 30x",
+                height: "30vh",
+                borderRadius: "5px",
+                // backgroundColor: 'blue'
+              }}>
+                <CancelSharpIcon
+                  style={{ flex: 1, marginLeft: "90%", position: "relative" }}
+                  onClick={() => {
+                    setState({
+                      file: null,
+                      filePreviewUrl: null,
+                    });
+                    setIsSelected(false);
+                  }}
+                  color="primary"
+                  fontSize="large"
+                />
+              </div>
+            </div>
+          ) : (
+            <div
+              className="content"
+              id="scroll"
+              ref={scrollBottom}
+              onScroll={onScroll}
+            >
+              {messages.map((e, i) => {
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      marginTop: "2%",
+                      overflow: "auto",
+                    }}
+                  >
+                    {e.sender === loggedUser.username ? (
+                      <div>
+                        {e.media_link ? (
+                          <ChatLinkView
+                            type={e.message_type}
+                            link={e.media_link}
+                            profile={profileSrc}
+                            text={e.message}
+                            sender={"Me"}
+                            time={e.time}
+                          />
+                        )
+                          :
+                          (
+                            <TextView
+                              sender={"Me"}
+                              profile={profileSrc}
+                              text={e.message}
+                              time={e.time}
+                            />
+                          )}
+                      </div>
                     ) : (
-                      <TextView
-                        sender={e.sender}
-                        profile={e.profile}
-                        text={e.message}
-                        time={e.time}
-                        float={"left"}
-                        type={type}
-                      />
+                      <div>
+                        {e.media_link ? (
+                          <ChatLinkView
+                            type={e.message_type}
+                            link={e.media_link}
+                            profile={e.profile}
+                            text={`${e.message}`}
+                            sender={e.sender}
+                            time={e.time}
+                            float={"left"}
+                          />
+                        ) : (
+                          <TextView
+                            sender={e.sender}
+                            profile={e.profile}
+                            text={e.message}
+                            time={e.time}
+                            float={"left"}
+                          />
+                        )}
+
+                      </div>
                     )}
 
                   </div>
-                )}
-
-              </div>
-            );
-          })}
-          <Outlet />
+                );
+              })}
+              <Outlet />
+            </div>
+          )}
         </div>
-      )}
-      
-      <div style={{ width: '100%', position: 'relative', paddingLeft: '30px' }}>
+
+      </Container>
+}
+{/* <MyDropzone /> */}
+      <div style={{ width: '100%', position: 'fixed', paddingLeft: '30px', bottom: '20px' }}>
         <ChatFooter inputRef={inputRef} handleClick={e => handleClick(e)} sendImage={state.file}
-          onStopRecording={e => onStopRecording(e)} photoUpload={e => photoUpload(e)} />
-
-        {/* <Form className="box">
-          <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} onClick={()=>alert('...in progress')}/>
-
-          <input
-            ref={inputRef}
-            className="input_text"
-            id="inp"
-            type="text"
-            placeholder="Enter Text Here..."
-            onKeyDown={(e) => e.key === "Enter" || handleClick}
-            onChange={(value) => value.target.value.length > 0 ? setSendVoiceNote(false) : setSendVoiceNote(true)}
-          />
-          <ImgUpload onChange={photoUpload} />
-          {!sendVoiceNote ?
-            <button onClick={handleClick} className="btn btn-outline-primry" style={{ width: '80px', border: 'none', borderRadius: '500px', color: '#128c7e' }}>
-              <SendRoundedIcon style={{ cursor: 'pointer' }} sx={{ fontSize: 40 }} ></SendRoundedIcon>
-            </button>
-            :
-            <Tooltip title="Record a message"><MicIcon style={{ cursor: 'pointer', color: '#128c7e' }} sx={{ fontSize: 30 }}><Record onStopRecording={onStopRecording}></Record></MicIcon></Tooltip>
-          }
-        </Form> */}
+          onStopRecording={e => onStopRecording(e)} photoUpload={e => photoUpload(e)} isConnected={isConnected} />
       </div>
     </div>
   );

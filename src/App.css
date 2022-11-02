@@ -172,7 +172,7 @@ hr {
 }
 .stu_modal .submit{
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
 }
 .stu_modal .submit button{
   background: #64B3E6;
