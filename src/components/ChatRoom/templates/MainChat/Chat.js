@@ -354,7 +354,7 @@ export function ChatFooter({ inputRef, handleClick, onStopRecording, photoUpload
     }, [inputRef.current.value])
     return (
         <Form>
-            {isConnected === 0 ?
+            {isConnected == 0 ?
                 <div className="box">
                     <HiOutlineEmojiHappy style={{ cursor: 'pointer', fontSize: '30px', color: '#128c7e' }} />
                     <input
