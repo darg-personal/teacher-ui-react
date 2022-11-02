@@ -3,7 +3,7 @@ localStorage.setItem("localStorageGroup", JSON.stringify(localStorageGroup));
 function getHost() {
   var HOST = "";
   if (window.location.origin.includes("localhost")) {
-    HOST = "http://localhost:8000";
+    HOST = "http://localhost:9000";
     console.log(HOST);
   }
   else if (window.location.origin.includes("teacher-v2.dreampotential.org/")) {
@@ -17,7 +17,6 @@ function getHost() {
     HOST = "http://18.117.227.68:8041"
     //HOST = "https://api.dreampotential.org";
   }
-  HOST = "http://18.117.227.68:8041"
 
   return HOST;
 }
@@ -36,12 +35,11 @@ function getServer() {
 function getWebsocketHost() {
   var WEBSOCKET_HOST = "";
   if (window.location.origin.includes("localhost")) {
-    WEBSOCKET_HOST = "ws://localhost:8000";
+    WEBSOCKET_HOST = "ws://localhost:9000";
   } else {
     //WEBSOCKET_HOST = "wss://api.dreampotential.org";
     WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
   }
-  WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
 
   return WEBSOCKET_HOST;
 }

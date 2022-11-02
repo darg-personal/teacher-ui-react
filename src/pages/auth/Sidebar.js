@@ -34,7 +34,7 @@ const SideData = [
   { icon: <HiUserGroup />, path: "/leads", student: "Leads" },
   { icon: <BsTelephoneFill />, path: "#", student: "Calls" },
   { icon: <TiMessages />, path: "#", student: "SMS" },
-  { icon: <MdLocationOn />, path: "#", student: "Places" },
+  { icon: <MdLocationOn />, path: "/place", student: "Places" },
   { icon: <FaLock />, path: "#", student: "Administration" },
   { icon: <AiFillDashboard />, path: "#", student: "Video Room" },
   { icon: <FaRegCreditCard />, path: "#", student: "Orders" },
@@ -84,11 +84,10 @@ const Sidebar = ({ handleClickHere }) => {
 
         {SideData.map((data, i) => (
           <Link to={data.path} key={i}>
-            <div className="student-wrap" >
+            <div className="student-wrap">
               <div>{data.icon}</div>
-
               <p className="mb-0"> {data.student}</p>
-            </div> </Link>
+            </div></Link>
         ))}
       </div>
     </div>
