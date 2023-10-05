@@ -15,7 +15,7 @@ function getHost() {
     console.log(HOST);
   } else {
     //HOST = "https://api.dreampotential.org";
-    HOST = "http://18.117.227.68:8041"
+    HOST = "http://app.realtorstat.com:8041"
   }
 
   return HOST;
@@ -27,7 +27,7 @@ function getServer() {
     SERVER = "http://localhost:8040/";
   } else {
     //SERVER = "http://18.117.227.68:8041";
-    SERVER = "https://api.dreampotential.org";
+    SERVER = "https://app.realtorstat.com:8041";
   }
   return SERVER;
 }
@@ -38,7 +38,7 @@ function getWebsocketHost() {
     WEBSOCKET_HOST = "ws://localhost:9000";
   } else {
     //WEBSOCKET_HOST = "wss://api.dreampotential.org";
-    WEBSOCKET_HOST = 'ws://18.117.227.68:8040';
+    WEBSOCKET_HOST = 'ws://app.realtorstat.com:8040';
   }
 
   return WEBSOCKET_HOST;
