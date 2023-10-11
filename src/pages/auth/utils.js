@@ -7,15 +7,15 @@ function getHost() {
     console.log(HOST);
   }
   else if (window.location.origin.includes("teacher-v2.dreampotential.org/")) {
-    HOST = "https://api.dreampotential.org";
+    HOST = "https://py-api.dreampotential.org"
     console.log(HOST);
   }
   else if (window.location.origin.includes("teacher-v2.alt-r.world")) {
-    HOST = "https://python-base-api.alt-r.world";
+    HOST = "https://py-api.dreampotential.org"
     console.log(HOST);
   } else {
     //HOST = "https://api.dreampotential.org";
-    HOST = "http://app.realtorstat.com:8041"
+    HOST = "https://py-api.dreampotential.org"
   }
 
   return HOST;
